@@ -36,15 +36,8 @@ body {
     padding: 14px 16px 18px;
 }
 
-.banner-title {
-    font-weight: bold;
-    font-size: 1rem;
-}
-
-.marathi {
-    margin-top: 6px;
-    font-size: 0.95rem;
-}
+.banner-title { font-weight: bold; font-size: 1rem; }
+.marathi { margin-top: 6px; font-size: 0.95rem; }
 
 .countdown span {
     background: #fff;
@@ -55,14 +48,10 @@ body {
     min-width: 70px;
 }
 
-/* ===== Confirmation Checkbox ===== */
+/* ===== Confirmation ===== */
 .confirm-box {
     margin-top: 14px;
     font-size: 0.9rem;
-}
-
-.confirm-box label {
-    cursor: pointer;
 }
 
 .confirm-box input {
@@ -84,21 +73,14 @@ body {
 
 .join-btn.disabled {
     background: #999;
-    pointer-events: none;
     opacity: 0.6;
 }
 
-/* ===== Newspaper Ads ===== */
+/* ===== Content ===== */
 .ads-section {
     max-width: 1200px;
     margin: auto;
     padding: 40px 20px;
-}
-
-.ads-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
 }
 
 .ad-card {
@@ -115,20 +97,13 @@ body {
     border-radius: 4px;
 }
 
-.ad-title {
-    margin-top: 10px;
-    font-weight: bold;
-    font-size: 14px;
-    text-decoration: underline;
-}
-
-/* ===== MODAL ===== */
+/* ===== Modal ===== */
 .modal {
     display: none;
     position: fixed;
-    z-index: 2000;
     inset: 0;
     background: rgba(0,0,0,0.85);
+    z-index: 2000;
     justify-content: center;
     align-items: center;
 }
@@ -136,7 +111,6 @@ body {
 .modal img {
     max-width: 95%;
     max-height: 95%;
-    border-radius: 6px;
 }
 
 .modal-close {
@@ -176,72 +150,39 @@ footer {
 
         <div id="countdown" class="countdown">Loading…</div>
 
-        <!-- Confirmation -->
         <div class="confirm-box">
             <label>
-                <input type="checkbox" id="confirmEmail" onchange="toggleJoin()">
+                <input type="checkbox" id="confirmEmail">
                 I have sent notification email to
                 <b>asmitajyotichsltd@gmail.com</b> stating my
                 <b>Name, Flat number, and reason</b> for joining this SGBM online.
             </label>
         </div>
 
-        <!-- Join Button -->
         <a href="https://meet.google.com/byo-jemv-vki"
            target="_blank"
            class="join-btn disabled"
-           id="joinBtn">
+           id="joinBtn"
+           onclick="return handleJoin(event)">
            Join Meeting
         </a>
     </div>
 </div>
 
-<!-- ===== Ads ===== -->
+<!-- ===== Content ===== -->
 <div class="ads-section">
     <h1>13 Jan 2026 | SGBM Notice - Redevelopment / PMC Recruitment</h1>
     <div class="ad-card" onclick="openModal(this)">
         <img src="Images/AGM_Notice.jpg">
     </div>
-
-    <h1>03 Jan 2026 | Request For Proposal (RFP) for selection of PMC - Criteria</h1>
-    <div class="ad-card" onclick="openModal(this)">
-        <img src="PMC/RFP_Images/Page-1.jpeg">
-        <img src="PMC/RFP_Images/Page-2.jpeg">
-        <img src="PMC/RFP_Images/Page-3.jpeg">
-        <img src="PMC/RFP_Images/Page-4.jpeg">
-    </div>
-
-    <h1>02 Jan 2026 | Newspaper Advertisement Clippings</h1>
-    <div class="ads-container">
-        <div class="ad-card" onclick="openModal(this)">
-            <img src="PMC/AD_Images/Maharashtra%20Times.jpeg">
-            <div class="ad-title">02 Jan 2026 | Maharashtra Times</div>
-        </div>
-
-        <div class="ad-card" onclick="openModal(this)">
-            <img src="PMC/AD_Images/Times%20of%20India.jpeg">
-            <div class="ad-title">02 Jan 2026 | Times of India</div>
-        </div>
-
-        <div class="ad-card" onclick="openModal(this)">
-            <img src="PMC/AD_Images/Mid%20Day%20English.jpeg">
-            <div class="ad-title">02 Jan 2026 | Mid Day English</div>
-        </div>
-
-        <div class="ad-card" onclick="openModal(this)">
-            <img src="PMC/AD_Images/Mid%20Day%20Gujarati.jpeg">
-            <div class="ad-title">02 Jan 2026 | Mid Day Gujarati</div>
-        </div>
-    </div>
 </div>
 
-<!-- ===== MODAL ===== -->
+<!-- ===== Modal ===== -->
 <div class="modal" id="imgModal">
     <span class="modal-close" onclick="closeModal()">×</span>
     <img id="modalImg">
 </div>
 
-<!-- ===== Footer ===== -->
 <footer>
     Visitor Count:
     <script src="https://cdn.counter.dev/script.js"
@@ -250,6 +191,31 @@ footer {
 
 <!-- ===== Scripts ===== -->
 <script>
+function handleJoin(e) {
+    const cb = document.getElementById("confirmEmail");
+    const btn = document.getElementById("joinBtn");
+
+    if (!cb.checked) {
+        alert(
+          "Please confirm that you have sent an email to the society office\n" +
+          "(asmitajyotichsltd@gmail.com)\n\n" +
+          "Mentioning your Name, Flat Number and reason for joining\n" +
+          "before joining the online SGBM."
+        );
+        e.preventDefault();
+        return false;
+    }
+
+    btn.classList.remove("disabled");
+    return true;
+}
+
+document.getElementById("confirmEmail").addEventListener("change", function () {
+    const btn = document.getElementById("joinBtn");
+    this.checked ? btn.classList.remove("disabled")
+                 : btn.classList.add("disabled");
+});
+
 function openModal(card) {
     document.getElementById("modalImg").src =
         card.querySelector("img").src;
@@ -258,15 +224,6 @@ function openModal(card) {
 
 function closeModal() {
     document.getElementById("imgModal").style.display = "none";
-}
-</script>
-
-<script>
-function toggleJoin() {
-    const cb = document.getElementById("confirmEmail");
-    const btn = document.getElementById("joinBtn");
-    cb.checked ? btn.classList.remove("disabled")
-               : btn.classList.add("disabled");
 }
 </script>
 
