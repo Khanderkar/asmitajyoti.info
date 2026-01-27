@@ -6,125 +6,156 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-    * { box-sizing: border-box; }
+* { box-sizing: border-box; }
 
-    body {
-        margin: 0;
-        font-family: Arial, Helvetica, sans-serif;
-        background: linear-gradient(135deg, #1e3c72, #2a5298);
-        color: #ffffff;
-        min-height: 100vh;
-        padding-top: 300px;
-        text-align: center;
-    }
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: #ffffff;
+    min-height: 100vh;
+    padding-top: 300px;
+    text-align: center;
+}
 
-    /* ===== Top Banner ===== */
-    .top-banner {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background: #ffcc00;
-        color: #000;
-        z-index: 1000;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    }
+/* ===== Top Banner ===== */
+.top-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #ffcc00;
+    color: #000;
+    z-index: 1000;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
 
-    .banner-content {
-        max-width: 1200px;
-        margin: auto;
-        padding: 14px 16px 18px;
-    }
+.banner-content {
+    max-width: 1200px;
+    margin: auto;
+    padding: 14px 16px 18px;
+}
 
-    .banner-title { font-weight: bold; font-size: 1rem; }
-    .marathi { margin-top: 6px; font-size: 0.95rem; }
-    .countdown span {
-        background: #fff;
-        padding: 6px 10px;
-        margin: 2px;
-        border-radius: 4px;
-        display: inline-block;
-        min-width: 70px;
-    }
+.banner-title {
+    font-weight: bold;
+    font-size: 1rem;
+}
 
-    .join-btn {
-        display: inline-block;
-        margin-top: 14px;
-        padding: 12px 26px;
-        background: #003366;
-        color: #ffffff;
-        text-decoration: none;
-        border-radius: 6px;
-        font-weight: bold;
-    }
+.marathi {
+    margin-top: 6px;
+    font-size: 0.95rem;
+}
 
-    /* ===== Newspaper Ads ===== */
-    .ads-section {
-        max-width: 1200px;
-        margin: auto;
-        padding: 40px 20px;
-    }
+.countdown span {
+    background: #fff;
+    padding: 6px 10px;
+    margin: 2px;
+    border-radius: 4px;
+    display: inline-block;
+    min-width: 70px;
+}
 
-    .ads-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
-    }
+/* ===== Confirmation Checkbox ===== */
+.confirm-box {
+    margin-top: 14px;
+    font-size: 0.9rem;
+}
 
-    .ad-card {
-        background: #ffffff;
-        color: #000;
-        border-radius: 8px;
-        padding: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        cursor: pointer;
-    }
+.confirm-box label {
+    cursor: pointer;
+}
 
-    .ad-card img {
-        width: 100%;
-        border-radius: 4px;
-    }
+.confirm-box input {
+    transform: scale(1.2);
+    margin-right: 8px;
+}
 
-    .ad-title {
-        margin-top: 10px;
-        font-weight: bold;
-        font-size: 14px;
-        text-decoration: underline;
-        cursor: pointer;
-    }
+/* ===== Join Button ===== */
+.join-btn {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 12px 26px;
+    background: #003366;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+}
 
-    /* ===== MODAL ZOOM ===== */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 2000;
-        inset: 0;
-        background: rgba(0,0,0,0.85);
-        justify-content: center;
-        align-items: center;
-    }
+.join-btn.disabled {
+    background: #999;
+    pointer-events: none;
+    opacity: 0.6;
+}
 
-    .modal img {
-        max-width: 95%;
-        max-height: 95%;
-        border-radius: 6px;
-        box-shadow: 0 0 20px rgba(255,255,255,0.4);
-    }
+/* ===== Newspaper Ads ===== */
+.ads-section {
+    max-width: 1200px;
+    margin: auto;
+    padding: 40px 20px;
+}
 
-    .modal-close {
-        position: absolute;
-        top: 20px;
-        right: 30px;
-        font-size: 36px;
-        color: #fff;
-        cursor: pointer;
-    }
+.ads-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
 
-    footer { margin-top: 40px; font-size: 0.85rem; }
+.ad-card {
+    background: #ffffff;
+    color: #000;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    cursor: pointer;
+}
 
-    @media (min-width: 769px) {
-        body { padding-top: 240px; }
-    }
+.ad-card img {
+    width: 100%;
+    border-radius: 4px;
+}
+
+.ad-title {
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 14px;
+    text-decoration: underline;
+}
+
+/* ===== MODAL ===== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal img {
+    max-width: 95%;
+    max-height: 95%;
+    border-radius: 6px;
+}
+
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 36px;
+    color: #fff;
+    cursor: pointer;
+}
+
+footer {
+    margin-top: 40px;
+    font-size: 0.85rem;
+}
+
+@media (min-width: 769px) {
+    body { padding-top: 240px; }
+}
 </style>
 </head>
 
@@ -137,29 +168,50 @@
             Online Google Meet – Special General Body Meeting<br>
             01 Feb 2026, 10:30 AM | Asmita Jyoti Redevelopment
         </div>
+
         <div class="marathi">
             ऑनलाईन Google Meet – विशेष सर्वसाधारण सभा<br>
             ०१ फेब्रुवारी २०२६ सकाळी १०:३० वाजता
         </div>
+
         <div id="countdown" class="countdown">Loading…</div>
-        <a href="https://meet.google.com/" target="_blank" class="join-btn">Join Meeting</a>
+
+        <!-- Confirmation -->
+        <div class="confirm-box">
+            <label>
+                <input type="checkbox" id="confirmEmail" onchange="toggleJoin()">
+                I have sent notification email to
+                <b>asmitajyotichsltd@gmail.com</b> stating my
+                <b>Name, Flat number, and reason</b> for joining this SGBM online.
+            </label>
+        </div>
+
+        <!-- Join Button -->
+        <a href="https://meet.google.com/byo-jemv-vki"
+           target="_blank"
+           class="join-btn disabled"
+           id="joinBtn">
+           Join Meeting
+        </a>
     </div>
 </div>
 
 <!-- ===== Ads ===== -->
 <div class="ads-section">
     <h1>13 Jan 2026 | SGBM Notice - Redevelopment / PMC Recruitment</h1>
-           <div class="ad-card" onclick="openModal(this)">
-            <img src="Images\AGM_Notice.jpg">
-        </div>
-    <h1>03 Jan 2026 | Request For Praposal (RFP) for selection of PMC- Criteria</h1>
-           <div class="ad-card" onclick="openModal(this)">
-            <img src="PMC/RFP_Images/Page-1.jpeg">
-            <img src="PMC/RFP_Images/Page-2.jpeg">
-            <img src="PMC/RFP_Images/Page-3.jpeg">
-            <img src="PMC/RFP_Images/Page-4.jpeg">
-        </div>
-     <h1>02 Jan 2026 | Newspaper Advertisement Clippings</h1>
+    <div class="ad-card" onclick="openModal(this)">
+        <img src="Images/AGM_Notice.jpg">
+    </div>
+
+    <h1>03 Jan 2026 | Request For Proposal (RFP) for selection of PMC - Criteria</h1>
+    <div class="ad-card" onclick="openModal(this)">
+        <img src="PMC/RFP_Images/Page-1.jpeg">
+        <img src="PMC/RFP_Images/Page-2.jpeg">
+        <img src="PMC/RFP_Images/Page-3.jpeg">
+        <img src="PMC/RFP_Images/Page-4.jpeg">
+    </div>
+
+    <h1>02 Jan 2026 | Newspaper Advertisement Clippings</h1>
     <div class="ads-container">
         <div class="ad-card" onclick="openModal(this)">
             <img src="PMC/AD_Images/Maharashtra%20Times.jpeg">
@@ -199,11 +251,22 @@
 <!-- ===== Scripts ===== -->
 <script>
 function openModal(card) {
-    document.getElementById("modalImg").src = card.querySelector("img").src;
+    document.getElementById("modalImg").src =
+        card.querySelector("img").src;
     document.getElementById("imgModal").style.display = "flex";
 }
+
 function closeModal() {
     document.getElementById("imgModal").style.display = "none";
+}
+</script>
+
+<script>
+function toggleJoin() {
+    const cb = document.getElementById("confirmEmail");
+    const btn = document.getElementById("joinBtn");
+    cb.checked ? btn.classList.remove("disabled")
+               : btn.classList.add("disabled");
 }
 </script>
 
@@ -222,12 +285,3 @@ setInterval(() => {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
