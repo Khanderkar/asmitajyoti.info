@@ -163,7 +163,6 @@ footer{
 
 <body>
 
-<!-- ===== Banner ===== -->
 <div class="top-banner">
 
     <div class="banner-content">
@@ -182,15 +181,13 @@ footer{
             Loading...
         </div>
 
-        <!-- Authorization Checkbox -->
         <div class="auth-box">
             <label>
                 <input type="checkbox" id="authorized">
-                I confirm that I am an authorized member entitled to attend this SGBM and the details provided below are correct.:
+                I confirm that I am an authorized member entitled to attend this SGBM and the details provided below are correct.
             </label>
         </div>
 
-        <!-- Member Form -->
         <div class="join-form">
 
             <input
@@ -222,9 +219,7 @@ footer{
 
         </div>
 
-        <a href="#"
-           id="joinBtn"
-           class="join-btn disabled">
+        <a href="#" id="joinBtn" class="join-btn disabled">
             Join Meeting
         </a>
 
@@ -232,7 +227,6 @@ footer{
 
 </div>
 
-<!-- ===== Content ===== -->
 <div class="ads-section">
 
     <h1>
@@ -245,7 +239,6 @@ footer{
 
 </div>
 
-<!-- ===== Modal ===== -->
 <div class="modal" id="imgModal">
     <span class="modal-close" onclick="closeModal()">×</span>
     <img id="modalImg">
@@ -260,13 +253,14 @@ footer{
 
 <script>
 
-/* Meeting URL */
-const meetingUrl = "https://ov-live-in.zoom.us/j/81949507804?pwd=OPhD5lM9MjVEJfweaWNkpNTmmOghX9.1";
+/* Zoom URL */
+const meetingUrl =
+"https://ov-live-in.zoom.us/j/81949507804?pwd=OPhD5lM9MjVEJfweaWNkpNTmmOghX9.1";
 
+/* Google Apps Script URL */
 const attendanceUrl =
-"https://script.google.com/macros/s/AKfycbwBYb6d-_0F0nPWOwp5141TSCXVpfe0jr6OJq1VGw1txkevsBSsSOXOeWe5DpjaiTz8/exec";    
+"YOUR_GOOGLE_APPS_SCRIPT_URL";
 
-/* Controls */
 const authorized = document.getElementById("authorized");
 const fullName = document.getElementById("fullName");
 const membershipId = document.getElementById("membershipId");
@@ -274,7 +268,7 @@ const building = document.getElementById("building");
 const flatNo = document.getElementById("flatNo");
 const joinBtn = document.getElementById("joinBtn");
 
-/* Enable/Disable form */
+/* Enable form */
 authorized.addEventListener("change", function(){
 
     const enabled = this.checked;
@@ -287,7 +281,7 @@ authorized.addEventListener("change", function(){
     validateForm();
 });
 
-/* Membership ID numbers only */
+/* Numbers only */
 membershipId.addEventListener("input", function(){
     this.value = this.value.replace(/[^0-9]/g, "");
 });
@@ -329,76 +323,48 @@ joinBtn.addEventListener("click", async function(e){
         return;
     }
 
-    try {
-
-        const response = await fetch(attendanceUrl, {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-
-                fullName: fullName.value.trim(),
-
-                membershipId:
-                    membershipId.value.trim(),
-
-                building:
-                    building.value,
-
-                flatNo:
-                    flatNo.value
-
-            })
-
-        });
-
-        const result =
-            await response.json();
-
-        if(result.success){
-
-            window.open(
-                meetingUrl,
-                "_blank"
-            );
-
-        } else {
-
-            alert(
-                "Unable to record attendance. Please try again."
-            );
-
-        }
-
-    } catch(ex){
-
-        alert(
-            "Unable to connect to attendance server."
-        );
-
-    }
-
-});
-
-    e.preventDefault();
-
-    if(
-        !authorized.checked ||
-        fullName.value.trim() === "" ||
-        building.value === "" ||
-        flatNo.value === ""
-    ){
-        alert(
-            "Please tick and fill all the required information for joining the meeting."
-        );
+    /* If no Google Sheet configured yet */
+    if(attendanceUrl === "YOUR_GOOGLE_APPS_SCRIPT_URL"){
+        window.open(meetingUrl, "_blank");
         return;
     }
 
-    window.open(meetingUrl, "_blank");
+    try{
+
+        const response = await fetch(attendanceUrl,{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                fullName:fullName.value.trim(),
+                membershipId:membershipId.value.trim(),
+                building:building.value,
+                flatNo:flatNo.value
+            })
+        });
+
+        const result = await response.json();
+
+        if(result.success){
+            window.open(meetingUrl,"_blank");
+        }
+        else{
+            alert("Unable to record attendance. Please try again.");
+        }
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        alert(
+            "Attendance recording failed. Opening meeting anyway."
+        );
+
+        window.open(meetingUrl,"_blank");
+    }
+
 });
 
 /* Image Popup */
