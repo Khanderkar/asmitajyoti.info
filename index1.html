@@ -360,29 +360,6 @@ joinBtn.addEventListener("click", function(e){
 
 });
 
-        const result = await response.json();
-
-        if(result.success){
-            window.open(meetingUrl,"_blank");
-        }
-        else{
-            alert("Unable to save your filled information. Please try again.");
-        }
-
-    }
-    catch(err){
-
-        console.error(err);
-
-        alert(
-            "Unable to save your filled information. Opening meeting anyway."
-        );
-
-        window.open(meetingUrl,"_blank");
-    }
-
-});
-
 /* Image Popup */
 function openModal(card){
     document.getElementById("modalImg").src =
