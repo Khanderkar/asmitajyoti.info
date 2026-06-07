@@ -132,7 +132,10 @@ body{
     max-width:95%;
     max-height:95%;
 }
-
+.join-btn{
+    border:none;
+    cursor:pointer;
+}
 .modal-close{
     position:absolute;
     top:20px;
@@ -382,8 +385,9 @@ footer{
 
         </div>
 
-        <a href="#" id="joinBtn" class="join-btn disabled">
-            Join Meeting
+<button type="button" id="joinBtn" class="join-btn disabled">
+    Join Meeting
+</button>
         </a>
 
     </div>
@@ -482,7 +486,10 @@ building.addEventListener("change", validateForm);
 flatNo.addEventListener("change", validateForm);
 
 /* Join Meeting */
+/* Join Meeting */
 joinBtn.addEventListener("click", function(e){
+
+    alert("Join button clicked");
 
     e.preventDefault();
 
