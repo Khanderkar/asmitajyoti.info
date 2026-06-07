@@ -6,125 +6,128 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-    * { box-sizing: border-box; }
+* { box-sizing: border-box; }
 
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: #ffffff;
+    min-height: 100vh;
+    padding-top: 300px;
+    text-align: center;
+}
+
+/* ===== Top Banner ===== */
+.top-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #ffcc00;
+    color: #000;
+    z-index: 1000;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.banner-content {
+    max-width: 1200px;
+    margin: auto;
+    padding: 14px 16px 18px;
+}
+
+.banner-title {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.marathi {
+    margin-top: 6px;
+    font-size: 0.95rem;
+}
+
+.countdown span {
+    background: #fff;
+    padding: 6px 10px;
+    margin: 2px;
+    border-radius: 4px;
+    display: inline-block;
+    min-width: 70px;
+}
+
+/* ===== Join Button ===== */
+.join-btn {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 12px 26px;
+    background: #003366;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.join-btn:hover {
+    opacity: 0.9;
+}
+
+/* ===== Content ===== */
+.ads-section {
+    max-width: 1200px;
+    margin: auto;
+    padding: 40px 20px;
+}
+
+.ad-card {
+    background: #ffffff;
+    color: #000;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    cursor: pointer;
+}
+
+.ad-card img {
+    width: 100%;
+    border-radius: 4px;
+}
+
+/* ===== Modal ===== */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal img {
+    max-width: 95%;
+    max-height: 95%;
+}
+
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 36px;
+    color: #fff;
+    cursor: pointer;
+}
+
+footer {
+    margin-top: 40px;
+    font-size: 0.85rem;
+}
+
+@media (min-width: 769px) {
     body {
-        margin: 0;
-        font-family: Arial, Helvetica, sans-serif;
-        background: linear-gradient(135deg, #1e3c72, #2a5298);
-        color: #ffffff;
-        min-height: 100vh;
-        padding-top: 300px;
-        text-align: center;
+        padding-top: 240px;
     }
-
-    /* ===== Top Banner ===== */
-    .top-banner {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background: #ffcc00;
-        color: #000;
-        z-index: 1000;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    }
-
-    .banner-content {
-        max-width: 1200px;
-        margin: auto;
-        padding: 14px 16px 18px;
-    }
-
-    .banner-title { font-weight: bold; font-size: 1rem; }
-    .marathi { margin-top: 6px; font-size: 0.95rem; }
-    .countdown span {
-        background: #fff;
-        padding: 6px 10px;
-        margin: 2px;
-        border-radius: 4px;
-        display: inline-block;
-        min-width: 70px;
-    }
-
-    .join-btn {
-        display: inline-block;
-        margin-top: 14px;
-        padding: 12px 26px;
-        background: #003366;
-        color: #ffffff;
-        text-decoration: none;
-        border-radius: 6px;
-        font-weight: bold;
-    }
-
-    /* ===== Newspaper Ads ===== */
-    .ads-section {
-        max-width: 1200px;
-        margin: auto;
-        padding: 40px 20px;
-    }
-
-    .ads-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
-    }
-
-    .ad-card {
-        background: #ffffff;
-        color: #000;
-        border-radius: 8px;
-        padding: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        cursor: pointer;
-    }
-
-    .ad-card img {
-        width: 100%;
-        border-radius: 4px;
-    }
-
-    .ad-title {
-        margin-top: 10px;
-        font-weight: bold;
-        font-size: 14px;
-        text-decoration: underline;
-        cursor: pointer;
-    }
-
-    /* ===== MODAL ZOOM ===== */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 2000;
-        inset: 0;
-        background: rgba(0,0,0,0.85);
-        justify-content: center;
-        align-items: center;
-    }
-
-    .modal img {
-        max-width: 95%;
-        max-height: 95%;
-        border-radius: 6px;
-        box-shadow: 0 0 20px rgba(255,255,255,0.4);
-    }
-
-    .modal-close {
-        position: absolute;
-        top: 20px;
-        right: 30px;
-        font-size: 36px;
-        color: #fff;
-        cursor: pointer;
-    }
-
-    footer { margin-top: 40px; font-size: 0.85rem; }
-
-    @media (min-width: 769px) {
-        body { padding-top: 240px; }
-    }
+}
 </style>
 </head>
 
@@ -133,63 +136,44 @@
 <!-- ===== Banner ===== -->
 <div class="top-banner">
     <div class="banner-content">
+
         <div class="banner-title">
             Online Google Meet – Special General Body Meeting<br>
-            01 Feb 2026, 10:30 AM | Asmita Jyoti Redevelopment
+            14 June 2026, 11:30 AM | Asmita Jyoti Redevelopment
         </div>
+
         <div class="marathi">
             ऑनलाईन Google Meet – विशेष सर्वसाधारण सभा<br>
-            ०१ फेब्रुवारी २०२६ सकाळी १०:३० वाजता
+            १४ जून २०२६ सकाळी ११:३० वाजता
         </div>
+
         <div id="countdown" class="countdown">Loading…</div>
-        <a href="https://meet.google.com/" target="_blank" class="join-btn">Join Meeting</a>
+
+        <a href="https://meet.google.com/byo-jemv-vki"
+           target="_blank"
+           class="join-btn"
+           id="joinBtn">
+           Join Meeting
+        </a>
+
     </div>
 </div>
 
-<!-- ===== Ads ===== -->
+<!-- ===== Content ===== -->
 <div class="ads-section">
-    <h1>13 Jan 2026 | SGBM Notice - Redevelopment / PMC Recruitment</h1>
-           <div class="ad-card" onclick="openModal(this)">
-            <img src="Images\AGM_Notice.jpg">
-        </div>
-    <h1>03 Jan 2026 | RFP - Appointment of PMC</h1>
-           <div class="ad-card" onclick="openModal(this)">
-            <img src="PMC/RFP_Images/Page-1.jpeg">
-            <img src="PMC/RFP_Images/Page-2.jpeg">
-            <img src="PMC/RFP_Images/Page-3.jpeg">
-            <img src="PMC/RFP_Images/Page-4.jpeg">
-        </div>
-     <h1>02 Jan 2026 | Newspaper Advertisement Clippings</h1>
-    <div class="ads-container">
-        <div class="ad-card" onclick="openModal(this)">
-            <img src="PMC/AD_Images/Maharashtra%20Times.jpeg">
-            <div class="ad-title">02 Jan 2026 | Maharashtra Times</div>
-        </div>
+    <h1>28 May 2026 | SGBM Notice - Redevelopment / PMC Recruitment</h1>
 
-        <div class="ad-card" onclick="openModal(this)">
-            <img src="PMC/AD_Images/Times%20of%20India.jpeg">
-            <div class="ad-title">02 Jan 2026 | Times of India</div>
-        </div>
-
-        <div class="ad-card" onclick="openModal(this)">
-            <img src="PMC/AD_Images/Mid%20Day%20English.jpeg">
-            <div class="ad-title">02 Jan 2026 | Mid Day English</div>
-        </div>
-
-        <div class="ad-card" onclick="openModal(this)">
-            <img src="PMC/AD_Images/Mid%20Day%20Gujarati.jpeg">
-            <div class="ad-title">02 Jan 2026 | Mid Day Gujarati</div>
-        </div>
+    <div class="ad-card" onclick="openModal(this)">
+        <img src="Images/AGM_Notice.jpg" alt="SGBM Notice">
     </div>
 </div>
 
-<!-- ===== MODAL ===== -->
+<!-- ===== Modal ===== -->
 <div class="modal" id="imgModal">
     <span class="modal-close" onclick="closeModal()">×</span>
-    <img id="modalImg">
+    <img id="modalImg" alt="Notice">
 </div>
 
-<!-- ===== Footer ===== -->
 <footer>
     Visitor Count:
     <script src="https://cdn.counter.dev/script.js"
@@ -199,33 +183,41 @@
 <!-- ===== Scripts ===== -->
 <script>
 function openModal(card) {
-    document.getElementById("modalImg").src = card.querySelector("img").src;
+    document.getElementById("modalImg").src =
+        card.querySelector("img").src;
     document.getElementById("imgModal").style.display = "flex";
 }
+
 function closeModal() {
     document.getElementById("imgModal").style.display = "none";
 }
+
+document.getElementById("imgModal").addEventListener("click", function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
 </script>
 
 <script>
-const meetingDate = new Date("2026-02-01T10:30:00").getTime();
+const meetingDate = new Date("2026-06-14T11:30:00").getTime();
+
 setInterval(() => {
     const d = meetingDate - new Date().getTime();
-    if (d <= 0) return;
+
+    if (d <= 0) {
+        document.getElementById("countdown").innerHTML =
+            "<span>Meeting Started</span>";
+        return;
+    }
+
     document.getElementById("countdown").innerHTML =
-        `<span>${Math.floor(d/86400000)} Days</span>
-         <span>${Math.floor(d/3600000)%24} Hrs</span>
-         <span>${Math.floor(d/60000)%60} Min</span>
-         <span>${Math.floor(d/1000)%60} Sec</span>`;
+        `<span>${Math.floor(d / 86400000)} Days</span>
+         <span>${Math.floor(d / 3600000) % 24} Hrs</span>
+         <span>${Math.floor(d / 60000) % 60} Min</span>
+         <span>${Math.floor(d / 1000) % 60} Sec</span>`;
 }, 1000);
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
