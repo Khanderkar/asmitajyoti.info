@@ -261,7 +261,10 @@ footer{
 <script>
 
 /* Meeting URL */
-const meetingUrl = "https://meet.google.com/byo-jemv-vki";
+const meetingUrl = "https://ov-live-in.zoom.us/j/81949507804?pwd=OPhD5lM9MjVEJfweaWNkpNTmmOghX9.1";
+
+const attendanceUrl =
+"https://script.google.com/macros/s/AKfycbwBYb6d-_0F0nPWOwp5141TSCXVpfe0jr6OJq1VGw1txkevsBSsSOXOeWe5DpjaiTz8/exec";    
 
 /* Controls */
 const authorized = document.getElementById("authorized");
@@ -310,7 +313,76 @@ building.addEventListener("change", validateForm);
 flatNo.addEventListener("change", validateForm);
 
 /* Join Meeting */
-joinBtn.addEventListener("click", function(e){
+joinBtn.addEventListener("click", async function(e){
+
+    e.preventDefault();
+
+    if(
+        !authorized.checked ||
+        fullName.value.trim() === "" ||
+        building.value === "" ||
+        flatNo.value === ""
+    ){
+        alert(
+            "Please tick and fill all the required information for joining the meeting."
+        );
+        return;
+    }
+
+    try {
+
+        const response = await fetch(attendanceUrl, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                fullName: fullName.value.trim(),
+
+                membershipId:
+                    membershipId.value.trim(),
+
+                building:
+                    building.value,
+
+                flatNo:
+                    flatNo.value
+
+            })
+
+        });
+
+        const result =
+            await response.json();
+
+        if(result.success){
+
+            window.open(
+                meetingUrl,
+                "_blank"
+            );
+
+        } else {
+
+            alert(
+                "Unable to record attendance. Please try again."
+            );
+
+        }
+
+    } catch(ex){
+
+        alert(
+            "Unable to connect to attendance server."
+        );
+
+    }
+
+});
 
     e.preventDefault();
 
