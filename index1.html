@@ -1,158 +1,161 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Asmita Jyoti – Redevelopment</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asmita Jyoti – Redevelopment</title>
 
 <style>
 * { box-sizing: border-box; }
 
-body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    color: #ffffff;
-    min-height: 100vh;
-    padding-top: 380px;
-    text-align: center;
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:linear-gradient(135deg,#1e3c72,#2a5298);
+    color:#fff;
+    min-height:100vh;
+    padding-top:420px;
+    text-align:center;
 }
 
-/* ===== Top Banner ===== */
-.top-banner {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: #ffcc00;
-    color: #000;
-    z-index: 1000;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+.top-banner{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    background:#ffcc00;
+    color:#000;
+    z-index:1000;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
 }
 
-.banner-content {
-    max-width: 1200px;
-    margin: auto;
-    padding: 14px 16px 18px;
+.banner-content{
+    max-width:1200px;
+    margin:auto;
+    padding:14px 16px 20px;
 }
 
-.banner-title {
-    font-weight: bold;
-    font-size: 1rem;
+.banner-title{
+    font-weight:bold;
+    font-size:1rem;
 }
 
-.marathi {
-    margin-top: 6px;
-    font-size: 0.95rem;
+.marathi{
+    margin-top:6px;
+    font-size:.95rem;
 }
 
-.countdown span {
-    background: #fff;
-    padding: 6px 10px;
-    margin: 2px;
-    border-radius: 4px;
-    display: inline-block;
-    min-width: 70px;
+.countdown span{
+    background:#fff;
+    padding:6px 10px;
+    margin:2px;
+    border-radius:4px;
+    display:inline-block;
+    min-width:70px;
 }
 
-/* ===== Registration Form ===== */
-.join-form {
-    margin-top: 15px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
+.auth-box{
+    margin-top:15px;
+    font-weight:bold;
+}
+
+.auth-box input{
+    transform:scale(1.2);
+    margin-right:8px;
+}
+
+.join-form{
+    margin-top:15px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
 }
 
 .join-form input,
-.join-form select {
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #999;
-    min-width: 180px;
-    font-size: 14px;
+.join-form select{
+    padding:10px;
+    border-radius:5px;
+    border:1px solid #999;
+    min-width:200px;
+    font-size:14px;
 }
 
-/* ===== Join Button ===== */
-.join-btn {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 12px 26px;
-    background: #003366;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 6px;
-    font-weight: bold;
-    transition: .2s;
+.join-btn{
+    display:inline-block;
+    margin-top:15px;
+    padding:12px 26px;
+    background:#003366;
+    color:#fff;
+    text-decoration:none;
+    border-radius:6px;
+    font-weight:bold;
 }
 
-.join-btn.disabled {
-    background: #999;
-    cursor: not-allowed;
-    opacity: .6;
-    pointer-events: none;
+.join-btn.disabled{
+    background:#999;
+    opacity:.6;
+    pointer-events:none;
 }
 
-/* ===== Content ===== */
-.ads-section {
-    max-width: 1200px;
-    margin: auto;
-    padding: 40px 20px;
+.ads-section{
+    max-width:1200px;
+    margin:auto;
+    padding:40px 20px;
 }
 
-.ad-card {
-    background: #fff;
-    color: #000;
-    border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.15);
-    cursor: pointer;
+.ad-card{
+    background:#fff;
+    color:#000;
+    border-radius:8px;
+    padding:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+    cursor:pointer;
 }
 
-.ad-card img {
-    width: 100%;
-    border-radius: 4px;
+.ad-card img{
+    width:100%;
+    border-radius:4px;
 }
 
-/* ===== Modal ===== */
-.modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.85);
-    z-index: 2000;
-    justify-content: center;
-    align-items: center;
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.85);
+    z-index:2000;
+    justify-content:center;
+    align-items:center;
 }
 
-.modal img {
-    max-width: 95%;
-    max-height: 95%;
+.modal img{
+    max-width:95%;
+    max-height:95%;
 }
 
-.modal-close {
-    position: absolute;
-    top: 20px;
-    right: 30px;
-    font-size: 36px;
-    color: #fff;
-    cursor: pointer;
+.modal-close{
+    position:absolute;
+    top:20px;
+    right:30px;
+    font-size:36px;
+    color:#fff;
+    cursor:pointer;
 }
 
-footer {
-    margin-top: 40px;
-    font-size: .85rem;
+footer{
+    margin-top:40px;
+    font-size:.85rem;
 }
 
-@media (max-width:768px) {
-    body {
-        padding-top: 520px;
+@media(max-width:768px){
+
+    body{
+        padding-top:650px;
     }
 
-    .join-form {
-        flex-direction: column;
-        align-items: center;
+    .join-form{
+        flex-direction:column;
+        align-items:center;
     }
 }
 </style>
@@ -162,6 +165,7 @@ footer {
 
 <!-- ===== Banner ===== -->
 <div class="top-banner">
+
     <div class="banner-content">
 
         <div class="banner-title">
@@ -174,51 +178,66 @@ footer {
             १४ जून २०२६ सकाळी ११:३० वाजता
         </div>
 
-        <div id="countdown" class="countdown">Loading...</div>
+        <div id="countdown" class="countdown">
+            Loading...
+        </div>
 
-        <!-- Registration -->
+        <!-- Authorization Checkbox -->
+        <div class="auth-box">
+            <label>
+                <input type="checkbox" id="authorized">
+                I am authorized member to join this SGBM and my details are as follows:
+            </label>
+        </div>
+
+        <!-- Member Form -->
         <div class="join-form">
 
             <input
                 type="text"
                 id="fullName"
-                placeholder="Full Name *">
+                placeholder="Full Name *"
+                disabled>
 
             <input
                 type="text"
                 id="membershipId"
                 placeholder="Membership ID (Optional)"
-                inputmode="numeric">
+                disabled>
 
-            <select id="building">
+            <select id="building" disabled>
                 <option value="">Select Building *</option>
-                <option>A1</option>
-                <option>A2</option>
-                <option>A3</option>
+                <option>A01</option>
+                <option>A02</option>
+                <option>B01</option>
             </select>
 
-            <select id="flatNo">
-                <option value="">Select Flat No *</option>
+            <select id="flatNo" disabled>
+                <option value="">Select Flat Number *</option>
                 <option>01</option>
                 <option>02</option>
                 <option>03</option>
+                <option>04</option>
             </select>
 
         </div>
 
         <a href="#"
-           class="join-btn disabled"
-           id="joinBtn">
+           id="joinBtn"
+           class="join-btn disabled">
             Join Meeting
         </a>
 
     </div>
+
 </div>
 
 <!-- ===== Content ===== -->
 <div class="ads-section">
 
-    <h1>28 May 2026 | SGBM Notice - Redevelopment / PMC Recruitment</h1>
+    <h1>
+        28 May 2026 | SGBM Notice - Redevelopment / PMC Recruitment
+    </h1>
 
     <div class="ad-card" onclick="openModal(this)">
         <img src="Images/AGM_Notice.jpg" alt="Notice">
@@ -241,27 +260,47 @@ footer {
 
 <script>
 
+/* Meeting URL */
+const meetingUrl = "https://meet.google.com/byo-jemv-vki";
+
+/* Controls */
+const authorized = document.getElementById("authorized");
 const fullName = document.getElementById("fullName");
 const membershipId = document.getElementById("membershipId");
 const building = document.getElementById("building");
 const flatNo = document.getElementById("flatNo");
 const joinBtn = document.getElementById("joinBtn");
 
-/* Membership ID = numbers only */
-membershipId.addEventListener("input", function() {
+/* Enable/Disable form */
+authorized.addEventListener("change", function(){
+
+    const enabled = this.checked;
+
+    fullName.disabled = !enabled;
+    membershipId.disabled = !enabled;
+    building.disabled = !enabled;
+    flatNo.disabled = !enabled;
+
+    validateForm();
+});
+
+/* Membership ID numbers only */
+membershipId.addEventListener("input", function(){
     this.value = this.value.replace(/[^0-9]/g, "");
 });
 
-/* Enable Join Button */
-function validateForm() {
+/* Validation */
+function validateForm(){
 
-    if (
+    if(
+        authorized.checked &&
         fullName.value.trim() !== "" &&
         building.value !== "" &&
         flatNo.value !== ""
-    ) {
+    ){
         joinBtn.classList.remove("disabled");
-    } else {
+    }
+    else{
         joinBtn.classList.add("disabled");
     }
 }
@@ -271,28 +310,25 @@ building.addEventListener("change", validateForm);
 flatNo.addEventListener("change", validateForm);
 
 /* Join Meeting */
-joinBtn.addEventListener("click", function(e) {
+joinBtn.addEventListener("click", function(e){
 
-    if (joinBtn.classList.contains("disabled")) {
+    if(joinBtn.classList.contains("disabled")){
         e.preventDefault();
         return;
     }
 
-    window.open(
-        "https://ov-live-in.zoom.us/j/81949507804?pwd=OPhD5lM9MjVEJfweaWNkpNTmmOghX9.1",
-        "_blank"
-    );
+    window.open(meetingUrl, "_blank");
 });
 
 /* Image Popup */
-function openModal(card) {
+function openModal(card){
     document.getElementById("modalImg").src =
         card.querySelector("img").src;
 
     document.getElementById("imgModal").style.display = "flex";
 }
 
-function closeModal() {
+function closeModal(){
     document.getElementById("imgModal").style.display = "none";
 }
 
@@ -302,10 +338,9 @@ const meetingDate =
 
 setInterval(() => {
 
-    const d =
-        meetingDate - new Date().getTime();
+    const d = meetingDate - new Date().getTime();
 
-    if (d <= 0) {
+    if(d <= 0){
         document.getElementById("countdown").innerHTML =
             "<span>Meeting Started</span>";
         return;
@@ -323,4 +358,3 @@ setInterval(() => {
 
 </body>
 </html>
-```
