@@ -349,7 +349,7 @@ joinBtn.addEventListener("click", async function(e){
             window.open(meetingUrl,"_blank");
         }
         else{
-            alert("Unable to record attendance. Please try again.");
+            alert("Unable to save your filled information. Please try again.");
         }
 
     }
@@ -358,7 +358,7 @@ joinBtn.addEventListener("click", async function(e){
         console.error(err);
 
         alert(
-            "Attendance recording failed. Opening meeting anyway."
+            "Unable to save your filled information. Opening meeting anyway."
         );
 
         window.open(meetingUrl,"_blank");
