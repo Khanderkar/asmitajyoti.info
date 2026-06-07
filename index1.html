@@ -95,7 +95,7 @@ body{
 .join-btn.disabled{
     background:#999;
     opacity:.6;
-    pointer-events:none;
+    cursor:pointer;
 }
 
 .ads-section{
@@ -186,7 +186,7 @@ footer{
         <div class="auth-box">
             <label>
                 <input type="checkbox" id="authorized">
-                I am authorized member to join this SGBM and my details are as follows:
+                I confirm that I am an authorized member entitled to attend this SGBM and the details provided below are correct.:
             </label>
         </div>
 
@@ -312,8 +312,17 @@ flatNo.addEventListener("change", validateForm);
 /* Join Meeting */
 joinBtn.addEventListener("click", function(e){
 
-    if(joinBtn.classList.contains("disabled")){
-        e.preventDefault();
+    e.preventDefault();
+
+    if(
+        !authorized.checked ||
+        fullName.value.trim() === "" ||
+        building.value === "" ||
+        flatNo.value === ""
+    ){
+        alert(
+            "Please tick and fill all the required information for joining the meeting."
+        );
         return;
     }
 
