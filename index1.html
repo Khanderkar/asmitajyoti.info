@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,7 +15,7 @@ body {
     background: linear-gradient(135deg, #1e3c72, #2a5298);
     color: #ffffff;
     min-height: 100vh;
-    padding-top: 300px;
+    padding-top: 380px;
     text-align: center;
 }
 
@@ -55,21 +56,42 @@ body {
     min-width: 70px;
 }
 
+/* ===== Registration Form ===== */
+.join-form {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.join-form input,
+.join-form select {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #999;
+    min-width: 180px;
+    font-size: 14px;
+}
+
 /* ===== Join Button ===== */
 .join-btn {
     display: inline-block;
-    margin-top: 14px;
+    margin-top: 15px;
     padding: 12px 26px;
     background: #003366;
-    color: #ffffff;
+    color: #fff;
     text-decoration: none;
     border-radius: 6px;
     font-weight: bold;
-    transition: 0.2s;
+    transition: .2s;
 }
 
-.join-btn:hover {
-    opacity: 0.9;
+.join-btn.disabled {
+    background: #999;
+    cursor: not-allowed;
+    opacity: .6;
+    pointer-events: none;
 }
 
 /* ===== Content ===== */
@@ -80,11 +102,11 @@ body {
 }
 
 .ad-card {
-    background: #ffffff;
+    background: #fff;
     color: #000;
     border-radius: 8px;
     padding: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
     cursor: pointer;
 }
 
@@ -98,7 +120,7 @@ body {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.85);
+    background: rgba(0,0,0,.85);
     z-index: 2000;
     justify-content: center;
     align-items: center;
@@ -120,12 +142,17 @@ body {
 
 footer {
     margin-top: 40px;
-    font-size: 0.85rem;
+    font-size: .85rem;
 }
 
-@media (min-width: 769px) {
+@media (max-width:768px) {
     body {
-        padding-top: 240px;
+        padding-top: 520px;
+    }
+
+    .join-form {
+        flex-direction: column;
+        align-items: center;
     }
 }
 </style>
@@ -147,13 +174,42 @@ footer {
             १४ जून २०२६ सकाळी ११:३० वाजता
         </div>
 
-        <div id="countdown" class="countdown">Loading…</div>
+        <div id="countdown" class="countdown">Loading...</div>
 
-        <a href="https://meet.google.com/byo-jemv-vki"
-           target="_blank"
-           class="join-btn"
+        <!-- Registration -->
+        <div class="join-form">
+
+            <input
+                type="text"
+                id="fullName"
+                placeholder="Full Name *">
+
+            <input
+                type="text"
+                id="membershipId"
+                placeholder="Membership ID (Optional)"
+                inputmode="numeric">
+
+            <select id="building">
+                <option value="">Select Building *</option>
+                <option>A1</option>
+                <option>A2</option>
+                <option>A3</option>
+            </select>
+
+            <select id="flatNo">
+                <option value="">Select Flat No *</option>
+                <option>01</option>
+                <option>02</option>
+                <option>03</option>
+            </select>
+
+        </div>
+
+        <a href="#"
+           class="join-btn disabled"
            id="joinBtn">
-           Join Meeting
+            Join Meeting
         </a>
 
     </div>
@@ -161,30 +217,78 @@ footer {
 
 <!-- ===== Content ===== -->
 <div class="ads-section">
+
     <h1>28 May 2026 | SGBM Notice - Redevelopment / PMC Recruitment</h1>
 
     <div class="ad-card" onclick="openModal(this)">
-        <img src="Images/AGM_Notice.jpg" alt="SGBM Notice">
+        <img src="Images/AGM_Notice.jpg" alt="Notice">
     </div>
+
 </div>
 
 <!-- ===== Modal ===== -->
 <div class="modal" id="imgModal">
     <span class="modal-close" onclick="closeModal()">×</span>
-    <img id="modalImg" alt="Notice">
+    <img id="modalImg">
 </div>
 
 <footer>
     Visitor Count:
     <script src="https://cdn.counter.dev/script.js"
-        data-id="6461317c-4e57-4b01-a820-e81a891f2dd6"></script>
+        data-id="6461317c-4e57-4b01-a820-e81a891f2dd6">
+    </script>
 </footer>
 
-<!-- ===== Scripts ===== -->
 <script>
+
+const fullName = document.getElementById("fullName");
+const membershipId = document.getElementById("membershipId");
+const building = document.getElementById("building");
+const flatNo = document.getElementById("flatNo");
+const joinBtn = document.getElementById("joinBtn");
+
+/* Membership ID = numbers only */
+membershipId.addEventListener("input", function() {
+    this.value = this.value.replace(/[^0-9]/g, "");
+});
+
+/* Enable Join Button */
+function validateForm() {
+
+    if (
+        fullName.value.trim() !== "" &&
+        building.value !== "" &&
+        flatNo.value !== ""
+    ) {
+        joinBtn.classList.remove("disabled");
+    } else {
+        joinBtn.classList.add("disabled");
+    }
+}
+
+fullName.addEventListener("input", validateForm);
+building.addEventListener("change", validateForm);
+flatNo.addEventListener("change", validateForm);
+
+/* Join Meeting */
+joinBtn.addEventListener("click", function(e) {
+
+    if (joinBtn.classList.contains("disabled")) {
+        e.preventDefault();
+        return;
+    }
+
+    window.open(
+        "https://meet.google.com/byo-jemv-vki",
+        "_blank"
+    );
+});
+
+/* Image Popup */
 function openModal(card) {
     document.getElementById("modalImg").src =
         card.querySelector("img").src;
+
     document.getElementById("imgModal").style.display = "flex";
 }
 
@@ -192,18 +296,14 @@ function closeModal() {
     document.getElementById("imgModal").style.display = "none";
 }
 
-document.getElementById("imgModal").addEventListener("click", function(e) {
-    if (e.target === this) {
-        closeModal();
-    }
-});
-</script>
-
-<script>
-const meetingDate = new Date("2026-06-14T11:30:00").getTime();
+/* Countdown */
+const meetingDate =
+    new Date("2026-06-14T11:30:00").getTime();
 
 setInterval(() => {
-    const d = meetingDate - new Date().getTime();
+
+    const d =
+        meetingDate - new Date().getTime();
 
     if (d <= 0) {
         document.getElementById("countdown").innerHTML =
@@ -212,12 +312,15 @@ setInterval(() => {
     }
 
     document.getElementById("countdown").innerHTML =
-        `<span>${Math.floor(d / 86400000)} Days</span>
-         <span>${Math.floor(d / 3600000) % 24} Hrs</span>
-         <span>${Math.floor(d / 60000) % 60} Min</span>
-         <span>${Math.floor(d / 1000) % 60} Sec</span>`;
+        `<span>${Math.floor(d/86400000)} Days</span>
+         <span>${Math.floor(d/3600000)%24} Hrs</span>
+         <span>${Math.floor(d/60000)%60} Min</span>
+         <span>${Math.floor(d/1000)%60} Sec</span>`;
+
 }, 1000);
+
 </script>
 
 </body>
 </html>
+```
