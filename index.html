@@ -516,14 +516,17 @@ joinBtn.addEventListener("click", function(e){
     document.getElementById("formFlatNo").value =
         flatNo.value;
 
-    document.getElementById("attendanceForm").submit();
+alert(
+    "Thank you. Your attendance is being recorded. You will now be redirected to the meeting."
+);
 
-    window.open(
-        meetingUrl,
-        "_blank"
-    );
+document.getElementById("attendanceForm").submit();
 
-});
+setTimeout(function(){
+
+    window.location.href = meetingUrl;
+
+}, 2000);
 
 /* Image Popup */
 function openModal(card){
