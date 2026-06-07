@@ -513,8 +513,13 @@ joinBtn.addEventListener("click", function(e){
 alert(
     "Thank you. Your attendance is being recorded. You will now be redirected to the meeting."
 );
-
+<!--
 document.getElementById("attendanceForm").submit();
+-->
+window.open(
+  "https://script.google.com/macros/s/AKfycbwBYb6d-_0F0nPWOwp5141TSCXVpfe0jr6OJq1VGw1txkevsBSsSOXOeWe5DpjaiTz8/exec?test=iphone",
+  "_blank"
+);
 console.log("Submitting attendance form...");
 alert("Submitting attendance...");
 
