@@ -188,21 +188,19 @@ footer{
             </label>
         </div>
 
-        <div class="join-form">
+        <div class="join-form" id="joinForm" style="display:none;">
 
             <input
                 type="text"
                 id="fullName"
                 placeholder="Full Name *"
-                disabled>
 
             <input
                 type="text"
                 id="membershipId"
                 placeholder="Membership ID (Optional)"
-                disabled>
 
-            <select id="building" disabled>
+            <select id="building" 
                 <option value="">Select Building *</option>
                 <option>A1</option>
                 <option>A2</option>
@@ -223,7 +221,7 @@ footer{
                 <option>Shops/Units</option>
             </select>
 
-            <select id="flatNo" disabled>
+            <select id="flatNo"
                 <option value="">Select Flat Number *</option>
                 <option>01</option>
                 <option>02</option>
@@ -452,12 +450,8 @@ const joinBtn = document.getElementById("joinBtn");
 /* Enable form */
 authorized.addEventListener("change", function(){
 
-    const enabled = this.checked;
-
-    fullName.disabled = !enabled;
-    membershipId.disabled = !enabled;
-    building.disabled = !enabled;
-    flatNo.disabled = !enabled;
+    document.getElementById("joinForm").style.display =
+        this.checked ? "flex" : "none";
 
     validateForm();
 });
