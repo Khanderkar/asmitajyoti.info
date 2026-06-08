@@ -97,7 +97,7 @@ body{
 .join-btn.disabled{
     background:#999;
     opacity:.6;
-    cursor:pointer;
+    cursor:not-allowed;
 }
 
 .ads-section{
@@ -390,20 +390,6 @@ footer{
     <img id="modalImg">
 </div>
 
-<iframe name="attendanceFrame" id="attendanceFrame" style="display:none;"></iframe>
-
-<form
-    id="attendanceForm"
-    method="POST"
-    action="https://script.google.com/macros/s/AKfycbwBYb6d-_0F0nPWOwp5141TSCXVpfe0jr6OJq1VGw1txkevsBSsSOXOeWe5DpjaiTz8/exec"
-    target="attendanceFrame"
-    style="display:none;">
-    <input type="hidden" name="fullName" id="formFullName">
-    <input type="hidden" name="membershipId" id="formMembershipId">
-    <input type="hidden" name="building" id="formBuilding">
-    <input type="hidden" name="flatNo" id="formFlatNo">
-</form>
-
 <footer>
     Visitor Count:
     <script src="https://cdn.counter.dev/script.js" data-id="6461317c-4e57-4b01-a820-e81a891f2dd6"></script>
@@ -412,6 +398,7 @@ footer{
 <script>
 /* Zoom URL */
 const meetingUrl = "https://ov-live-in.zoom.us/j/81949507804?pwd=OPhD5lM9MjVEJfweaWNkpNTmmOghX9.1";
+const scriptUrl = "https://script.google.com/macros/s/AKfycbwBYb6d-_0F0nPWOwp5141TSCXVpfe0jr6OJq1VGw1txkevsBSsSOXOeWe5DpjaiTz8/exec";
 
 const authorized = document.getElementById("authorized");
 const fullName = document.getElementById("fullName");
@@ -464,19 +451,35 @@ joinBtn.addEventListener("click", function(e){
         return;
     }
 
-    document.getElementById("formFullName").value = fullName.value.trim();
-    document.getElementById("formMembershipId").value = membershipId.value.trim();
-    document.getElementById("formBuilding").value = building.value;
-    document.getElementById("formFlatNo").value = flatNo.value;
+    // Change button text to show it is working
+    joinBtn.innerText = "Connecting...";
+    joinBtn.classList.add("disabled");
 
-    // Submitting data to Google Sheets
-    document.getElementById("attendanceForm").submit();
+    // Prepare data using standard URL-encoded form formatting
+    const formData = new URLSearchParams();
+    formData.append("fullName", fullName.value.trim());
+    formData.append("membershipId", membershipId.value.trim());
+    formData.append("building", building.value);
+    formData.append("flatNo", flatNo.value);
 
-    console.log("Submitting attendance form...");
+    /* 
+      We use standard JavaScript fetch paired with 'keepalive: true'.
+      This tells mobile iOS systems that even if the page redirects away, 
+      the phone MUST finish uploading this request background data to Google Sheets.
+    */
+    fetch(scriptUrl, {
+        method: "POST",
+        body: formData,
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        keepalive: true
+    }).catch(err => console.log("Background record request sent"));
 
+    // Safe timing window for the background dispatch before sending them to Zoom
     setTimeout(function(){
         window.location.href = meetingUrl;
-    }, 2000);
+    }, 1200);
 });   
 
 /* Image Popup */
