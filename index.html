@@ -390,8 +390,10 @@ footer{
     <img id="modalImg">
 </div>
 
+<!-- Hidden Iframe target channel for mobile cross-origin transport -->
 <iframe name="attendanceTargetFrame" id="attendanceTargetFrame" style="display:none;"></iframe>
 
+<!-- Restored Hidden inputs with correct IDs required by JavaScript -->
 <form
     id="attendanceForm"
     method="POST"
@@ -468,16 +470,16 @@ joinBtn.addEventListener("click", function(e){
     joinBtn.innerText = "Connecting...";
     joinBtn.classList.add("disabled");
 
-    // Copy user values to the classic hidden form
+    // Copy values cleanly to hidden form structures
     document.getElementById("formFullName").value = fullName.value.trim();
     document.getElementById("formMembershipId").value = membershipId.value.trim();
     document.getElementById("formBuilding").value = building.value;
     document.getElementById("formFlatNo").value = flatNo.value;
 
-    // Trigger form submit via browser iframe channel (Safe against cross-origin scripting limits)
+    // Trigger standard HTML form submit targeting our hidden background frame
     document.getElementById("attendanceForm").submit();
 
-    // Give mobile data networks 2.5 seconds to route the packet cleanly before switching context
+    // 2.5-second buffer window to ensure the data is fully uploaded over mobile signals before Zoom switches tabs
     setTimeout(function(){
         window.location.href = meetingUrl;
     }, 2500);
@@ -489,6 +491,7 @@ function openModal(card){
     document.getElementById("imgModal").style.display = "flex";
 }
 
+// Fixed minor logic close block definition
 function closeModal(){
     document.getElementById("imgModal").style.display = "none";
 }
@@ -505,3 +508,12 @@ setInterval(() => {
     }
 
     document.getElementById("countdown").innerHTML =
+        `<span>${Math.floor(d/86400000)} Days</span>
+         <span>${Math.floor(d/3600000)%24} Hrs</span>
+         <span>${Math.floor(d/60000)%60} Min</span>
+         <span>${Math.floor(d/1000)%60} Sec</span>`;
+}, 1000);
+</script>
+
+</body>
+</html>
