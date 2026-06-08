@@ -100,6 +100,27 @@ body{
     cursor:not-allowed;
 }
 
+/* Styled info-box wrapper for manual Zoom logging credentials */
+.zoom-info-box {
+    display: none;
+    background: #ffffff;
+    color: #333333;
+    max-width: 650px;
+    margin: 15px auto 0 auto;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    line-height: 1.5;
+    border-left: 5px solid #003366;
+}
+
+.zoom-info-box a {
+    color: #003366;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
 .ads-section{
     max-width:1200px;
     margin:auto;
@@ -157,6 +178,11 @@ footer{
     .join-form{
         flex-direction:column;
         align-items:center;
+    }
+    
+    .zoom-info-box {
+        max-width: 90%;
+        font-size: 13px;
     }
 }
 </style>
@@ -375,6 +401,14 @@ footer{
         <button type="button" id="joinBtn" class="join-btn disabled">
             Join Meeting
         </button>
+
+        <!-- Container targets manual Zoom launch parameter strings -->
+        <div id="zoomInfoBox" class="zoom-info-box">
+            If the meeting does not open automatically, copy credentials or open link directly:<br>
+            <a href="https://app.zoom.us/wc/join" target="_blank">app.zoom.us/wc/join</a> | 
+            <strong>Meeting ID:</strong> 819 4950 7804 | 
+            <strong>Passcode:</strong> 651334
+        </div>
     </div>
 </div>
 
@@ -390,11 +424,6 @@ footer{
     <img id="modalImg">
 </div>
 
-<!-- 
-  Targeting standard '_blank' natively here completely satisfies 
-  mobile popup rules since it is launched by an explicit button click.
-  Make sure your action URL below matches your Google script deployment link.
--->
 <form
     id="attendanceForm"
     method="POST"
@@ -419,14 +448,14 @@ const membershipId = document.getElementById("membershipId");
 const building = document.getElementById("building");
 const flatNo = document.getElementById("flatNo");
 const joinBtn = document.getElementById("joinBtn");
+const zoomInfoBox = document.getElementById("zoomInfoBox");
 
-/* Interface visibility states functionality toggle */
+/* Form open/close display states functionality */
 authorized.addEventListener("change", function(){
     document.getElementById("joinForm").style.display = this.checked ? "flex" : "none";
     validateForm();
 });
 
-/* Clean non-numeric input elements */
 membershipId.addEventListener("input", function(){
     this.value = this.value.replace(/[^0-9]/g, "");
 });
@@ -449,7 +478,7 @@ fullName.addEventListener("input", validateForm);
 building.addEventListener("change", validateForm);
 flatNo.addEventListener("change", validateForm);
 
-/* Handle Join Request Event Entry */
+/* Handle Join Meeting Click Trigger */
 joinBtn.addEventListener("click", function(e){
     e.preventDefault();
 
@@ -463,28 +492,20 @@ joinBtn.addEventListener("click", function(e){
         return;
     }
 
-    // Map verified input data sets smoothly to structural form layers
+    // Map verified structural field values cleanly
     document.getElementById("formFullName").value = fullName.value.trim();
     document.getElementById("formMembershipId").value = membershipId.value.trim();
     document.getElementById("formBuilding").value = building.value;
     document.getElementById("formFlatNo").value = flatNo.value;
 
-    // Submit the real native form to launch the new tab/window without popup blocks
-    document.getElementById("attendanceForm").submit();
+    // Instantly reveal manual connection parameters layout box underneath button
+    zoomInfoBox.style.display = "block";
 
-    // Safely refresh the original window state after action routing finishes
-    setTimeout(function() {
-        fullName.value = "";
-        membershipId.value = "";
-        building.value = "";
-        flatNo.value = "";
-        authorized.checked = false;
-        document.getElementById("joinForm").style.display = "none";
-        validateForm();
-    }, 1500);
+    // Fire form submission to native external window channel
+    document.getElementById("attendanceForm").submit();
 });   
 
-/* Display Notice Panels */
+/* Image Zoom View Popups */
 function openModal(card){
     document.getElementById("modalImg").src = card.querySelector("img").src;
     document.getElementById("imgModal").style.display = "flex";
@@ -494,7 +515,7 @@ function closeModal(){
     document.getElementById("imgModal").style.display = "none";
 }
 
-/* Event Clock Setup module loop */
+/* Clock Tracking Countdown script loop execution */
 const meetingDate = new Date("2026-06-14T11:30:00").getTime();
 
 setInterval(() => {
