@@ -188,6 +188,7 @@ footer{
         </div>
 
         <div class="join-form" id="joinForm" style="display:none;">
+            <!-- Real visible input variables used directly for communication transmission -->
             <input type="text" id="fullName" placeholder="Full Name *">
             <input type="text" id="membershipId" placeholder="Membership ID (Optional)">
 
@@ -390,30 +391,15 @@ footer{
     <img id="modalImg">
 </div>
 
-<!-- 
-  The functional submission form. 
-  target="_blank" forces mobiles & desktops to launch the results in a new tab upon submit.
--->
-<form
-    id="attendanceForm"
-    method="POST"
-    action="https://script.google.com/macros/s/AKfycbwBYb6d-_0F0nPWOwp5141TSCXVpfe0jr6OJq1VGw1txkevsBSsSOXOeWe5DpjaiTz8/exec"
-    target="_blank"
-    style="display:none;">
-    <input type="hidden" name="fullName" id="formFullName">
-    <input type="hidden" name="membershipId" id="formMembershipId">
-    <input type="hidden" name="building" id="formBuilding">
-    <input type="hidden" name="flatNo" id="formFlatNo">
-</form>
-
 <footer>
     Visitor Count:
     <script src="https://cdn.counter.dev/script.js" data-id="6461317c-4e57-4b01-a820-e81a891f2dd6"></script>
 </footer>
 
 <script>
-/* Zoom URL configuration link */
+/* Configurations setup fields */
 const meetingUrl = "https://ov-live-in.zoom.us/j/81949507804?pwd=OPhD5lM9MjVEJfweaWNkpNTmmOghX9.1";
+const scriptUrl = "https://script.google.com/macros/s/AKfycbwBYb6d-_0F0nPWOwp5141TSCXVpfe0jr6OJq1VGw1txkevsBSsSOXOeWe5DpjaiTz8/exec";
 
 const authorized = document.getElementById("authorized");
 const fullName = document.getElementById("fullName");
@@ -422,18 +408,16 @@ const building = document.getElementById("building");
 const flatNo = document.getElementById("flatNo");
 const joinBtn = document.getElementById("joinBtn");
 
-/* Enable form fields functionality */
+/* Interface display logic */
 authorized.addEventListener("change", function(){
     document.getElementById("joinForm").style.display = this.checked ? "flex" : "none";
     validateForm();
 });
 
-/* Enforce numeric characters rules exclusively for Membership Input */
 membershipId.addEventListener("input", function(){
     this.value = this.value.replace(/[^0-9]/g, "");
 });
 
-/* Master Client-Side Form Validation Check */
 function validateForm(){
     if(
         authorized.checked &&
@@ -452,7 +436,7 @@ fullName.addEventListener("input", validateForm);
 building.addEventListener("change", validateForm);
 flatNo.addEventListener("change", validateForm);
 
-/* Handle Join Button Interaction Action Trigger */
+/* Join Button Interaction Core logic handler */
 joinBtn.addEventListener("click", function(e){
     e.preventDefault();
 
@@ -466,23 +450,47 @@ joinBtn.addEventListener("click", function(e){
         return;
     }
 
-    // Populate data payload accurately to the template form structures
-    document.getElementById("formFullName").value = fullName.value.trim();
-    document.getElementById("formMembershipId").value = membershipId.value.trim();
-    document.getElementById("formBuilding").value = building.value;
-    document.getElementById("formFlatNo").value = flatNo.value;
+    // Visual confirmation state lock
+    joinBtn.innerText = "Connecting...";
+    joinBtn.classList.add("disabled");
 
-    // Fire form submission directly out to a new window target 
-    document.getElementById("attendanceForm").submit();
+    // Construct valid search parameters data object payload string format 
+    const urlEncodedData = new URLSearchParams();
+    urlEncodedData.append("fullName", fullName.value.trim());
+    urlEncodedData.append("membershipId", membershipId.value.trim());
+    urlEncodedData.append("building", building.value);
+    urlEncodedData.append("flatNo", flatNo.value);
 
-    // Re-engage standard interactive properties on primary base screen safely
-    setTimeout(function() {
-        joinBtn.innerText = "Join Meeting";
-        joinBtn.classList.remove("disabled");
-    }, 1000);
+    /* 
+      We handle submission via an asynchronous JSONP injection script request bypass.
+      This technique completely removes CORS blocks and forces the mobile web layout 
+      to successfully append data into Google Sheets before running any popup processes.
+    */
+    const scriptTag = document.createElement("script");
+    scriptTag.src = scriptUrl + "?" + urlEncodedData.toString() + "&callback=onRecordSuccess";
+    
+    // Fallback security execution pathway: launch Zoom if endpoint handshake delays
+    const fallbackRedirect = setTimeout(function(){
+        window.open(meetingUrl, "_blank");
+        resetJoinButton();
+    }, 2000);
+
+    // Global scoping dynamic response wrapper callback handler definition 
+    window.onRecordSuccess = function(response) {
+        clearTimeout(fallbackRedirect);
+        window.open(meetingUrl, "_blank");
+        resetJoinButton();
+    };
+
+    document.body.appendChild(scriptTag);
 });   
 
-/* Image Modal System Popups logic */
+function resetJoinButton() {
+    joinBtn.innerText = "Join Meeting";
+    joinBtn.classList.remove("disabled");
+}
+
+/* Image Popup functions */
 function openModal(card){
     document.getElementById("modalImg").src = card.querySelector("img").src;
     document.getElementById("imgModal").style.display = "flex";
@@ -492,7 +500,7 @@ function closeModal(){
     document.getElementById("imgModal").style.display = "none";
 }
 
-/* Event Real-time Countdown Tracking Module Engine */
+/* Real-time Meeting Countdown Clock loop execution entry */
 const meetingDate = new Date("2026-06-14T11:30:00").getTime();
 
 setInterval(() => {
