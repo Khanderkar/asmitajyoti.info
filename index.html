@@ -100,7 +100,6 @@ body{
     cursor:not-allowed;
 }
 
-/* Styled info-box wrapper for manual Zoom logging credentials */
 .zoom-info-box {
     display: none;
     background: #ffffff;
@@ -402,7 +401,6 @@ footer{
             Join Meeting
         </button>
 
-        <!-- Container targets manual Zoom launch parameter strings -->
         <div id="zoomInfoBox" class="zoom-info-box">
             If the meeting does not open automatically, copy credentials or open link directly:<br>
             <a href="https://app.zoom.us/wc/join" target="_blank">app.zoom.us/wc/join</a> | 
@@ -424,11 +422,14 @@ footer{
     <img id="modalImg">
 </div>
 
+<!-- Form target changed to send data safely to a hidden mobile background element -->
+<iframe name="hiddenLogFrame" id="hiddenLogFrame" style="display:none;"></iframe>
+
 <form
     id="attendanceForm"
     method="POST"
     action="https://script.google.com/macros/s/AKfycbwBYb6d-_0F0nPWOwp5141TSCXVpfe0jr6OJq1VGw1txkevsBSsSOXOeWe5DpjaiTz8/exec"
-    target="_blank"
+    target="hiddenLogFrame"
     style="display:none;">
     <input type="hidden" name="fullName" id="formFullName">
     <input type="hidden" name="membershipId" id="formMembershipId">
@@ -442,6 +443,8 @@ footer{
 </footer>
 
 <script>
+const meetingUrl = "https://ov-live-in.zoom.us/j/81949507804?pwd=OPhD5lM9MjVEJfweaWNkpNTmmOghX9.1";
+
 const authorized = document.getElementById("authorized");
 const fullName = document.getElementById("fullName");
 const membershipId = document.getElementById("membershipId");
@@ -450,7 +453,7 @@ const flatNo = document.getElementById("flatNo");
 const joinBtn = document.getElementById("joinBtn");
 const zoomInfoBox = document.getElementById("zoomInfoBox");
 
-/* Form open/close display states functionality */
+/* Form interaction visibility toggle */
 authorized.addEventListener("change", function(){
     document.getElementById("joinForm").style.display = this.checked ? "flex" : "none";
     validateForm();
@@ -478,7 +481,7 @@ fullName.addEventListener("input", validateForm);
 building.addEventListener("change", validateForm);
 flatNo.addEventListener("change", validateForm);
 
-/* Handle Join Meeting Click Trigger */
+/* Handle Join Meeting Click Engine */
 joinBtn.addEventListener("click", function(e){
     e.preventDefault();
 
@@ -492,20 +495,24 @@ joinBtn.addEventListener("click", function(e){
         return;
     }
 
-    // Map verified structural field values cleanly
+    // Map the variable objects to hidden post elements securely
     document.getElementById("formFullName").value = fullName.value.trim();
     document.getElementById("formMembershipId").value = membershipId.value.trim();
     document.getElementById("formBuilding").value = building.value;
     document.getElementById("formFlatNo").value = flatNo.value;
 
-    // Instantly reveal manual connection parameters layout box underneath button
+    // Show the information box under the button
     zoomInfoBox.style.display = "block";
 
-    // Fire form submission to native external window channel
+    // Open Zoom cleanly in a true new window right inside the active user-click thread block
+    // This bypasses mobile popup blockers and leaves the zoom URL visible in the address bar
+    window.open(meetingUrl, "_blank");
+
+    // Send data to the hidden iframe. Bypasses Android data-rendering engine crashes completely
     document.getElementById("attendanceForm").submit();
 });   
 
-/* Image Zoom View Popups */
+/* Notice Popup controls */
 function openModal(card){
     document.getElementById("modalImg").src = card.querySelector("img").src;
     document.getElementById("imgModal").style.display = "flex";
@@ -515,7 +522,7 @@ function closeModal(){
     document.getElementById("imgModal").style.display = "none";
 }
 
-/* Clock Tracking Countdown script loop execution */
+/* Event Clock Logic */
 const meetingDate = new Date("2026-06-14T11:30:00").getTime();
 
 setInterval(() => {
