@@ -85,7 +85,6 @@ body{
     background:#999;
     opacity:.6;
     cursor:not-allowed;
-    pointer-events: none;
 }
 
 .zoom-info-box {
@@ -202,7 +201,7 @@ footer{
         </div>
 
         <div id="zoomInfoBox" class="zoom-info-box">
-            If the meeting does not open automatically, copy credentials or open link directly:<br>
+            If the meeting does not open automatically after clicking Join Meeting, copy credentials or open link directly:<br>
             <a href="https://app.zoom.us/wc/join" target="_blank">app.zoom.us/wc/join</a> | 
             <strong>Meeting ID:</strong> 819 4950 7804 | 
             <strong>Passcode:</strong> 651334
@@ -232,22 +231,23 @@ const authorized = document.getElementById("authorized");
 const joinBtn = document.getElementById("joinBtn");
 const zoomInfoBox = document.getElementById("zoomInfoBox");
 
-/* Handle checkbox state to toggle both the button state and meeting credentials display */
+/* Handle checkbox state to toggle button styling and details block visibility */
 authorized.addEventListener("change", function(){
     if(this.checked) {
         joinBtn.classList.remove("disabled");
-        zoomInfoBox.style.display = "block"; // Instantly show credentials when ticked
+        zoomInfoBox.style.display = "block";
     } else {
         joinBtn.classList.add("disabled");
-        zoomInfoBox.style.display = "none";  // Hide credentials if unticked
+        zoomInfoBox.style.display = "none";
     }
 });
 
-/* Catch click triggers on a disabled button configuration */
+/* Intercept button click interactions */
 joinBtn.addEventListener("click", function(e){
-    if(joinBtn.classList.contains("disabled")){
+    // If the checkbox isn't checked, block redirection and show the alert
+    if(!authorized.checked){
         e.preventDefault();
-        alert("Please tick the confirmation box to join the meeting.");
+        alert("Please tick and fill all the required information for joining the meeting.");
     }
 });   
 
