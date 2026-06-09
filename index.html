@@ -14,7 +14,7 @@ body{
     background:linear-gradient(135deg,#1e3c72,#2a5298);
     color:#fff;
     min-height:100vh;
-    padding-top:280px; /* Reduced padding since input fields are removed */
+    padding-top:280px;
     text-align:center;
 }
 
@@ -85,7 +85,7 @@ body{
     background:#999;
     opacity:.6;
     cursor:not-allowed;
-    pointer-events: none; /* Disables clicking when unchecked */
+    pointer-events: none;
 }
 
 .zoom-info-box {
@@ -159,7 +159,7 @@ footer{
 
 @media(max-width:768px){
     body{
-        padding-top:420px; /* Adjusted responsive padding */
+        padding-top:420px;
     }
     
     .zoom-info-box {
@@ -196,7 +196,6 @@ footer{
         </div>
 
         <div class="join-container">
-            <!-- Native user-triggered link directly to Zoom to bypass mobile popup blockers completely -->
             <a href="https://ov-live-in.zoom.us/j/81949507804?pwd=OPhD5lM9MjVEJfweaWNkpNTmmOghX9.1" id="joinBtn" class="join-btn disabled" target="_blank">
                 Join Meeting
             </a>
@@ -233,28 +232,25 @@ const authorized = document.getElementById("authorized");
 const joinBtn = document.getElementById("joinBtn");
 const zoomInfoBox = document.getElementById("zoomInfoBox");
 
-/* Handle checkbox state to toggle the active/disabled look of the button */
+/* Handle checkbox state to toggle both the button state and meeting credentials display */
 authorized.addEventListener("change", function(){
     if(this.checked) {
         joinBtn.classList.remove("disabled");
+        zoomInfoBox.style.display = "block"; // Instantly show credentials when ticked
     } else {
         joinBtn.classList.add("disabled");
+        zoomInfoBox.style.display = "none";  // Hide credentials if unticked
     }
 });
 
-/* Direct link intercept listener to trigger the info-box instantly upon a valid click */
+/* Catch click triggers on a disabled button configuration */
 joinBtn.addEventListener("click", function(e){
     if(joinBtn.classList.contains("disabled")){
         e.preventDefault();
         alert("Please tick the confirmation box to join the meeting.");
-        return;
     }
-    
-    // Smoothly display the credentials text block right beneath the active click 
-    zoomInfoBox.style.display = "block";
 });   
 
-/* Notice Image Popup Functions */
 function openModal(card){
     document.getElementById("modalImg").src = card.querySelector("img").src;
     document.getElementById("imgModal").style.display = "flex";
@@ -264,7 +260,6 @@ function closeModal(){
     document.getElementById("imgModal").style.display = "none";
 }
 
-/* Event Clock Logic */
 const meetingDate = new Date("2026-06-14T11:30:00").getTime();
 
 setInterval(() => {
