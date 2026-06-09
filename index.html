@@ -14,7 +14,7 @@ body{
     background:linear-gradient(135deg,#1e3c72,#2a5298);
     color:#fff;
     min-height:100vh;
-    padding-top:420px;
+    padding-top:280px; /* Reduced padding since input fields are removed */
     text-align:center;
 }
 
@@ -62,29 +62,15 @@ body{
 .auth-box input{
     transform:scale(1.2);
     margin-right:8px;
+    cursor:pointer;
 }
 
-.join-form{
-    margin-top:15px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    justify-content:center;
+.join-container {
+    margin-top: 15px;
 }
 
-.join-form input,
-.join-form select{
-    padding:10px;
-    border-radius:5px;
-    border:1px solid #999;
-    min-width:200px;
-    font-size:14px;
-}
-
-/* Styled link selector button mimicking native elements flawlessly */
 .join-btn{
     display:inline-block;
-    margin-top:15px;
     padding:12px 26px;
     background:#003366;
     color:#fff;
@@ -99,7 +85,7 @@ body{
     background:#999;
     opacity:.6;
     cursor:not-allowed;
-    pointer-events: none; /* Stops linking operations completely when state is locked */
+    pointer-events: none; /* Disables clicking when unchecked */
 }
 
 .zoom-info-box {
@@ -173,12 +159,7 @@ footer{
 
 @media(max-width:768px){
     body{
-        padding-top:650px;
-    }
-
-    .join-form{
-        flex-direction:column;
-        align-items:center;
+        padding-top:420px; /* Adjusted responsive padding */
     }
     
     .zoom-info-box {
@@ -210,199 +191,16 @@ footer{
         <div class="auth-box">
             <label>
                 <input type="checkbox" id="authorized">
-                I confirm that I am an authorized member entitled to attend this SGBM and the details provided below are correct.
+                I confirm that I am an authorized member entitled to attend this SGBM.
             </label>
         </div>
 
-        <div class="join-form" id="joinForm" style="display:none;">
-            <input type="text" id="fullName" placeholder="Full Name *">
-            <input type="text" id="membershipId" placeholder="Membership ID (Optional)">
-
-            <select id="building">
-                <option value="">Select Building *</option>
-                <option>A1</option>
-                <option>A2</option>
-                <option>B1</option>
-                <option>C1</option>
-                <option>D1</option>
-                <option>D2</option>
-                <option>D3</option>
-                <option>D4</option>
-                <option>D5</option>
-                <option>D6</option>
-                <option>D7</option>
-                <option>D8</option>
-                <option>D9</option>
-                <option>D10</option>
-                <option>D11</option>
-                <option>E1</option>
-                <option>Shops/Units</option>
-            </select>
-
-            <select id="flatNo">
-                <option value="">Select Flat Number *</option>
-                <option>01</option>
-                <option>02</option>
-                <option>03</option>
-                <option>04</option>
-                <option>05</option>
-                <option>06</option>
-                <option>11</option>
-                <option>12</option>
-                <option>13</option>
-                <option>14</option>
-                <option>15</option>
-                <option>16</option>
-                <option>21</option>
-                <option>22</option>
-                <option>23</option>
-                <option>24</option>
-                <option>25</option>
-                <option>26</option>
-                <option>31</option>
-                <option>32</option>
-                <option>33</option>
-                <option>34</option>
-                <option>35</option>
-                <option>36</option>
-                <option>41</option>
-                <option>42</option>
-                <option>43</option>
-                <option>44</option>
-                <option>45</option>
-                <option>46</option>
-                <option>51</option>
-                <option>52</option>
-                <option>53</option>
-                <option>54</option>
-                <option>55</option>
-                <option>56</option>
-                <option>61</option>
-                <option>62</option>
-                <option>63</option>
-                <option>64</option>
-                <option>65</option>
-                <option>66</option>
-                <option>71</option>
-                <option>72</option>
-                <option>73</option>
-                <option>74</option>
-                <option>75</option>
-                <option>76</option>
-                <option>81</option>
-                <option>82</option>
-                <option>83</option>
-                <option>84</option>
-                <option>85</option>
-                <option>86</option>
-                <option>91</option>
-                <option>92</option>
-                <option>93</option>
-                <option>94</option>
-                <option>95</option>
-                <option>96</option>
-                <option>101</option>
-                <option>102</option>
-                <option>103</option>
-                <option>104</option>
-                <option>105</option>
-                <option>106</option>
-                <option>111</option>
-                <option>112</option>
-                <option>113</option>
-                <option>114</option>
-                <option>115</option>
-                <option>116</option>
-                <option>121</option>
-                <option>122</option>
-                <option>123</option>
-                <option>124</option>
-                <option>125</option>
-                <option>126</option>
-                <option>131</option>
-                <option>132</option>
-                <option>133</option>
-                <option>134</option>
-                <option>135</option>
-                <option>136</option>
-                <option>141</option>
-                <option>142</option>
-                <option>143</option>
-                <option>144</option>
-                <option>145</option>
-                <option>146</option>
-                <option>151</option>
-                <option>152</option>
-                <option>153</option>
-                <option>154</option>
-                <option>155</option>
-                <option>156</option>
-                <option>Shop # 01</option>
-                <option>Shop # 02</option>
-                <option>Shop # 03</option>
-                <option>Shop # 04</option>
-                <option>Shop # 05</option>
-                <option>Shop # 06</option>
-                <option>Shop # 08</option>
-                <option>Shop # 09</option>
-                <option>Shop # 10</option>
-                <option>Shop # 11</option>
-                <option>Shop # 12</option>
-                <option>Shop # 13</option>
-                <option>Shop # 14</option>
-                <option>Shop # 15</option>
-                <option>Shop # 16</option>
-                <option>Shop # 17</option>
-                <option>Shop # 18</option>
-                <option>Shop # 19</option>
-                <option>Shop # 20</option>
-                <option>Shop # 21</option>
-                <option>Shop # 22</option>
-                <option>Shop # 23</option>
-                <option>Shop # 24</option>
-                <option>Shop # 25</option>
-                <option>Shop # 26</option>
-                <option>Shop # 27</option>
-                <option>Shop # 28</option>
-                <option>Shop # 29</option>
-                <option>Shop # 30</option>
-                <option>Shop # 31</option>
-                <option>Shop # 32</option>
-                <option>Shop # 33</option>
-                <option>Shop # 34</option>
-                <option>Shop # 35</option>
-                <option>Shop # 36</option>
-                <option>Shop # 37</option>
-                <option>Shop # 38</option>
-                <option>Shop # 39</option>
-                <option>Shop # 40</option>
-                <option>Shop # 41</option>
-                <option>Shop # 42</option>
-                <option>Shop # 43</option>
-                <option>Shop # 44</option>
-                <option>Shop # 45</option>
-                <option>Shop # 46</option>
-                <option>Shop # 47</option>
-                <option>Shop # 48</option>
-                <option>Shop # 49</option>
-                <option>Shop # 50</option>
-                <option>Shop # 51</option>
-                <option>Shop # 52</option>
-                <option>Unit # 01</option>
-                <option>Unit # 02</option>
-                <option>Unit # 03</option>
-                <option>Unit # 04</option>
-                <option>Unit # 05</option>
-                <option>Unit # 06</option>
-                <option>Unit # 07</option>
-                <option>Unit # 08</option>
-            </select>
+        <div class="join-container">
+            <!-- Native user-triggered link directly to Zoom to bypass mobile popup blockers completely -->
+            <a href="https://ov-live-in.zoom.us/j/81949507804?pwd=OPhD5lM9MjVEJfweaWNkpNTmmOghX9.1" id="joinBtn" class="join-btn disabled" target="_blank">
+                Join Meeting
+            </a>
         </div>
-
-        <!-- Button re-engineered as an anchor link tag for seamless tracking transitions -->
-        <a href="#" id="joinBtn" class="join-btn disabled" target="_blank">
-            Join Meeting
-        </a>
 
         <div id="zoomInfoBox" class="zoom-info-box">
             If the meeting does not open automatically, copy credentials or open link directly:<br>
@@ -431,71 +229,32 @@ footer{
 </footer>
 
 <script>
-// !! IMPORTANT !! REPLACE THIS BASE PATH STRING WITH YOUR NEW GOOGLE APPS SCRIPT WEB APP URL IDENTIFIER
-const scriptBaseUrl = "https://script.google.com/macros/s/AKfycbwBYb6d-_0F0nPWOwp5141TSCXVpfe0jr6OJq1VGw1txkevsBSsSOXOeWe5DpjaiTz8/exec";
-
 const authorized = document.getElementById("authorized");
-const fullName = document.getElementById("fullName");
-const membershipId = document.getElementById("membershipId");
-const building = document.getElementById("building");
-const flatNo = document.getElementById("flatNo");
 const joinBtn = document.getElementById("joinBtn");
 const zoomInfoBox = document.getElementById("zoomInfoBox");
 
+/* Handle checkbox state to toggle the active/disabled look of the button */
 authorized.addEventListener("change", function(){
-    document.getElementById("joinForm").style.display = this.checked ? "flex" : "none";
-    updateAnchorLink();
-});
-
-membershipId.addEventListener("input", function(){
-    this.value = this.value.replace(/[^0-9]/g, "");
-    updateAnchorLink();
-});
-
-fullName.addEventListener("input", updateAnchorLink);
-building.addEventListener("change", updateAnchorLink);
-flatNo.addEventListener("change", updateAnchorLink);
-
-/* 
-  Calculates field parameters and appends them natively into the hyperlink href attribute.
-  This makes the data payload part of the direct navigation click sequence.
-*/
-function updateAnchorLink(){
-    if(
-        authorized.checked &&
-        fullName.value.trim() !== "" &&
-        building.value !== "" &&
-        flatNo.value !== ""
-    ){
+    if(this.checked) {
         joinBtn.classList.remove("disabled");
-        
-        // Dynamically append URL parameters to the destination anchor
-        const queryParams = new URLSearchParams();
-        queryParams.append("fullName", fullName.value.trim());
-        queryParams.append("membershipId", membershipId.value.trim());
-        queryParams.append("building", building.value);
-        queryParams.append("flatNo", flatNo.value);
-        
-        joinBtn.href = scriptBaseUrl + "?" + queryParams.toString();
-    }
-    else{
+    } else {
         joinBtn.classList.add("disabled");
-        joinBtn.href = "#";
     }
-}
+});
 
-/* Intercept click context only for verification or fallback UI cues */
+/* Direct link intercept listener to trigger the info-box instantly upon a valid click */
 joinBtn.addEventListener("click", function(e){
     if(joinBtn.classList.contains("disabled")){
         e.preventDefault();
-        alert("Please tick and fill all the required information for joining the meeting.");
+        alert("Please tick the confirmation box to join the meeting.");
         return;
     }
     
-    // Display our safe structural info box element 
+    // Smoothly display the credentials text block right beneath the active click 
     zoomInfoBox.style.display = "block";
 });   
 
+/* Notice Image Popup Functions */
 function openModal(card){
     document.getElementById("modalImg").src = card.querySelector("img").src;
     document.getElementById("imgModal").style.display = "flex";
@@ -505,6 +264,7 @@ function closeModal(){
     document.getElementById("imgModal").style.display = "none";
 }
 
+/* Event Clock Logic */
 const meetingDate = new Date("2026-06-14T11:30:00").getTime();
 
 setInterval(() => {
