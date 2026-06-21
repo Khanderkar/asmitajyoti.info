@@ -113,6 +113,15 @@ body{
     padding:40px 20px;
 }
 
+/* Custom styling for the PDF link to stand out and look clickable */
+.pdf-link {
+    color: #ffcc00;
+    text-decoration: none;
+}
+.pdf-link:hover {
+    text-decoration: underline;
+}
+
 .ad-card{
     background:#fff;
     color:#000;
@@ -210,6 +219,16 @@ footer{
 </div>
 
 <div class="ads-section">
+    <!-- New Minutes of Meeting PDF Section -->
+    <h1>
+        <a href="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf" target="_blank" class="pdf-link">
+            21 Jun 2026 | SGBM Minutes Of Meeting (PDF)
+        </a>
+    </h1>
+    
+    <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.3); margin: 40px 0;">
+
+    <!-- Existing Notice Section -->
     <h1>28 May 2026 | SGBM Notice - Redevelopment / PMC Recruitment</h1>
     <div class="ad-card" onclick="openModal(this)">
         <img src="Images/AGM_Notice.jpg" alt="Notice">
