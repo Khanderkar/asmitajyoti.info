@@ -14,7 +14,7 @@ body{
     background:linear-gradient(135deg,#1e3c72,#2a5298);
     color:#fff;
     min-height:100vh;
-    padding-top:40px; /* Reduced padding from 280px since the fixed banner is hidden */
+    padding-top:40px; 
     text-align:center;
 }
 
@@ -113,7 +113,6 @@ body{
     padding:40px 20px;
 }
 
-/* Custom styling for the PDF link to stand out and look clickable */
 .pdf-link {
     color: #ffcc00;
     text-decoration: none;
@@ -129,11 +128,20 @@ body{
     padding:10px;
     box-shadow:0 2px 8px rgba(0,0,0,.15);
     cursor:pointer;
+    display: block; /* Ensures the whole link container acts like a block card */
+    text-decoration: none;
 }
 
 .ad-card img{
     width:100%;
     border-radius:4px;
+}
+
+/* Style to make the placeholder vector fit nicely in your card layout without being stretched */
+.pdf-thumbnail-img {
+    max-height: 250px;
+    width: auto !important;
+    margin: 10px auto;
 }
 
 .modal{
@@ -167,7 +175,7 @@ footer{
 
 @media(max-width:768px){
     body{
-        padding-top:40px; /* Reduced mobile padding context as well */
+        padding-top:40px;
     }
     
     .zoom-info-box {
@@ -222,12 +230,15 @@ footer{
 -->
 
 <div class="ads-section">
-    <!-- Minutes of Meeting PDF Section -->
+    <!-- Minutes of Meeting PDF Section with Thumbnail -->
     <h1>
         <a href="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf" target="_blank" class="pdf-link">
             21 Jun 2026 | SGBM Minutes Of Meeting (PDF)
         </a>
     </h1>
+    <a href="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf" target="_blank" class="ad-card">
+        <img class="pdf-thumbnail-img" src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcSZ-EoEb_eT90yicprsogzUSgGny4hJ3B2V--_fcOeYhcvt2111AdoVcplGhVDV6IU7yU5iTq_5ci2ib9k" alt="PDF Document Icon">
+    </a>
     
     <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.3); margin: 40px 0;">
 
@@ -269,7 +280,6 @@ if (authorized) {
 /* Intercept button click interactions */
 if (joinBtn) {
     joinBtn.addEventListener("click", function(e){
-        // If the checkbox isn't checked, block redirection and show the alert
         if(!authorized.checked){
             e.preventDefault();
             alert("Please tick and fill all the required information for joining the meeting.");
@@ -278,6 +288,9 @@ if (joinBtn) {
 }
 
 function openModal(card){
+    // Safe check to make sure we don't try to open the PDF icon link in the image viewer modal
+    if(card.classList.contains('pdf-thumbnail-img') || card.tagName === 'A') return;
+    
     document.getElementById("modalImg").src = card.querySelector("img").src;
     document.getElementById("imgModal").style.display = "flex";
 }
