@@ -14,7 +14,7 @@ body{
     background:linear-gradient(135deg,#1e3c72,#2a5298);
     color:#fff;
     min-height:100vh;
-    padding-top:280px;
+    padding-top:40px; /* Reduced padding from 280px since the fixed banner is hidden */
     text-align:center;
 }
 
@@ -167,7 +167,7 @@ footer{
 
 @media(max-width:768px){
     body{
-        padding-top:420px;
+        padding-top:40px; /* Reduced mobile padding context as well */
     }
     
     .zoom-info-box {
@@ -180,6 +180,8 @@ footer{
 
 <body>
 
+<!-- THE YELLOW ZOOM BANNER SECTION HAS BEEN COMMENTED OUT BELOW -->
+<!-- 
 <div class="top-banner">
     <div class="banner-content">
         <div class="banner-title">
@@ -217,9 +219,10 @@ footer{
         </div>
     </div>
 </div>
+-->
 
 <div class="ads-section">
-    <!-- New Minutes of Meeting PDF Section -->
+    <!-- Minutes of Meeting PDF Section -->
     <h1>
         <a href="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf" target="_blank" class="pdf-link">
             21 Jun 2026 | SGBM Minutes Of Meeting (PDF)
@@ -251,24 +254,28 @@ const joinBtn = document.getElementById("joinBtn");
 const zoomInfoBox = document.getElementById("zoomInfoBox");
 
 /* Handle checkbox state to toggle button styling and details block visibility */
-authorized.addEventListener("change", function(){
-    if(this.checked) {
-        joinBtn.classList.remove("disabled");
-        zoomInfoBox.style.display = "block";
-    } else {
-        joinBtn.classList.add("disabled");
-        zoomInfoBox.style.display = "none";
-    }
-});
+if (authorized) {
+    authorized.addEventListener("change", function(){
+        if(this.checked) {
+            joinBtn.classList.remove("disabled");
+            zoomInfoBox.style.display = "block";
+        } else {
+            joinBtn.classList.add("disabled");
+            zoomInfoBox.style.display = "none";
+        }
+    });
+}
 
 /* Intercept button click interactions */
-joinBtn.addEventListener("click", function(e){
-    // If the checkbox isn't checked, block redirection and show the alert
-    if(!authorized.checked){
-        e.preventDefault();
-        alert("Please tick and fill all the required information for joining the meeting.");
-    }
-});   
+if (joinBtn) {
+    joinBtn.addEventListener("click", function(e){
+        // If the checkbox isn't checked, block redirection and show the alert
+        if(!authorized.checked){
+            e.preventDefault();
+            alert("Please tick and fill all the required information for joining the meeting.");
+        }
+    });   
+}
 
 function openModal(card){
     document.getElementById("modalImg").src = card.querySelector("img").src;
@@ -283,13 +290,16 @@ const meetingDate = new Date("2026-06-14T11:30:00").getTime();
 
 setInterval(() => {
     const d = meetingDate - new Date().getTime();
+    const countdownEl = document.getElementById("countdown");
+    
+    if(!countdownEl) return;
 
     if(d <= 0){
-        document.getElementById("countdown").innerHTML = "<span>Meeting Started</span>";
+        countdownEl.innerHTML = "<span>Meeting Started</span>";
         return;
     }
 
-    document.getElementById("countdown").innerHTML =
+    countdownEl.innerHTML =
         `<span>${Math.floor(d/86400000)} Days</span>
          <span>${Math.floor(d/3600000)%24} Hrs</span>
          <span>${Math.floor(d/60000)%60} Min</span>
