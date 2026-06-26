@@ -280,7 +280,7 @@ footer {
 
 <div class="main-wrapper">
 
-    <!-- LEFT SIDEBAR -->
+    <!-- LEFT SIDEBAR (Sorted in descending chronological order) -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-content">
             <div class="sidebar-header">
@@ -291,6 +291,7 @@ footer {
             <ul class="sidebar-menu">
                 <li class="sidebar-item" onclick="switchDoc(0)">21 Jun 2026 | SGBM (14Jun2026) Minutes Of Meeting</li>
                 <li class="sidebar-item" onclick="switchDoc(1)">28 May 2026 | SGBM Notice (14Jun2026) - Redevelopment / PMC Recruitment</li>
+                <li class="sidebar-item" onclick="switchDoc(2)">13 Jan 2026 | SGBM Notice (01Feb2026) - Redevelopment / PMC Recruitment</li>
             </ul>
         </div>
     </div>
@@ -306,17 +307,25 @@ footer {
             Please select an item from the "List of Documents" to view it.
         </div>
         
-        <!-- Document 1: FULL EMBEDDED PDF -->
+        <!-- Document index 0: 21 Jun 2026 -->
         <div class="doc-content" id="doc-0">
             <h1 class="doc-title">21 Jun 2026 | SGBM (14Jun2026) Minutes Of Meeting</h1>
             <iframe class="pdf-viewer-frame" src="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf#toolbar=1&navpanes=1" scrolling="yes"></iframe>
         </div>
 
-        <!-- Document 2: Image Notice -->
+        <!-- Document index 1: 28 May 2026 -->
         <div class="doc-content" id="doc-1">
             <h1 class="doc-title">28 May 2026 | SGBM Notice (14Jun2026) - Redevelopment / PMC Recruitment</h1>
             <div class="ad-card" onclick="openModal(this)">
-                <img src="Images/AGM_Notice.jpg" alt="Notice">
+                <img src="https://asmitajyoti.info/Images/AGM_Notice_14Jun2026.jpg" alt="Notice 14Jun2026">
+            </div>
+        </div>
+
+        <!-- Document index 2: 13 Jan 2026 -->
+        <div class="doc-content" id="doc-2">
+            <h1 class="doc-title">13 Jan 2026 | SGBM Notice (01Feb2026) - Redevelopment / PMC Recruitment</h1>
+            <div class="ad-card" onclick="openModal(this)">
+                <img src="https://asmitajyoti.info/Images/AGM_Notice_01Feb2026.jpg" alt="Notice 01Feb2026">
             </div>
         </div>
 
