@@ -174,16 +174,24 @@ body {
     text-align: center;
 }
 
-/* Full PDF Frame Styling with fixed multi-page scrolling capability */
-.pdf-viewer-frame {
+/* iOS & Mobile Fix Container to force scroll bars on PDFs */
+.pdf-scroll-wrapper {
     width: 100%;
     flex: 1;
-    border: none;
+    min-height: 600px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Crucial for iOS scroll momentum */
     border-radius: 6px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     background: #fff;
-    min-height: 600px;
-    overflow-y: auto;
+}
+
+/* Full PDF Frame Styling */
+.pdf-viewer-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
 }
 
 /* Notice Card Layout */
@@ -267,20 +275,23 @@ footer {
     .content-area {
         padding: 15px;
     }
+    .pdf-scroll-wrapper {
+        min-height: 500px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<!-- YELLOW HEADER BOX -->
+<!-- UPDATED YELLOW HEADER BOX -->
 <div class="top-header">
-    Asmita Jyoti Redevelopment
+    Asmita Jyoti CHSL Redevelopment updates
 </div>
 
 <div class="main-wrapper">
 
-    <!-- LEFT SIDEBAR (Sorted in descending chronological order) -->
+    <!-- LEFT SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-content">
             <div class="sidebar-header">
@@ -296,7 +307,7 @@ footer {
         </div>
     </div>
 
-    <!-- FLOATING TOGGLE BUTTON OUTSIDE SIDEBAR (Only visible when sidebar is collapsed) -->
+    <!-- FLOATING TOGGLE BUTTON OUTSIDE SIDEBAR -->
     <button class="toggle-btn floating" id="collapsedToggleBtn" onclick="toggleSidebar()" style="display: none;">&gt;&gt;</button>
 
     <!-- RIGHT SIDE CONTENT CONTAINER -->
@@ -307,10 +318,12 @@ footer {
             Please select an item from the "List of Documents" to view it.
         </div>
         
-        <!-- Document index 0: 21 Jun 2026 -->
+        <!-- Document index 0: 21 Jun 2026 (With iOS-safe Scroll Wrapper) -->
         <div class="doc-content" id="doc-0">
             <h1 class="doc-title">21 Jun 2026 | SGBM (14Jun2026) Minutes Of Meeting</h1>
-            <iframe class="pdf-viewer-frame" src="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf#toolbar=1&navpanes=1" scrolling="yes"></iframe>
+            <div class="pdf-scroll-wrapper">
+                <iframe class="pdf-viewer-frame" src="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf#toolbar=1&navpanes=1" scrolling="yes"></iframe>
+            </div>
         </div>
 
         <!-- Document index 1: 28 May 2026 -->
@@ -352,17 +365,14 @@ function toggleSidebar() {
     sidebar.classList.toggle('collapsed');
     
     if (sidebar.classList.contains('collapsed')) {
-        // Show the outside floating >> button when menu is hidden
         collapsedToggleBtn.style.display = 'block';
     } else {
-        // Hide the outside button when menu is visible
         collapsedToggleBtn.style.display = 'none';
     }
 }
 
 // Switch Right Panel Document Content
 function switchDoc(index) {
-    // Hide the initial welcome message placeholder
     document.getElementById('welcomeMsg').style.display = 'none';
 
     const contents = document.querySelectorAll('.doc-content');
