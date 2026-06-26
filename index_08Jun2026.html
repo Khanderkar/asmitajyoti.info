@@ -141,6 +141,20 @@ body {
     position: relative;
 }
 
+/* Placeholder box configuration */
+.welcome-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+    max-width: 500px;
+}
+
 .doc-content {
     display: none;
     width: 100%;
@@ -160,7 +174,7 @@ body {
     text-align: center;
 }
 
-/* Full PDF Frame Styling */
+/* Full PDF Frame Styling with fixed multi-page scrolling capability */
 .pdf-viewer-frame {
     width: 100%;
     flex: 1;
@@ -168,7 +182,8 @@ body {
     border-radius: 6px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     background: #fff;
-    min-height: 500px;
+    min-height: 600px;
+    overflow-y: auto;
 }
 
 /* Notice Card Layout */
@@ -283,13 +298,18 @@ footer {
     <!-- FLOATING TOGGLE BUTTON OUTSIDE SIDEBAR (Only visible when sidebar is collapsed) -->
     <button class="toggle-btn floating" id="collapsedToggleBtn" onclick="toggleSidebar()" style="display: none;">&gt;&gt;</button>
 
-    <!-- RIGHT SIDE CONTENT CONTAINER (Starts Blank) -->
+    <!-- RIGHT SIDE CONTENT CONTAINER -->
     <div class="content-area">
+        
+        <!-- Welcome Message (Visible by default on initial page load) -->
+        <div class="welcome-placeholder" id="welcomeMsg">
+            Please select an item from the "List of Documents" to view it.
+        </div>
         
         <!-- Document 1: FULL EMBEDDED PDF -->
         <div class="doc-content" id="doc-0">
             <h1 class="doc-title">21 Jun 2026 | SGBM (14Jun2026) Minutes Of Meeting</h1>
-            <iframe class="pdf-viewer-frame" src="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf"></iframe>
+            <iframe class="pdf-viewer-frame" src="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf#toolbar=1&navpanes=1" scrolling="yes"></iframe>
         </div>
 
         <!-- Document 2: Image Notice -->
@@ -333,6 +353,9 @@ function toggleSidebar() {
 
 // Switch Right Panel Document Content
 function switchDoc(index) {
+    // Hide the initial welcome message placeholder
+    document.getElementById('welcomeMsg').style.display = 'none';
+
     const contents = document.querySelectorAll('.doc-content');
     contents.forEach(doc => doc.classList.remove('active'));
 
