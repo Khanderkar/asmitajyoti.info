@@ -30,18 +30,32 @@ body {
 /* --- LEFT SIDEBAR --- */
 .sidebar {
     width: 320px;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.25);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
-    transition: all 0.3s ease;
+    transition: width 0.3s ease;
     z-index: 10;
+    flex-shrink: 0;
 }
 
 .sidebar.collapsed {
     width: 0;
-    overflow: hidden;
     border-right: none;
+}
+
+/* Hide content when sidebar is shrinking to avoid layout pop */
+.sidebar-content {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: opacity 0.2s ease;
+}
+
+.sidebar.collapsed .sidebar-content {
+    opacity: 0;
+    pointer-events: none;
 }
 
 .sidebar-header {
@@ -77,7 +91,7 @@ body {
     border-left: 4px solid #ffcc00;
 }
 
-/* --- TOGGLE COLLAPSE BUTTON --- */
+/* --- STREAMLINED TOGGLE BUTTON (<< / >>) --- */
 .toggle-btn {
     position: absolute;
     top: 15px;
@@ -85,10 +99,11 @@ body {
     background: #ffcc00;
     color: #000;
     border: none;
-    padding: 8px 12px;
+    padding: 8px 14px;
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
+    font-size: 1.1rem;
     z-index: 100;
     transition: left 0.3s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
@@ -101,45 +116,44 @@ body {
 /* --- RIGHT SIDE CONTENT AREA --- */
 .content-area {
     flex: 1;
-    padding: 60px 40px 40px 40px;
+    padding: 70px 30px 30px 30px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
 }
 
 .doc-content {
     display: none;
     width: 100%;
-    max-width: 800px;
+    height: 100%;
+    max-width: 1000px;
     animation: fadeIn 0.4s ease;
 }
 
 .doc-content.active {
-    display: block;
+    display: flex;
+    flex-direction: column;
 }
 
 .doc-title {
-    font-size: 1.8rem;
-    margin-bottom: 20px;
+    font-size: 1.5rem;
+    margin: 0 0 15px 0;
     text-align: center;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Full PDF Frame Styling */
+.pdf-viewer-frame {
+    width: 100%;
+    flex: 1;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    background: #fff;
+    min-height: 500px;
 }
 
-/* Existing Card & Element Styles */
-.pdf-link {
-    color: #ffcc00;
-    text-decoration: none;
-}
-.pdf-link:hover {
-    text-decoration: underline;
-}
-
+/* Notice Card Layout */
 .ad-card {
     background: #fff;
     color: #000;
@@ -148,7 +162,6 @@ body {
     box-shadow: 0 4px 15px rgba(0,0,0,.25);
     cursor: pointer;
     display: block;
-    text-decoration: none;
     margin: 0 auto;
     max-width: 600px;
 }
@@ -158,14 +171,12 @@ body {
     border-radius: 4px;
 }
 
-.pdf-thumbnail-img {
-    max-height: 300px;
-    width: auto !important;
-    display: block;
-    margin: 10px auto;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Modal styles */
+/* Modal views */
 .modal {
     display: none;
     position: fixed;
@@ -191,33 +202,36 @@ body {
 }
 
 footer {
-    padding: 20px;
+    padding: 15px;
     font-size: .85rem;
-    background: rgba(0,0,0,0.1);
+    background: rgba(0,0,0,0.2);
     text-align: center;
 }
 
-/* Responsive Overrides */
+/* Mobile Adjustments */
 @media(max-width: 768px) {
     .main-wrapper {
         flex-direction: column;
     }
     .sidebar {
         width: 100%;
-        height: 200px;
-        border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        height: auto;
     }
     .sidebar.collapsed {
         height: 0;
     }
+    .sidebar-content {
+        width: 100%;
+    }
     .toggle-btn {
-        top: auto;
-        bottom: 70px;
-        left: 20px !important;
+        position: relative;
+        top: 0;
+        left: 0 !important;
+        margin: 10px;
+        align-self: flex-start;
     }
     .content-area {
-        padding: 20px;
+        padding: 15px;
     }
 }
 </style>
@@ -227,29 +241,30 @@ footer {
 
 <div class="main-wrapper">
 
+    <!-- LEFT SIDEBAR -->
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">Documents Menu</div>
-        <ul class="sidebar-menu">
-            <li class="sidebar-item active" onclick="switchDoc(0)">21 Jun 2026 | SGBM Minutes Of Meeting (PDF)</li>
-            <li class="sidebar-item" onclick="switchDoc(1)">28 May 2026 | SGBM Notice - Redevelopment</li>
-        </ul>
+        <div class="sidebar-content">
+            <div class="sidebar-header">Documents Menu</div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item active" onclick="switchDoc(0)">21 Jun 2026 | SGBM Minutes (PDF)</li>
+                <li class="sidebar-item" onclick="switchDoc(1)">28 May 2026 | SGBM Notice</li>
+            </ul>
+        </div>
     </div>
 
-    <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">☰ Toggle Sidebar</button>
+    <!-- SIDEBAR TOGGLE BUTTON (<< / >>) -->
+    <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">&lt;&lt;</button>
 
+    <!-- RIGHT SIDE CONTENT CONTAINER -->
     <div class="content-area">
         
+        <!-- Document 1: FULL EMBEDDED PDF -->
         <div class="doc-content active" id="doc-0">
-            <h1 class="doc-title">
-                <a href="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf" target="_blank" class="pdf-link">
-                    21 Jun 2026 | SGBM Minutes Of Meeting (PDF)
-                </a>
-            </h1>
-            <a href="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf" target="_blank" class="ad-card">
-                <img class="pdf-thumbnail-img" src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcSZ-EoEb_eT90yicprsogzUSgGny4hJ3B2V--_fcOeYhcvt2111AdoVcplGhVDV6IU7yU5iTq_5ci2ib9k" alt="PDF Document Icon">
-            </a>
+            <h1 class="doc-title">21 Jun 2026 | SGBM Minutes Of Meeting</h1>
+            <iframe class="pdf-viewer-frame" src="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf"></iframe>
         </div>
 
+        <!-- Document 2: Image Notice -->
         <div class="doc-content" id="doc-1">
             <h1 class="doc-title">28 May 2026 | SGBM Notice - Redevelopment / PMC Recruitment</h1>
             <div class="ad-card" onclick="openModal(this)">
@@ -260,6 +275,7 @@ footer {
     </div>
 </div>
 
+<!-- Modal View Component -->
 <div class="modal" id="imgModal">
     <span class="modal-close" onclick="closeModal()">×</span>
     <img id="modalImg">
@@ -271,31 +287,35 @@ footer {
 </footer>
 
 <script>
-// Sidebar Toggle Logic
+// Sidebar Toggle Logic with changing symbols
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleBtn');
+    
     sidebar.classList.toggle('collapsed');
+    
+    if (sidebar.classList.contains('collapsed')) {
+        toggleBtn.innerHTML = '&gt;&gt;';
+    } else {
+        toggleBtn.innerHTML = '&lt;&lt;';
+    }
 }
 
 // Switch Right Panel Document Content
 function switchDoc(index) {
-    // Hide all document contents
     const contents = document.querySelectorAll('.doc-content');
     contents.forEach(doc => doc.classList.remove('active'));
 
-    // Deactivate all sidebar items
     const menuItems = document.querySelectorAll('.sidebar-item');
     menuItems.forEach(item => item.classList.remove('active'));
 
-    // Activate selected items
     document.getElementById(`doc-${index}`).classList.add('active');
     menuItems[index].classList.add('active');
 }
 
 // Modal View Controls
 function openModal(card){
-    if(card.classList.contains('pdf-thumbnail-img') || card.tagName === 'A') return;
-    
+    if(card.tagName === 'IFRAME') return;
     document.getElementById("modalImg").src = card.querySelector("img").src;
     document.getElementById("imgModal").style.display = "flex";
 }
