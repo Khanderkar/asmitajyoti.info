@@ -8,179 +8,282 @@
 <style>
 * { box-sizing: border-box; }
 
-body{
-    margin:0;
-    font-family:Arial, Helvetica, sans-serif;
-    background:linear-gradient(135deg,#1e3c72,#2a5298);
-    color:#fff;
-    min-height:100vh;
-    padding-top:40px; 
-    text-align:center;
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-.top-banner{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    background:#ffcc00;
-    color:#000;
-    z-index:1000;
-    box-shadow:0 2px 6px rgba(0,0,0,.25);
-}
-
-.banner-content{
-    max-width:1200px;
-    margin:auto;
-    padding:14px 16px 20px;
-}
-
-.banner-title{
-    font-weight:bold;
-    font-size:1rem;
-}
-
-.marathi{
-    margin-top:6px;
-    font-size:.95rem;
-}
-
-.countdown span{
-    background:#fff;
-    padding:6px 10px;
-    margin:2px;
-    border-radius:4px;
-    display:inline-block;
-    min-width:70px;
-}
-
-.auth-box{
-    margin-top:15px;
-    font-weight:bold;
-}
-
-.auth-box input{
-    transform:scale(1.2);
-    margin-right:8px;
-    cursor:pointer;
-}
-
-.join-container {
-    margin-top: 15px;
-}
-
-.join-btn{
-    display:inline-block;
-    padding:12px 26px;
-    background:#003366;
-    color:#fff;
-    text-decoration:none;
-    border-radius:6px;
-    font-weight:bold;
-    border:none;
-    cursor:pointer;
-}
-
-.join-btn.disabled{
-    background:#999;
-    opacity:.6;
-    cursor:not-allowed;
-}
-
-.zoom-info-box {
-    display: none;
-    background: #ffffff;
-    color: #333333;
-    max-width: 650px;
-    margin: 15px auto 0 auto;
-    padding: 12px 16px;
-    border-radius: 6px;
-    font-size: 14px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    line-height: 1.5;
-    border-left: 5px solid #003366;
-}
-
-.zoom-info-box a {
-    color: #003366;
-    text-decoration: underline;
+/* --- TOP HEADER BOX --- */
+.top-header {
+    background: #ffcc00; 
+    color: #ffffff;      
+    padding: 15px 20px;
+    font-size: 1.6rem;
     font-weight: bold;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    z-index: 110;
+    letter-spacing: 0.5px;
 }
 
-.ads-section{
-    max-width:1200px;
-    margin:auto;
-    padding:40px 20px;
+/* Main Layout Wrapper */
+.main-wrapper {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 62px); 
+    overflow: hidden;
+    position: relative;
 }
 
-.pdf-link {
-    color: #ffcc00;
+/* --- LEFT SIDEBAR --- */
+.sidebar {
+    width: 320px;
+    background: rgba(0, 0, 0, 0.25);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: width 0.3s ease;
+    z-index: 10;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.sidebar.collapsed {
+    width: 0;
+    border-right: none;
+}
+
+.sidebar-content {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: opacity 0.2s ease;
+}
+
+.sidebar.collapsed .sidebar-content {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.sidebar-header {
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    font-weight: bold;
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+}
+
+.sidebar-item {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s ease;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.sidebar-item:hover, .sidebar-item.active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.sidebar-item.active {
+    border-left: 4px solid #ffcc00;
+}
+
+/* --- STREAMLINED TOGGLE BUTTON --- */
+.toggle-btn {
+    background: #ffcc00;
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.toggle-btn.floating {
+    position: absolute;
+    top: 12px;
+    left: 15px;
+    z-index: 100;
+}
+
+/* --- RIGHT SIDE CONTENT AREA --- */
+.content-area {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.welcome-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+    max-width: 500px;
+}
+
+.doc-content {
+    display: none;
+    width: 100%;
+    height: 100%;
+    max-width: 1000px;
+    animation: fadeIn 0.4s ease;
+}
+
+.doc-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.doc-title {
+    font-size: 1.5rem;
+    margin: 0 0 15px 0;
+    text-align: center;
+}
+
+/* iOS PDF Mobile Container Fixes */
+.pdf-scroll-wrapper {
+    width: 100%;
+    flex: 1;
+    min-height: 550px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 6px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    background: #fff;
+    overflow: hidden;
+}
+
+.pdf-object-frame {
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    border: none;
+}
+
+/* Mobile Fallback Button for 9-page view */
+.mobile-pdf-link-fallback {
+    display: block;
+    margin: 15px auto;
+    padding: 12px 24px;
+    background: #003366;
+    color: #fff;
     text-decoration: none;
-}
-.pdf-link:hover {
-    text-decoration: underline;
-}
-
-.ad-card{
-    background:#fff;
-    color:#000;
-    border-radius:8px;
-    padding:10px;
-    box-shadow:0 2px 8px rgba(0,0,0,.15);
-    cursor:pointer;
-    display: block; /* Ensures the whole link container acts like a block card */
-    text-decoration: none;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-.ad-card img{
-    width:100%;
-    border-radius:4px;
+/* Notice Card Layout */
+.ad-card {
+    background: #fff;
+    color: #000;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.25);
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+    max-width: 600px;
 }
 
-/* Style to make the placeholder vector fit nicely in your card layout without being stretched */
-.pdf-thumbnail-img {
-    max-height: 250px;
-    width: auto !important;
-    margin: 10px auto;
+.ad-card img {
+    width: 100%;
+    border-radius: 4px;
 }
 
-.modal{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.85);
-    z-index:2000;
-    justify-content:center;
-    align-items:center;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.modal img{
-    max-width:95%;
-    max-height:95%;
+/* Modal views */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.85);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
 }
 
-.modal-close{
-    position:absolute;
-    top:20px;
-    right:30px;
-    font-size:36px;
-    color:#fff;
-    cursor:pointer;
+.modal img {
+    max-width: 95%;
+    max-height: 95%;
 }
 
-footer{
-    margin-top:40px;
-    font-size:.85rem;
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 36px;
+    color: #fff;
+    cursor: pointer;
 }
 
-@media(max-width:768px){
-    body{
-        padding-top:40px;
+footer {
+    padding: 15px;
+    font-size: .85rem;
+    background: rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+@media(max-width: 768px) {
+    .main-wrapper {
+        flex-direction: column;
+        height: auto;
     }
-    
-    .zoom-info-box {
-        max-width: 90%;
-        font-size: 13px;
+    .sidebar {
+        width: 100%;
+        height: auto;
+    }
+    .sidebar.collapsed {
+        height: 0;
+    }
+    .sidebar-content {
+        width: 100%;
+    }
+    .toggle-btn.floating {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin: 10px;
+        align-self: flex-start;
+    }
+    .content-area {
+        padding: 15px;
     }
 }
 </style>
@@ -188,67 +291,72 @@ footer{
 
 <body>
 
-<!-- THE YELLOW ZOOM BANNER SECTION HAS BEEN COMMENTED OUT BELOW -->
-<!-- 
-<div class="top-banner">
-    <div class="banner-content">
-        <div class="banner-title">
-            Online Zoom Meet – Special General Body Meeting<br>
-            14 June 2026, 11:30 AM | Asmita Jyoti Redevelopment
-        </div>
+<!-- YELLOW HEADER BOX -->
+<div class="top-header">
+    Asmita Jyoti CHSL Redevelopment updates
+</div>
 
-        <div class="marathi">
-            ऑनलाईन Zoom Meet – विशेष सर्वसाधारण सभा<br>
-            १४ जून २०२६ सकाळी ११:३० वाजता
-        </div>
+<div class="main-wrapper">
 
-        <div id="countdown" class="countdown">
-            Loading...
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <div class="sidebar-header">
+                <span>List of Documents</span>
+                <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">&lt;&lt;</button>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item" onclick="switchDoc(0)">21 Jun 2026 | SGBM (14Jun2026) Minutes Of Meeting</li>
+                <li class="sidebar-item" onclick="switchDoc(1)">28 May 2026 | SGBM Notice (14Jun2026) - Redevelopment / PMC Recruitment</li>
+                <li class="sidebar-item" onclick="switchDoc(2)">13 Jan 2026 | SGBM Notice (01Feb2026) - Redevelopment / PMC Recruitment</li>
+            </ul>
         </div>
+    </div>
 
-        <div class="auth-box">
-            <label>
-                <input type="checkbox" id="authorized">
-                I confirm that I am an authorized member entitled to attend this SGBM.
-            </label>
+    <!-- FLOATING TOGGLE BUTTON OUTSIDE SIDEBAR -->
+    <button class="toggle-btn floating" id="collapsedToggleBtn" onclick="toggleSidebar()" style="display: none;">&gt;&gt;</button>
+
+    <!-- RIGHT SIDE CONTENT CONTAINER -->
+    <div class="content-area">
+        
+        <!-- Welcome Message -->
+        <div class="welcome-placeholder" id="welcomeMsg">
+            Please select an item from the "List of Documents" to view it.
         </div>
-
-        <div class="join-container">
-            <a href="https://ov-live-in.zoom.us/j/81949507804?pwd=OPhD5lM9MjVEJfweaWNkpNTmmOghX9.1" id="joinBtn" class="join-btn disabled" target="_blank">
-                Join Meeting
+        
+        <!-- Document index 0: 21 Jun 2026 (Using Object Tag with explicit direct link for iOS compatibility) -->
+        <div class="doc-content" id="doc-0">
+            <h1 class="doc-title">21 Jun 2026 | SGBM (14Jun2026) Minutes Of Meeting</h1>
+            <a href="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf" target="_blank" class="mobile-pdf-link-fallback">
+                👉 Click here to Open full 9-Page PDF Document
             </a>
+            <div class="pdf-scroll-wrapper">
+                <object class="pdf-object-frame" data="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf#toolbar=1&navpanes=1" type="application/pdf">
+                    <iframe class="pdf-viewer-frame" src="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf#toolbar=1&navpanes=1"></iframe>
+                </object>
+            </div>
         </div>
 
-        <div id="zoomInfoBox" class="zoom-info-box">
-            If the meeting does not open automatically after clicking Join Meeting, copy credentials or open link directly:<br>
-            <a href="https://app.zoom.us/wc/join" target="_blank">app.zoom.us/wc/join</a> | 
-            <strong>Meeting ID:</strong> 819 4950 7804 | 
-            <strong>Passcode:</strong> 651334
+        <!-- Document index 1: 28 May 2026 -->
+        <div class="doc-content" id="doc-1">
+            <h1 class="doc-title">28 May 2026 | SGBM Notice (14Jun2026) - Redevelopment / PMC Recruitment</h1>
+            <div class="ad-card" onclick="openModal(this)">
+                <img src="https://asmitajyoti.info/Images/AGM_Notice_14Jun2026.jpg" alt="Notice 14Jun2026">
+            </div>
         </div>
-    </div>
-</div>
--->
 
-<div class="ads-section">
-    <!-- Minutes of Meeting PDF Section with Thumbnail -->
-    <h1>
-        <a href="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf" target="_blank" class="pdf-link">
-            21 Jun 2026 | SGBM Minutes Of Meeting (PDF)
-        </a>
-    </h1>
-    <a href="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf" target="_blank" class="ad-card">
-        <img class="pdf-thumbnail-img" src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcSZ-EoEb_eT90yicprsogzUSgGny4hJ3B2V--_fcOeYhcvt2111AdoVcplGhVDV6IU7yU5iTq_5ci2ib9k" alt="PDF Document Icon">
-    </a>
-    
-    <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.3); margin: 40px 0;">
+        <!-- Document index 2: 13 Jan 2026 -->
+        <div class="doc-content" id="doc-2">
+            <h1 class="doc-title">13 Jan 2026 | SGBM Notice (01Feb2026) - Redevelopment / PMC Recruitment</h1>
+            <div class="ad-card" onclick="openModal(this)">
+                <img src="https://asmitajyoti.info/Images/AGM_Notice_01Feb2026.jpg" alt="Notice 01Feb2026">
+            </div>
+        </div>
 
-    <!-- Existing Notice Section -->
-    <h1>28 May 2026 | SGBM Notice - Redevelopment / PMC Recruitment</h1>
-    <div class="ad-card" onclick="openModal(this)">
-        <img src="Images/AGM_Notice.jpg" alt="Notice">
     </div>
 </div>
 
+<!-- Modal View Component -->
 <div class="modal" id="imgModal">
     <span class="modal-close" onclick="closeModal()">×</span>
     <img id="modalImg">
@@ -260,37 +368,34 @@ footer{
 </footer>
 
 <script>
-const authorized = document.getElementById("authorized");
-const joinBtn = document.getElementById("joinBtn");
-const zoomInfoBox = document.getElementById("zoomInfoBox");
-
-/* Handle checkbox state to toggle button styling and details block visibility */
-if (authorized) {
-    authorized.addEventListener("change", function(){
-        if(this.checked) {
-            joinBtn.classList.remove("disabled");
-            zoomInfoBox.style.display = "block";
-        } else {
-            joinBtn.classList.add("disabled");
-            zoomInfoBox.style.display = "none";
-        }
-    });
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const collapsedToggleBtn = document.getElementById('collapsedToggleBtn');
+    
+    sidebar.classList.toggle('collapsed');
+    
+    if (sidebar.classList.contains('collapsed')) {
+        collapsedToggleBtn.style.display = 'block';
+    } else {
+        collapsedToggleBtn.style.display = 'none';
+    }
 }
 
-/* Intercept button click interactions */
-if (joinBtn) {
-    joinBtn.addEventListener("click", function(e){
-        if(!authorized.checked){
-            e.preventDefault();
-            alert("Please tick and fill all the required information for joining the meeting.");
-        }
-    });   
+function switchDoc(index) {
+    document.getElementById('welcomeMsg').style.display = 'none';
+
+    const contents = document.querySelectorAll('.doc-content');
+    contents.forEach(doc => doc.classList.remove('active'));
+
+    const menuItems = document.querySelectorAll('.sidebar-item');
+    menuItems.forEach(item => item.classList.remove('active'));
+
+    document.getElementById(`doc-${index}`).classList.add('active');
+    menuItems[index].classList.add('active');
 }
 
 function openModal(card){
-    // Safe check to make sure we don't try to open the PDF icon link in the image viewer modal
-    if(card.classList.contains('pdf-thumbnail-img') || card.tagName === 'A') return;
-    
+    if(card.tagName === 'OBJECT' || card.tagName === 'IFRAME') return;
     document.getElementById("modalImg").src = card.querySelector("img").src;
     document.getElementById("imgModal").style.display = "flex";
 }
@@ -298,26 +403,6 @@ function openModal(card){
 function closeModal(){
     document.getElementById("imgModal").style.display = "none";
 }
-
-const meetingDate = new Date("2026-06-14T11:30:00").getTime();
-
-setInterval(() => {
-    const d = meetingDate - new Date().getTime();
-    const countdownEl = document.getElementById("countdown");
-    
-    if(!countdownEl) return;
-
-    if(d <= 0){
-        countdownEl.innerHTML = "<span>Meeting Started</span>";
-        return;
-    }
-
-    countdownEl.innerHTML =
-        `<span>${Math.floor(d/86400000)} Days</span>
-         <span>${Math.floor(d/3600000)%24} Hrs</span>
-         <span>${Math.floor(d/60000)%60} Min</span>
-         <span>${Math.floor(d/1000)%60} Sec</span>`;
-}, 1000);
 </script>
 
 </body>
