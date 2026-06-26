@@ -274,8 +274,8 @@ footer {
                 <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">&lt;&lt;</button>
             </div>
             <ul class="sidebar-menu">
-                <li class="sidebar-item active" onclick="switchDoc(0)">21 Jun 2026 | SGBM Minutes (PDF)</li>
-                <li class="sidebar-item" onclick="switchDoc(1)">28 May 2026 | SGBM Notice</li>
+                <li class="sidebar-item" onclick="switchDoc(0)">21 Jun 2026 | SGBM (14Jun2026) Minutes Of Meeting</li>
+                <li class="sidebar-item" onclick="switchDoc(1)">28 May 2026 | SGBM Notice (14Jun2026) - Redevelopment / PMC Recruitment</li>
             </ul>
         </div>
     </div>
@@ -283,18 +283,18 @@ footer {
     <!-- FLOATING TOGGLE BUTTON OUTSIDE SIDEBAR (Only visible when sidebar is collapsed) -->
     <button class="toggle-btn floating" id="collapsedToggleBtn" onclick="toggleSidebar()" style="display: none;">&gt;&gt;</button>
 
-    <!-- RIGHT SIDE CONTENT CONTAINER -->
+    <!-- RIGHT SIDE CONTENT CONTAINER (Starts Blank) -->
     <div class="content-area">
         
         <!-- Document 1: FULL EMBEDDED PDF -->
-        <div class="doc-content active" id="doc-0">
-            <h1 class="doc-title">21 Jun 2026 | SGBM Minutes Of Meeting</h1>
+        <div class="doc-content" id="doc-0">
+            <h1 class="doc-title">21 Jun 2026 | SGBM (14Jun2026) Minutes Of Meeting</h1>
             <iframe class="pdf-viewer-frame" src="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf"></iframe>
         </div>
 
         <!-- Document 2: Image Notice -->
         <div class="doc-content" id="doc-1">
-            <h1 class="doc-title">28 May 2026 | SGBM Notice - Redevelopment / PMC Recruitment</h1>
+            <h1 class="doc-title">28 May 2026 | SGBM Notice (14Jun2026) - Redevelopment / PMC Recruitment</h1>
             <div class="ad-card" onclick="openModal(this)">
                 <img src="Images/AGM_Notice.jpg" alt="Notice">
             </div>
