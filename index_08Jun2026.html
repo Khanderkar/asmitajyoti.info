@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Asmita Jyoti – Redevelopment</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asmita Jyoti – Redevelopment</title>
 
 <style>
 * { box-sizing: border-box; }
@@ -12,84 +12,145 @@ body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
     background: linear-gradient(135deg, #1e3c72, #2a5298);
-    color: #ffffff;
+    color: #fff;
     min-height: 100vh;
-    padding-top: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Main Layout Wrapper */
+.main-wrapper {
+    display: flex;
+    flex: 1;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+/* --- LEFT SIDEBAR --- */
+.sidebar {
+    width: 320px;
+    background: rgba(0, 0, 0, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.sidebar.collapsed {
+    width: 0;
+    overflow: hidden;
+    border-right: none;
+}
+
+.sidebar-header {
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    font-weight: bold;
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+}
+
+.sidebar-item {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s ease;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.sidebar-item:hover, .sidebar-item.active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.sidebar-item.active {
+    border-left: 4px solid #ffcc00;
+}
+
+/* --- TOGGLE COLLAPSE BUTTON --- */
+.toggle-btn {
+    position: absolute;
+    top: 15px;
+    left: 335px;
+    background: #ffcc00;
+    color: #000;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 100;
+    transition: left 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.sidebar.collapsed + .toggle-btn {
+    left: 15px;
+}
+
+/* --- RIGHT SIDE CONTENT AREA --- */
+.content-area {
+    flex: 1;
+    padding: 60px 40px 40px 40px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.doc-content {
+    display: none;
+    width: 100%;
+    max-width: 800px;
+    animation: fadeIn 0.4s ease;
+}
+
+.doc-content.active {
+    display: block;
+}
+
+.doc-title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
     text-align: center;
 }
 
-/* ===== Top Banner ===== */
-.top-banner {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: #ffcc00;
-    color: #000;
-    z-index: 1000;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.banner-content {
-    max-width: 1200px;
-    margin: auto;
-    padding: 14px 16px 18px;
-}
-
-.banner-title { font-weight: bold; font-size: 1rem; }
-.marathi { margin-top: 6px; font-size: 0.95rem; }
-
-.countdown span {
-    background: #fff;
-    padding: 6px 10px;
-    margin: 2px;
-    border-radius: 4px;
-    display: inline-block;
-    min-width: 70px;
-}
-
-/* ===== Confirmation ===== */
-.confirm-box {
-    margin-top: 14px;
-    font-size: 0.9rem;
-}
-
-.confirm-box input {
-    transform: scale(1.2);
-    margin-right: 8px;
-}
-
-/* ===== Join Button ===== */
-.join-btn {
-    display: inline-block;
-    margin-top: 14px;
-    padding: 12px 26px;
-    background: #003366;
-    color: #ffffff;
+/* Existing Card & Element Styles */
+.pdf-link {
+    color: #ffcc00;
     text-decoration: none;
-    border-radius: 6px;
-    font-weight: bold;
 }
-
-.join-btn.disabled {
-    background: #999;
-    opacity: 0.6;
-}
-
-/* ===== Content ===== */
-.ads-section {
-    max-width: 1200px;
-    margin: auto;
-    padding: 40px 20px;
+.pdf-link:hover {
+    text-decoration: underline;
 }
 
 .ad-card {
-    background: #ffffff;
+    background: #fff;
     color: #000;
     border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.25);
     cursor: pointer;
+    display: block;
+    text-decoration: none;
+    margin: 0 auto;
+    max-width: 600px;
 }
 
 .ad-card img {
@@ -97,12 +158,19 @@ body {
     border-radius: 4px;
 }
 
-/* ===== Modal ===== */
+.pdf-thumbnail-img {
+    max-height: 300px;
+    width: auto !important;
+    display: block;
+    margin: 10px auto;
+}
+
+/* Modal styles */
 .modal {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.85);
+    background: rgba(0,0,0,.85);
     z-index: 2000;
     justify-content: center;
     align-items: center;
@@ -123,61 +191,75 @@ body {
 }
 
 footer {
-    margin-top: 40px;
-    font-size: 0.85rem;
+    padding: 20px;
+    font-size: .85rem;
+    background: rgba(0,0,0,0.1);
+    text-align: center;
 }
 
-@media (min-width: 769px) {
-    body { padding-top: 240px; }
+/* Responsive Overrides */
+@media(max-width: 768px) {
+    .main-wrapper {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        height: 200px;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .sidebar.collapsed {
+        height: 0;
+    }
+    .toggle-btn {
+        top: auto;
+        bottom: 70px;
+        left: 20px !important;
+    }
+    .content-area {
+        padding: 20px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<!-- ===== Banner ===== -->
-<div class="top-banner">
-    <div class="banner-content">
-        <div class="banner-title">
-            Online Google Meet – Special General Body Meeting<br>
-            14 June 2026, 11:30 AM | Asmita Jyoti Redevelopment
+<div class="main-wrapper">
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">Documents Menu</div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item active" onclick="switchDoc(0)">21 Jun 2026 | SGBM Minutes Of Meeting (PDF)</li>
+            <li class="sidebar-item" onclick="switchDoc(1)">28 May 2026 | SGBM Notice - Redevelopment</li>
+        </ul>
+    </div>
+
+    <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">☰ Toggle Sidebar</button>
+
+    <div class="content-area">
+        
+        <div class="doc-content active" id="doc-0">
+            <h1 class="doc-title">
+                <a href="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf" target="_blank" class="pdf-link">
+                    21 Jun 2026 | SGBM Minutes Of Meeting (PDF)
+                </a>
+            </h1>
+            <a href="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf" target="_blank" class="ad-card">
+                <img class="pdf-thumbnail-img" src="https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcSZ-EoEb_eT90yicprsogzUSgGny4hJ3B2V--_fcOeYhcvt2111AdoVcplGhVDV6IU7yU5iTq_5ci2ib9k" alt="PDF Document Icon">
+            </a>
         </div>
 
-        <div class="marathi">
-            ऑनलाईन Google Meet – विशेष सर्वसाधारण सभा<br>
-            १४ जून २०२६ सकाळी ११:३० वाजता
+        <div class="doc-content" id="doc-1">
+            <h1 class="doc-title">28 May 2026 | SGBM Notice - Redevelopment / PMC Recruitment</h1>
+            <div class="ad-card" onclick="openModal(this)">
+                <img src="Images/AGM_Notice.jpg" alt="Notice">
+            </div>
         </div>
 
-        <div id="countdown" class="countdown">Loading…</div>
-
-        <div class="confirm-box">
-            <label>
-                <input type="checkbox" id="confirmEmail">
-                I have sent notification email to
-                <b>asmitajyotichsltd@gmail.com</b> stating my
-                <b>Name, Flat number, and reason</b> for joining this SGBM online.
-            </label>
-        </div>
-
-        <a href="https://meet.google.com/byo-jemv-vki"
-           target="_blank"
-           class="join-btn disabled"
-           id="joinBtn"
-           onclick="return handleJoin(event)">
-           Join Meeting
-        </a>
     </div>
 </div>
 
-<!-- ===== Content ===== -->
-<div class="ads-section">
-    <h1>28 May 2026 | SGBM Notice - Redevelopment / PMC Recruitment</h1>
-    <div class="ad-card" onclick="openModal(this)">
-        <img src="Images/AGM_Notice.jpg">
-    </div>
-</div>
-
-<!-- ===== Modal ===== -->
 <div class="modal" id="imgModal">
     <span class="modal-close" onclick="closeModal()">×</span>
     <img id="modalImg">
@@ -185,61 +267,43 @@ footer {
 
 <footer>
     Visitor Count:
-    <script src="https://cdn.counter.dev/script.js"
-        data-id="6461317c-4e57-4b01-a820-e81a891f2dd6"></script>
+    <script src="https://cdn.counter.dev/script.js" data-id="6461317c-4e57-4b01-a820-e81a891f2dd6"></script>
 </footer>
 
-<!-- ===== Scripts ===== -->
 <script>
-function handleJoin(e) {
-    const cb = document.getElementById("confirmEmail");
-    const btn = document.getElementById("joinBtn");
-
-    if (!cb.checked) {
-        alert(
-          "Please confirm that you have sent an email to the society office\n" +
-          "(asmitajyotichsltd@gmail.com)\n\n" +
-          "Mentioning your Name, Flat Number and reason for joining\n" +
-          "before joining the online SGBM."
-        );
-        e.preventDefault();
-        return false;
-    }
-
-    btn.classList.remove("disabled");
-    return true;
+// Sidebar Toggle Logic
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('collapsed');
 }
 
-document.getElementById("confirmEmail").addEventListener("change", function () {
-    const btn = document.getElementById("joinBtn");
-    this.checked ? btn.classList.remove("disabled")
-                 : btn.classList.add("disabled");
-});
+// Switch Right Panel Document Content
+function switchDoc(index) {
+    // Hide all document contents
+    const contents = document.querySelectorAll('.doc-content');
+    contents.forEach(doc => doc.classList.remove('active'));
 
-function openModal(card) {
-    document.getElementById("modalImg").src =
-        card.querySelector("img").src;
+    // Deactivate all sidebar items
+    const menuItems = document.querySelectorAll('.sidebar-item');
+    menuItems.forEach(item => item.classList.remove('active'));
+
+    // Activate selected items
+    document.getElementById(`doc-${index}`).classList.add('active');
+    menuItems[index].classList.add('active');
+}
+
+// Modal View Controls
+function openModal(card){
+    if(card.classList.contains('pdf-thumbnail-img') || card.tagName === 'A') return;
+    
+    document.getElementById("modalImg").src = card.querySelector("img").src;
     document.getElementById("imgModal").style.display = "flex";
 }
 
-function closeModal() {
+function closeModal(){
     document.getElementById("imgModal").style.display = "none";
 }
 </script>
 
-<script>
-const meetingDate = new Date("2026-06-14T11:30:00").getTime();
-setInterval(() => {
-    const d = meetingDate - new Date().getTime();
-    if (d <= 0) return;
-    document.getElementById("countdown").innerHTML =
-        `<span>${Math.floor(d/86400000)} Days</span>
-         <span>${Math.floor(d/3600000)%24} Hrs</span>
-         <span>${Math.floor(d/60000)%60} Min</span>
-         <span>${Math.floor(d/1000)%60} Sec</span>`;
-}, 1000);
-</script>
-
 </body>
 </html>
-
