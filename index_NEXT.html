@@ -191,7 +191,7 @@ body {
     border: none;
 }
 
-/* Mobile Fallback Button for 9-page view */
+/* Mobile Fallback Button for multi-page view */
 .mobile-pdf-link-fallback {
     display: block;
     margin: 15px auto;
@@ -300,9 +300,11 @@ body {
             </div>
             <ul class="sidebar-menu">
                 <li class="sidebar-item" onclick="switchDoc(0)">26 Jun 2026 | Advisory Committee Participation Invitation</li>
-                <li class="sidebar-item" onclick="switchDoc(1)">21 Jun 2026 | SGBM (14Jun2026) Minutes Of Meeting</li>
-                <li class="sidebar-item" onclick="switchDoc(2)">28 May 2026 | SGBM Notice (14Jun2026) - Redevelopment / PMC Recruitment</li>
-                <li class="sidebar-item" onclick="switchDoc(3)">13 Jan 2026 | SGBM Notice (01Feb2026) - Redevelopment / PMC Recruitment</li>
+                <li class="sidebar-item" onclick="switchDoc(1)">26 Jun 2026 | Redevlopment Technical Review Committee</li>
+                <li class="sidebar-item" onclick="switchDoc(2)">21 Jun 2026 | SGBM (14Jun2026) Minutes Of Meeting</li>
+                <li class="sidebar-item" onclick="switchDoc(3)">28 May 2026 | SGBM Notice (14Jun2026) - Redevelopment / PMC Recruitment</li>
+                <li class="sidebar-item" onclick="switchDoc(4)">06 Feb 2026 | SGBM (01Feb2026) Minutes Of Meeting</li>
+                <li class="sidebar-item" onclick="switchDoc(5)">13 Jan 2026 | SGBM Notice (01Feb2026) - Redevelopment / PMC Recruitment</li>
             </ul>
         </div>
     </div>
@@ -318,7 +320,7 @@ body {
             Please select an item from the "List of Documents" to view it.
         </div>
         
-        <!-- Document index 0: 26 Jun 2026 -->
+        <!-- Document index 0: 26 Jun 2026 Advisory Committee -->
         <div class="doc-content" id="doc-0">
             <h1 class="doc-title">26 Jun 2026 | Advisory Committee Participation Invitation</h1>
             <div class="ad-card" onclick="openModal(this)">
@@ -326,29 +328,50 @@ body {
             </div>
         </div>
 
-        <!-- Document index 1: 21 Jun 2026 -->
+        <!-- Document index 1: 26 Jun 2026 Technical Review Committee -->
         <div class="doc-content" id="doc-1">
+            <h1 class="doc-title">26 Jun 2026 | Redevlopment Technical Review Committee</h1>
+            <div class="ad-card" onclick="openModal(this)">
+                <img src="https://AsmitaJyoti.info/Images/Redevlopment_Technical_Review_Committee_26Jun2026.jpg" alt="Redevelopment Technical Review Committee">
+            </div>
+        </div>
+
+        <!-- Document index 2: 21 Jun 2026 (UPDATED URL) -->
+        <div class="doc-content" id="doc-2">
             <h1 class="doc-title">21 Jun 2026 | SGBM (14Jun2026) Minutes Of Meeting</h1>
-            <a href="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf" target="_blank" class="mobile-pdf-link-fallback">
-                👉 Click here to Open full 9-Page PDF Document
+            <a href="https://asmitajyoti.info/Images/PDF/SGBM_MINUTES_14Jun2026.pdf" target="_blank" class="mobile-pdf-link-fallback">
+                👉 Click here to Open full PDF Document
             </a>
             <div class="pdf-scroll-wrapper">
-                <object class="pdf-object-frame" data="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf#toolbar=1&navpanes=1" type="application/pdf">
-                    <iframe class="pdf-viewer-frame" src="https://www.asmitajyoti.info/PDF/SGBM_MINUTES_14_02_2026.pdf#toolbar=1&navpanes=1"></iframe>
+                <object class="pdf-object-frame" data="https://asmitajyoti.info/Images/PDF/SGBM_MINUTES_14Jun2026.pdf#toolbar=1&navpanes=1" type="application/pdf">
+                    <iframe class="pdf-viewer-frame" src="https://asmitajyoti.info/Images/PDF/SGBM_MINUTES_14Jun2026.pdf#toolbar=1&navpanes=1"></iframe>
                 </object>
             </div>
         </div>
 
-        <!-- Document index 2: 28 May 2026 -->
-        <div class="doc-content" id="doc-2">
+        <!-- Document index 3: 28 May 2026 -->
+        <div class="doc-content" id="doc-3">
             <h1 class="doc-title">28 May 2026 | SGBM Notice (14Jun2026) - Redevelopment / PMC Recruitment</h1>
             <div class="ad-card" onclick="openModal(this)">
                 <img src="https://asmitajyoti.info/Images/AGM_Notice_14Jun2026.jpg" alt="Notice 14Jun2026">
             </div>
         </div>
 
-        <!-- Document index 3: 13 Jan 2026 -->
-        <div class="doc-content" id="doc-3">
+        <!-- Document index 4: 06 Feb 2026 -->
+        <div class="doc-content" id="doc-4">
+            <h1 class="doc-title">06 Feb 2026 | SGBM (01Feb2026) Minutes Of Meeting</h1>
+            <a href="https://asmitajyoti.info/Images/SGBM_MINUTES_01Feb2026.pdf" target="_blank" class="mobile-pdf-link-fallback">
+                👉 Click here to Open full PDF Document
+            </a>
+            <div class="pdf-scroll-wrapper">
+                <object class="pdf-object-frame" data="https://asmitajyoti.info/Images/SGBM_MINUTES_01Feb2026.pdf#toolbar=1&navpanes=1" type="application/pdf">
+                    <iframe class="pdf-viewer-frame" src="https://asmitajyoti.info/Images/SGBM_MINUTES_01Feb2026.pdf#toolbar=1&navpanes=1"></iframe>
+                </object>
+            </div>
+        </div>
+
+        <!-- Document index 5: 13 Jan 2026 -->
+        <div class="doc-content" id="doc-5">
             <h1 class="doc-title">13 Jan 2026 | SGBM Notice (01Feb2026) - Redevelopment / PMC Recruitment</h1>
             <div class="ad-card" onclick="openModal(this)">
                 <img src="https://asmitajyoti.info/Images/AGM_Notice_01Feb2026.jpg" alt="Notice 01Feb2026">
