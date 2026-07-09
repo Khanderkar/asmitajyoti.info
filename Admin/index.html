@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asmita Jyoti - Admin Reports</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; color: #333; margin: 0; padding: 20px; }
+        .admin-header { background: #003366; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; margin-bottom: 25px; }
+        .login-box { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
+        .login-box button { background: #003366; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 1rem; margin-top: 10px; }
+        .dashboard { display: none; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #ffcc00; color: black; }
+        tr:hover { background: #f9f9f9; }
+        .logout-btn { background: #ff3333; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        #recaptcha-container { margin: 15px 0; display: flex; justify-content: center; }
+    </style>
+</head>
+<body>
+
+<!-- PHONE AUTH INTERFACE -->
+<div class="login-box" id="authContainer">
+    <h2>Admin Mobile OTP Login</h2>
+    
+    <!-- Step A: Enter Phone -->
+    <div id="phone-step">
+        <input type="tel" id="adminPhone" placeholder="Mobile with country code (e.g. +919876543210)">
+        <!-- Invisible safety check anchor required by Google for Phone Auth verification -->
+        <div id="recaptcha-container"></div>
+        <button id="sendOtpBtn">Send Verification Code</button>
+    </div>
+
+    <!-- Step B: Enter Verification PIN (Hidden initially) -->
+    <div id="otp-step" style="display: none;">
+        <p style="color: #666; font-size: 0.9rem;">Enter the 6-digit code sent to your mobile device.</p>
+        <input type="text" id="otpCode" placeholder="Enter 6-digit OTP" maxLength="6">
+        <button id="verifyOtpBtn">Verify & Login</button>
+    </div>
+</div>
+
+<!-- DATA VIEW PANEL DASHBOARD -->
+<div class="dashboard" id="dashboardContainer">
+    <div class="admin-header">
+        <h2>Registration Reports Panel</h2>
+        <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
+    </div>
+    
+    <table id="reportsTable">
+        <thead>
+            <tr>
+                <th>Submission Timestamp</th>
+                <th>Meeting Code</th>
+                <th>Full Name</th>
+                <th>Building / Flat</th>
+                <th>Registered Mobile</th>
+                <th>Registered Email</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Loaded dynamically from database collection -->
+        </tbody>
+    </table>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  // Substitute with your exact keys from the config block inside your main file
+  const firebaseConfig = {
+  apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
+  authDomain: "asmitajyoti-sgbm.firebaseapp.com",
+  projectId: "asmitajyoti-sgbm",
+  storageBucket: "asmitajyoti-sgbm.firebasestorage.app",
+  messagingSenderId: "85179629629",
+  appId: "1:85179629629:web:81718858a1d21aba752a54",
+  measurementId: "G-D107TNSPL1"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let confirmationResultGlobal = null;
+
+  // Track user login state changes
+  onAuthStateChanged(auth, (user) => {
+      if (user) {
+          // Check if logged-in user phone is what you whitelisted to guarantee security
+          document.getElementById('authContainer').style.display = 'none';
+          document.getElementById('dashboardContainer').style.display = 'block';
+          loadReports();
+      } else {
+          document.getElementById('authContainer').style.display = 'block';
+          document.getElementById('dashboardContainer').style.display = 'none';
+          resetAuthUI();
+      }
+  });
+
+  function resetAuthUI() {
+      document.getElementById('phone-step').style.display = 'block';
+      document.getElementById('otp-step').style.display = 'none';
+      document.getElementById('adminPhone').value = '';
+      document.getElementById('otpCode').value = '';
+  }
+
+  // Initialize invisible reCAPTCHA safety gate handler
+  function initRecaptcha() {
+      if (!window.recaptchaVerifier) {
+          window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+              'size': 'invisible'
+          });
+      }
+  }
+
+  // Action A: Request OTP Delivery Sequence
+  document.getElementById('sendOtpBtn').addEventListener('click', async () => {
+      const phoneNumber = document.getElementById('adminPhone').value.trim();
+      if(!phoneNumber.startsWith('+')) {
+          alert("Please specify country code (e.g. +91 for India) before your number.");
+          return;
+      }
+
+      initRecaptcha();
+      const appVerifier = window.recaptchaVerifier;
+
+      try {
+          const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+          confirmationResultGlobal = confirmationResult;
+          
+          // Switch fields view layout state
+          document.getElementById('phone-step').style.display = 'none';
+          document.getElementById('otp-step').style.display = 'block';
+      } catch (error) {
+          console.error(error);
+          alert("SMS Dispatch Failure: " + error.message);
+          if (window.recaptchaVerifier) {
+              window.recaptchaVerifier.render().then(widgetId => grecaptcha.reset(widgetId));
+          }
+      }
+  });
+
+  // Action B: Validate Code & Establish Database Authentication Stream
+  document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
+      const code = document.getElementById('otpCode').value.trim();
+      if(code.length !== 6) {
+          alert("Please enter a valid 6-digit OTP code.");
+          return;
+      }
+
+      try {
+          await confirmationResultGlobal.confirm(code);
+      } catch (error) {
+          alert("Invalid OTP Code. Access Denied.");
+      }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+      signOut(auth);
+  });
+
+  // Load database spreadsheets
+  async function loadReports() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '<tr><td colspan="6">Fetching database logs...</td></tr>';
+      
+      try {
+          const q = query(collection(db, "registrations"), orderBy("timestamp", "desc"));
+          const querySnapshot = await getDocs(q);
+          tbody.innerHTML = '';
+          
+          if(querySnapshot.empty) {
+              tbody.innerHTML = '<tr><td colspan="6">No registration entries found.</td></tr>';
+              return;
+          }
+
+          querySnapshot.forEach((doc) => {
+              const data = doc.data();
+              const dateObj = data.timestamp ? data.timestamp.toDate() : new Date();
+              const formattedTime = dateObj.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+              tbody.innerHTML += `<tr>
+                  <td>${formattedTime}</td>
+                  <td><span style="background:#003366;color:#fff;padding:2px 6px;border-radius:3px;font-size:0.85rem;">${data.meetingCode || 'N/A'}</span></td>
+                  <td><strong>${data.name || ''}</strong></td>
+                  <td>${data.buildingNumber || ''} - ${data.flatNumber || ''}</td>
+                  <td>${data.mobileNumber || ''}</td>
+                  <td>${data.emailAddress || ''}</td>
+              </tr>`;
+          });
+      } catch (error) {
+          tbody.innerHTML = `<tr><td colspan="6" style="color:red;">Access Denied: Rules validation parameter error.</td></tr>`;
+      }
+  }
+</script>
+</body>
+</html>
