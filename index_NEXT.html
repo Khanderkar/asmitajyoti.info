@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Asmita Jyoti – Member SBGM</title>
 
-<!-- Favicon configs inherited from your main layout -->
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
@@ -41,12 +40,19 @@ body {
 /* --- TOP HORIZONTAL REGISTRATION FORM CONTAINER --- */
 .form-horizontal-container {
     background: rgba(0, 0, 0, 0.2);
-    padding: 20px 40px;
+    padding: 0 40px; 
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     width: 100%;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     z-index: 105;
     position: relative;
+    transition: all 0.4s ease;
+}
+
+/* Clear padding entirely when minimized */
+.form-horizontal-container.minimized {
+    padding: 0 !important;
+    border-bottom: none !important;
 }
 
 /* CENTER-ALIGNED FORM TITLE */
@@ -60,13 +66,15 @@ body {
 
 /* Slidewrapper to handle smooth transition collapse mechanics */
 .form-slide-wrapper {
-    max-height: 500px;
+    max-height: 600px;
+    padding: 20px 0;
     overflow: hidden;
-    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1);
+    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), padding 0.4s ease;
 }
 
 .form-horizontal-container.minimized .form-slide-wrapper {
     max-height: 0 !important;
+    padding: 0 !important;
 }
 
 .horizontal-form-row {
@@ -175,8 +183,12 @@ button.submit-btn:hover {
     background: rgba(255, 204, 0, 0.15);
 }
 
+/* Relocate button cleanly when minimized */
 .form-horizontal-container.minimized .form-collapse-arrow-btn {
-    bottom: 10px;
+    bottom: -45px;
+    background: #ffcc00;
+    color: #000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
 /* --- MAIN CONTENTS LOWER SECTION --- */
@@ -428,25 +440,25 @@ button.submit-btn:hover {
     .content-area {
         padding: 15px;
     }
+    .form-collapse-arrow-btn {
+        right: 10px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<!-- 1. TOP YELLOW HEADER BOX -->
 <div class="top-header">
     Asmita Jyoti CHSL Redevelopment updates
 </div>
 
-<!-- 2. ATTENDANCE ENTRY MODULE -->
 <div class="form-horizontal-container" id="attendanceContainer">
-    <div class="form-title-inline">Asmita Jyoti CHSL Member SBBM Attendance Entry</div>
     
-    <!-- Action Minimize Toggle Button -->
     <button class="form-collapse-arrow-btn" id="formToggleBtn" onclick="toggleAttendanceView()">▲</button>
 
-    <div class="form-slide-wrapper">
+    <div class="form-slide-wrapper" id="slideWrapper">
+        <div class="form-title-inline">Asmita Jyoti CHSL Member SBBM Attendance Entry</div>
         <form id="registryForm">
             <div class="horizontal-form-row">
                 
@@ -556,10 +568,8 @@ button.submit-btn:hover {
     </div>
 </div>
 
-<!-- 3. LOWER DOCUMENT DASHBOARD AREA -->
 <div class="main-wrapper">
 
-    <!-- LEFT SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-content">
             <div class="sidebar-header">
@@ -579,7 +589,6 @@ button.submit-btn:hover {
 
     <button class="toggle-btn floating" id="collapsedToggleBtn" onclick="toggleSidebar()" style="display: none;">&gt;&gt;</button>
 
-    <!-- RIGHT SIDE CONTENT CONTAINER -->
     <div class="content-area">
         
         <div class="welcome-placeholder" id="welcomeMsg">
@@ -651,20 +660,15 @@ button.submit-btn:hover {
     <script src="https://cdn.counter.dev/script.js" data-id="6461317c-4e57-4b01-a820-e81a891f2dd6"></script>
 </footer>
 
-<!-- SYSTEM DATA CONTROL INTERFACE & GLOBAL PARAMETERS SECTION -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // ==========================================
-  //     ALL CONFIGURABLE VALUES GO HERE
-  // ==========================================
   const CONFIG = {
-      MEETING_CODE: "Test-Jul2026",
+      MEETING_CODE: "SGBM_JULY_2026",
       ZOOM_URL: "https://zoom.us",
-      INITIAL_COLLAPSE_STATE: "NO", // Choose "YES" to load hidden or "NO" to load open
+      INITIAL_COLLAPSE_STATE: "NO", 
       
-      // Paste your exact key values generated from the Firebase Console dashboard step here
       FIREBASE_KEYS: {
   apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
   authDomain: "asmitajyoti-sgbm.firebaseapp.com",
@@ -676,21 +680,20 @@ button.submit-btn:hover {
       }
   };
 
-  // Run initialization routines
   const app = initializeApp(CONFIG.FIREBASE_KEYS);
   const db = getFirestore(app);
 
-  // Set initial collapse state based on settings choice block
   window.addEventListener('DOMContentLoaded', () => {
       const container = document.getElementById('attendanceContainer');
+      const wrapper = document.getElementById('slideWrapper');
       const arrow = document.getElementById('formToggleBtn');
       if (CONFIG.INITIAL_COLLAPSE_STATE === "YES") {
           container.classList.add('minimized');
+          wrapper.style.display = 'none';
           arrow.innerHTML = "▼";
       }
   });
 
-  // Handle data storage operations
   document.getElementById('registryForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -698,27 +701,20 @@ button.submit-btn:hover {
       btn.innerText = "Connecting...";
       btn.disabled = true;
 
-      const name = document.getElementById('fullName').value.trim();
-      const building = document.getElementById('buildingNum').value;
-      const flat = document.getElementById('flatNum').value;
-      const mobile = document.getElementById('mobileNum').value.trim();
-      const email = document.getElementById('emailAddress').value.trim();
-
       try {
           await addDoc(collection(db, "registrations"), {
               meetingCode: CONFIG.MEETING_CODE,
-              name: name,
-              buildingNumber: building,
-              flatNumber: flat,
-              mobileNumber: mobile,
-              emailAddress: email || "Not Provided",
+              name: document.getElementById('fullName').value.trim(),
+              buildingNumber: document.getElementById('buildingNum').value,
+              flatNumber: document.getElementById('flatNum').value,
+              mobileNumber: document.getElementById('mobileNum').value.trim(),
+              emailAddress: document.getElementById('emailAddress').value.trim() || "Not Provided",
               timestamp: new Date()
           });
-          
           window.location.href = CONFIG.ZOOM_URL;
       } catch (error) {
           console.error(error);
-          alert("Submission failure. Verify Firebase connection rules configuration parameters.");
+          alert("Submission failure.");
           btn.innerText = "Join meeting";
           btn.disabled = false;
       }
@@ -726,17 +722,30 @@ button.submit-btn:hover {
 </script>
 
 <script>
-// Dynamic view minimization switcher logic function
 function toggleAttendanceView() {
     const container = document.getElementById('attendanceContainer');
+    const wrapper = document.getElementById('slideWrapper');
     const arrow = document.getElementById('formToggleBtn');
     
-    container.classList.toggle('minimized');
-    
     if (container.classList.contains('minimized')) {
-        arrow.innerHTML = "▼";
+        // EXPANDING VIEW
+        wrapper.style.display = 'block';
+        // Allow rendering frame context updates before moving height configurations
+        setTimeout(() => {
+            container.classList.remove('minimized');
+            arrow.innerHTML = "▲";
+        }, 10);
     } else {
-        arrow.innerHTML = "▲";
+        // COLLAPSING VIEW
+        container.classList.add('minimized');
+        arrow.innerHTML = "▼";
+        
+        // Hide structural context layout entirely from layout hierarchy when height rules finish transitioning
+        setTimeout(() => {
+            if (container.classList.contains('minimized')) {
+                wrapper.style.display = 'none';
+            }
+        }, 400); // Matches the 0.4s CSS transition configuration
     }
 }
 
