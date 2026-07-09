@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asmita Jyoti - Admin Reports</title>
+    <title>Asmita Jyoti - Online Meeting Data</title>
     <style>
         body { font-family: Arial, sans-serif; background: #f4f6f9; color: #333; margin: 0; padding: 20px; }
-        .admin-header { background: #003366; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; margin-bottom: 25px; }
+        .admin-header { background: #003366; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        .header-left-group { display: flex; align-items: center; gap: 20px; }
+        .meeting-dropdown-selector { padding: 10px 15px; font-size: 1rem; font-weight: bold; border-radius: 4px; border: 2px solid #ffcc00; background: #fff; color: #003366; cursor: pointer; outline: none; }
         .login-box { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
         .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
         .login-box button { background: #003366; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 1rem; margin-top: 10px; }
@@ -25,15 +27,12 @@
 <div class="login-box" id="authContainer">
     <h2>Admin Mobile OTP Login</h2>
     
-    <!-- Step A: Enter Phone -->
     <div id="phone-step">
-        <input type="tel" id="adminPhone" placeholder="Mobile with country code (e.g. +919876543210)">
-        <!-- Invisible safety check anchor required by Google for Phone Auth verification -->
+        <input type="tel" id="adminPhone" placeholder="Mobile with country code (e.g. +919821334896)">
         <div id="recaptcha-container"></div>
         <button id="sendOtpBtn">Send Verification Code</button>
     </div>
 
-    <!-- Step B: Enter Verification PIN (Hidden initially) -->
     <div id="otp-step" style="display: none;">
         <p style="color: #666; font-size: 0.9rem;">Enter the 6-digit code sent to your mobile device.</p>
         <input type="text" id="otpCode" placeholder="Enter 6-digit OTP" maxLength="6">
@@ -44,7 +43,14 @@
 <!-- DATA VIEW PANEL DASHBOARD -->
 <div class="dashboard" id="dashboardContainer">
     <div class="admin-header">
-        <h2>Registration Reports Panel</h2>
+        <div class="header-left-group">
+            <h2 style="margin:0;">Online meeting data</h2>
+            
+            <!-- NEW DYNAMIC DROP-DOWN SELECTOR -->
+            <select class="meeting-dropdown-selector" id="meetingFilter" onchange="filterTableByMeeting()">
+                <option value="" disabled selected>Loading Meetings...</option>
+            </select>
+        </div>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
     
@@ -70,7 +76,7 @@
   import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // Substitute with your exact keys from the config block inside your main file
+  // Use your exact configuration keys here
   const firebaseConfig = {
   apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
   authDomain: "asmitajyoti-sgbm.firebaseapp.com",
@@ -86,14 +92,13 @@
   const db = getFirestore(app);
 
   let confirmationResultGlobal = null;
+  let allMasterRecords = []; // Stores database state locally to allow instant dropdown toggling
 
-  // Track user login state changes
   onAuthStateChanged(auth, (user) => {
       if (user) {
-          // Check if logged-in user phone is what you whitelisted to guarantee security
           document.getElementById('authContainer').style.display = 'none';
           document.getElementById('dashboardContainer').style.display = 'block';
-          loadReports();
+          fetchMasterData();
       } else {
           document.getElementById('authContainer').style.display = 'block';
           document.getElementById('dashboardContainer').style.display = 'none';
@@ -108,7 +113,6 @@
       document.getElementById('otpCode').value = '';
   }
 
-  // Initialize invisible reCAPTCHA safety gate handler
   function initRecaptcha() {
       if (!window.recaptchaVerifier) {
           window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
@@ -117,41 +121,25 @@
       }
   }
 
-  // Action A: Request OTP Delivery Sequence
   document.getElementById('sendOtpBtn').addEventListener('click', async () => {
       const phoneNumber = document.getElementById('adminPhone').value.trim();
       if(!phoneNumber.startsWith('+')) {
-          alert("Please specify country code (e.g. +91 for India) before your number.");
+          alert("Please specify country code (e.g. +91) before your number.");
           return;
       }
-
       initRecaptcha();
-      const appVerifier = window.recaptchaVerifier;
-
       try {
-          const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
-          confirmationResultGlobal = confirmationResult;
-          
-          // Switch fields view layout state
+          confirmationResultGlobal = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
           document.getElementById('phone-step').style.display = 'none';
           document.getElementById('otp-step').style.display = 'block';
       } catch (error) {
           console.error(error);
           alert("SMS Dispatch Failure: " + error.message);
-          if (window.recaptchaVerifier) {
-              window.recaptchaVerifier.render().then(widgetId => grecaptcha.reset(widgetId));
-          }
       }
   });
 
-  // Action B: Validate Code & Establish Database Authentication Stream
   document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
       const code = document.getElementById('otpCode').value.trim();
-      if(code.length !== 6) {
-          alert("Please enter a valid 6-digit OTP code.");
-          return;
-      }
-
       try {
           await confirmationResultGlobal.confirm(code);
       } catch (error) {
@@ -163,38 +151,95 @@
       signOut(auth);
   });
 
-  // Load database spreadsheets
-  async function loadReports() {
+  // FETCH MASTER DATA & BUILD LOGIC FOR UNIQUE DROPDOWNS
+  async function fetchMasterData() {
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '<tr><td colspan="6">Fetching database logs...</td></tr>';
       
       try {
           const q = query(collection(db, "registrations"), orderBy("timestamp", "desc"));
           const querySnapshot = await getDocs(q);
-          tbody.innerHTML = '';
+          allMasterRecords = [];
           
           if(querySnapshot.empty) {
               tbody.innerHTML = '<tr><td colspan="6">No registration entries found.</td></tr>';
               return;
           }
 
+          // Gather unique values while looping over snapshots
+          const uniqueMeetingCodes = new Set();
+
           querySnapshot.forEach((doc) => {
               const data = doc.data();
               const dateObj = data.timestamp ? data.timestamp.toDate() : new Date();
               const formattedTime = dateObj.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
-              tbody.innerHTML += `<tr>
-                  <td>${formattedTime}</td>
-                  <td><span style="background:#003366;color:#fff;padding:2px 6px;border-radius:3px;font-size:0.85rem;">${data.meetingCode || 'N/A'}</span></td>
-                  <td><strong>${data.name || ''}</strong></td>
-                  <td>${data.buildingNumber || ''} - ${data.flatNumber || ''}</td>
-                  <td>${data.mobileNumber || ''}</td>
-                  <td>${data.emailAddress || ''}</td>
-              </tr>`;
+              const record = {
+                  id: doc.id,
+                  meetingCode: data.meetingCode || 'N/A',
+                  timestamp: formattedTime,
+                  name: data.name || '',
+                  flatInfo: `${data.buildingNumber || ''} - ${data.flatNumber || ''}`,
+                  mobile: data.mobileNumber || '',
+                  email: data.emailAddress || ''
+              };
+              
+              allMasterRecords.push(record);
+              uniqueMeetingCodes.add(record.meetingCode);
           });
+
+          // Rebuild the filter dropdown selector map
+          const dropdown = document.getElementById('meetingFilter');
+          dropdown.innerHTML = '';
+
+          // Populate unique choices sorted alphabetically or chronologically
+          uniqueMeetingCodes.forEach(code => {
+              const opt = document.createElement('option');
+              opt.value = code;
+              opt.innerText = code;
+              dropdown.appendChild(opt);
+          });
+
+          // Load the latest submission's meeting code on screen automatically
+          if(allMasterRecords.length > 0) {
+              const latestMeetingCode = allMasterRecords[0].meetingCode;
+              dropdown.value = latestMeetingCode;
+              renderFilteredTable(latestMeetingCode);
+          }
+
       } catch (error) {
+          console.error(error);
           tbody.innerHTML = `<tr><td colspan="6" style="color:red;">Access Denied: Rules validation parameter error.</td></tr>`;
       }
+  }
+
+  // RENDER FILTERED SUB-ROWS ON USER SELECTION CHOICE
+  window.filterTableByMeeting = function() {
+      const selectedMeeting = document.getElementById('meetingFilter').value;
+      renderFilteredTable(selectedMeeting);
+  };
+
+  function renderFilteredTable(filterCode) {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      const filtered = allMasterRecords.filter(r => r.meetingCode === filterCode);
+
+      if(filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6">No logs for this meeting code.</td></tr>';
+          return;
+      }
+
+      filtered.forEach(r => {
+          tbody.innerHTML += `<tr>
+              <td>${r.timestamp}</td>
+              <td><span style="background:#003366;color:#fff;padding:2px 6px;border-radius:3px;font-size:0.85rem;">${r.meetingCode}</span></td>
+              <td><strong>${r.name}</strong></td>
+              <td>${r.flatInfo}</td>
+              <td>${r.mobile}</td>
+              <td>${r.email}</td>
+          </tr>`;
+      });
   }
 </script>
 </body>
