@@ -1,0 +1,101 @@
+<!-- 3. LOWER DOCUMENT DASHBOARD AREA -->
+<div class="main-wrapper">
+
+    <!-- LEFT SIDEBAR (Now drops standard hardcoded lists) -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <div class="sidebar-header">
+                <span>List of Documents</span>
+                <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">&lt;&lt;</button>
+            </div>
+            <ul class="sidebar-menu" id="dynamicSidebarMenu">
+                <!-- Built dynamically by JavaScript engine -->
+            </ul>
+        </div>
+    </div>
+
+    <button class="toggle-btn floating" id="collapsedToggleBtn" onclick="toggleSidebar()" style="display: none;">&gt;&gt;</button>
+
+    <!-- RIGHT SIDE CONTENT AREA (Now entirely template-driven) -->
+    <div class="content-area" id="dynamicContentArea">
+        <div class="welcome-placeholder" id="welcomeMsg">
+            Please select an item from the "List of Documents" to view it.
+        </div>
+        
+        <!-- Placeholder containing document title rendering anchors -->
+        <div class="doc-content" id="activeDocContainer">
+            <h1 class="doc-title" id="renderTitle"></h1>
+            <div id="renderTarget"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// GLOBAL STATE DATA CONTAINER MAP
+let documentDataList = [];
+
+// AUTO RUN LOADER ROUTINE ON INTERFACE READY
+document.addEventListener('DOMContentLoaded', loadExternalDocuments);
+
+async function loadExternalDocuments() {
+    try {
+        // Fetch the external configuration catalog file
+        const response = await fetch('documents.json');
+        documentDataList = await response.json();
+        
+        const menuContainer = document.getElementById('dynamicSidebarMenu');
+        menuContainer.innerHTML = ''; // Reset frame layout
+
+        // Build Sidebar elements programmatically
+        documentDataList.forEach((doc, index) => {
+            const listItem = document.createElement('li');
+            listItem.className = 'sidebar-item';
+            listItem.innerText = `${doc.date} | ${doc.title}`;
+            listItem.onclick = () => switchDoc(index, listItem);
+            menuContainer.appendChild(listItem);
+        });
+    } catch (error) {
+        console.error("Failed to load layout configuration index matrix:", error);
+        document.getElementById('welcomeMsg').innerText = "System error loading document directory list.";
+    }
+}
+
+function switchDoc(index, selectedElement) {
+    // Hide welcome default layout block
+    document.getElementById('welcomeMsg').style.display = 'none';
+    
+    // Manage sidebar selection styles indicators
+    const menuItems = document.querySelectorAll('.sidebar-item');
+    menuItems.forEach(item => item.classList.remove('active'));
+    selectedElement.classList.add('active');
+
+    const doc = documentDataList[index];
+    
+    // Set Document title field parameters
+    document.getElementById('renderTitle').innerText = `${doc.date} | ${doc.title}`;
+    
+    const target = document.getElementById('renderTarget');
+    target.innerHTML = ''; // Wipe past viewer frame context structures
+
+    // RENDER FACTORY LOGIC: Outputs exact framework needed based on "type" parameter key
+    if (doc.type === "image") {
+        target.innerHTML = `
+            <div class="ad-card" onclick="openModal(this)">
+                <img src="${doc.url}" alt="${doc.title}">
+            </div>`;
+    } else if (doc.type === "pdf") {
+        target.innerHTML = `
+            <a href="${doc.url}" target="_blank" class="mobile-pdf-link-fallback">
+                👉 Click here to Open full PDF Document
+            </a>
+            <div class="pdf-scroll-wrapper">
+                <object class="pdf-object-frame" data="${doc.url}#toolbar=1&navpanes=1" type="application/pdf">
+                    <iframe class="pdf-viewer-frame" src="${doc.url}#toolbar=1&navpanes=1" style="width:100%; height:100%; border:none;"></iframe>
+                </object>
+            </div>`;
+    }
+
+    // Make target document section visible on canvas screen
+    document.getElementById('activeDocContainer').classList.add('active');
+}
+</script>
