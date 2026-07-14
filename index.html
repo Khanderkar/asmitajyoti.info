@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Asmita Jyoti – Redevelopment</title>
+<title>Asmita Jyoti – Member SBGM</title>
 
-<!-- FAVICON GENERATOR CODE INSERTED HERE -->
+<!-- Favicon configs inherited from your main layout -->
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
@@ -25,7 +25,7 @@ body {
     flex-direction: column;
 }
 
-/* --- TOP HEADER BOX --- */
+/* --- TOP YELLOW HEADER BOX --- */
 .top-header {
     background: #ffcc00; 
     color: #ffffff;      
@@ -38,11 +38,165 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Main Layout Wrapper */
+/* --- TOP HORIZONTAL REGISTRATION FORM CONTAINER --- */
+.form-horizontal-container {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0 40px; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    z-index: 105;
+    position: relative;
+    transition: all 0.4s ease;
+}
+
+/* Clear padding entirely when minimized */
+.form-horizontal-container.minimized {
+    padding: 0 !important;
+    border-bottom: none !important;
+}
+
+/* CENTER-ALIGNED FORM TITLE */
+.form-title-inline {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffcc00;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Slidewrapper to handle smooth transition collapse mechanics */
+.form-slide-wrapper {
+    max-height: 600px;
+    padding: 20px 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), padding 0.4s ease;
+}
+
+.form-horizontal-container.minimized .form-slide-wrapper {
+    max-height: 0 !important;
+    padding: 0 !important;
+}
+
+.horizontal-form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.input-field-group {
+    flex: 1;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-field-group.optional label::after {
+    content: " (Optional)";
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+label {
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-bottom: 6px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.marathi-label {
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: #ffcc00;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-size: 0.9rem;
+    height: 40px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+input:focus, select:focus {
+    border-color: #ffcc00;
+    background: rgba(255, 255, 255, 0.25);
+}
+
+select option {
+    background: #1e3c72;
+    color: #fff;
+}
+
+.submit-row-container {
+    width: 100%;
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+button.submit-btn {
+    background: #ffcc00;
+    color: #000;
+    border: none;
+    padding: 0 40px;
+    height: 42px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+button.submit-btn:hover {
+    background: #e6b800;
+}
+
+/* MINIMIZE / EXPAND TOGGLE ARROW */
+.form-collapse-arrow-btn {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    background: transparent;
+    border: 2px solid #ffcc00;
+    color: #ffcc00;
+    border-radius: 4px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 106;
+}
+
+.form-collapse-arrow-btn:hover {
+    background: rgba(255, 204, 0, 0.15);
+}
+
+/* Relocate button cleanly when minimized */
+.form-horizontal-container.minimized .form-collapse-arrow-btn {
+    bottom: -45px;
+    background: #ffcc00;
+    color: #000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* --- MAIN CONTENTS LOWER SECTION --- */
 .main-wrapper {
     display: flex;
     flex: 1;
-    height: calc(100vh - 62px); 
+    height: calc(100vh - 250px); 
     overflow: hidden;
     position: relative;
 }
@@ -114,7 +268,6 @@ body {
     border-left: 4px solid #ffcc00;
 }
 
-/* --- STREAMLINED TOGGLE BUTTON --- */
 .toggle-btn {
     background: #ffcc00;
     color: #000;
@@ -178,11 +331,10 @@ body {
     text-align: center;
 }
 
-/* iOS PDF Mobile Container Fixes */
 .pdf-scroll-wrapper {
     width: 100%;
     flex: 1;
-    min-height: 550px;
+    min-height: 450px;
     display: flex;
     flex-direction: column;
     border-radius: 6px;
@@ -198,7 +350,6 @@ body {
     border: none;
 }
 
-/* Mobile Fallback Button for multi-page view */
 .mobile-pdf-link-fallback {
     display: block;
     margin: 15px auto;
@@ -212,7 +363,6 @@ body {
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-/* Notice Card Layout */
 .ad-card {
     background: #fff;
     color: #000;
@@ -235,7 +385,6 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Modal views */
 .modal {
     display: none;
     position: fixed;
@@ -260,7 +409,14 @@ body {
     cursor: pointer;
 }
 
-@media(max-width: 768px) {
+@media(max-width: 992px) {
+    .horizontal-form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .input-field-group {
+        width: 100%;
+    }
     .main-wrapper {
         flex-direction: column;
         height: auto;
@@ -285,113 +441,171 @@ body {
     .content-area {
         padding: 15px;
     }
+    .form-collapse-arrow-btn {
+        right: 10px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<!-- YELLOW HEADER BOX -->
+<!-- 1. TOP YELLOW HEADER BOX -->
 <div class="top-header">
     Asmita Jyoti CHSL Redevelopment updates
 </div>
 
+<!-- 2. ATTENDANCE ENTRY MODULE -->
+<div class="form-horizontal-container" id="attendanceContainer">
+    
+    <!-- Action Minimize Toggle Button -->
+    <button class="form-collapse-arrow-btn" id="formToggleBtn" onclick="toggleAttendanceView()">▲</button>
+
+    <div class="form-slide-wrapper" id="slideWrapper">
+        <div class="form-title-inline">Asmita Jyoti CHSL Member SBBM Attendance Entry</div>
+        <form id="registryForm">
+            <div class="horizontal-form-row">
+                
+                <div class="input-field-group">
+                    <label for="fullName">Full Name <span style="color:#ff3333;">*</span></label>
+                    <input type="text" id="fullName" placeholder="Your answer" required>
+                </div>
+
+                <div class="input-field-group">
+                    <label for="buildingNum">Building Number | <span class="marathi-label">इमारत क्रमांक</span> <span style="color:#ff3333;">*</span></label>
+                    <select id="buildingNum" required>
+                        <option value="" disabled selected>Choose</option>
+                        <option value="A1">A1</option><option value="A2">A2</option><option value="B1">B1</option>
+                        <option value="C1">C1</option><option value="D1">D1</option><option value="D2">D2</option>
+                        <option value="D3">D3</option><option value="D4">D4</option><option value="D5">D5</option>
+                        <option value="D6">D6</option><option value="D7">D7</option><option value="D8">D8</option>
+                        <option value="D9">D9</option><option value="D10">D10</option><option value="D11">D11</option>
+                        <option value="E1">E1</option><option value="Shops/Units">Shops/Units</option>
+                    </select>
+                </div>
+
+                <div class="input-field-group">
+                    <label for="flatNum">Flat Number | <span class="marathi-label">सदनिका क्रमांक</span> <span style="color:#ff3333;">*</span></label>
+                    <select id="flatNum" required>
+                        <option value="" disabled selected>Choose</option>
+                        <option value="01">01</option><option value="02">02</option><option value="03">03</option>
+                        <option value="04">04</option><option value="05">05</option><option value="06">06</option>
+                        <option value="11">11</option><option value="12">12</option><option value="13">13</option>
+                        <option value="14">14</option><option value="15">15</option><option value="16">16</option>
+                        <option value="21">21</option><option value="22">22</option><option value="23">23</option>
+                        <option value="24">24</option><option value="25">25</option><option value="26">26</option>
+                        <option value="31">31</option><option value="32">32</option><option value="33">33</option>
+                        <option value="34">34</option><option value="35">35</option><option value="36">36</option>
+                        <option value="41">41</option><option value="42">42</option><option value="43">43</option>
+                        <option value="44">44</option><option value="45">45</option><option value="46">46</option>
+                        <option value="51">51</option><option value="52">52</option><option value="53">53</option>
+                        <option value="54">54</option><option value="55">55</option><option value="56">56</option>
+                        <option value="61">61</option><option value="62">62</option><option value="63">63</option>
+                        <option value="64">64</option><option value="65">65</option><option value="66">66</option>
+                        <option value="71">71</option><option value="72">72</option><option value="73">73</option>
+                        <option value="74">74</option><option value="75">75</option><option value="76">76</option>
+                        <option value="81">81</option><option value="82">82</option><option value="83">83</option>
+                        <option value="84">84</option><option value="85">85</option><option value="86">86</option>
+                        <option value="91">91</option><option value="92">92</option><option value="93">93</option>
+                        <option value="94">94</option><option value="95">95</option><option value="96">96</option>
+                        <option value="101">101</option><option value="102">102</option><option value="103">103</option>
+                        <option value="104">104</option><option value="105">105</option><option value="106">106</option>
+                        <option value="111">111</option><option value="112">112</option><option value="113">113</option>
+                        <option value="114">114</option><option value="115">115</option><option value="116">116</option>
+                        <option value="121">121</option><option value="122">122</option><option value="123">123</option>
+                        <option value="124">124</option><option value="125">125</option><option value="126">126</option>
+                        <option value="131">131</option><option value="132">132</option><option value="133">133</option>
+                        <option value="134">134</option><option value="135">135</option><option value="136">136</option>
+                        <option value="141">141</option><option value="142">142</option><option value="143">143</option>
+                        <option value="144">144</option><option value="145">145</option><option value="146">146</option>
+                        <option value="151">151</option><option value="152">152</option><option value="153">153</option>
+                        <option value="154">154</option><option value="155">155</option><option value="156">156</option>
+                        <option value="Shop # 01">Shop # 01</option><option value="Shop # 02">Shop # 02</option>
+                        <option value="Shop # 03">Shop # 03</option><option value="Shop # 04">Shop # 04</option>
+                        <option value="Shop # 05">Shop # 05</option><option value="Shop # 06">Shop # 06</option>
+                        <option value="Shop # 08">Shop # 08</option><option value="Shop # 09">Shop # 09</option>
+                        <option value="Shop # 10">Shop # 10</option><option value="Shop # 11">Shop # 11</option>
+                        <option value="Shop # 12">Shop # 12</option><option value="Shop # 13">Shop # 13</option>
+                        <option value="Shop # 14">Shop # 14</option><option value="Shop # 15">Shop # 15</option>
+                        <option value="Shop # 16">Shop # 16</option><option value="Shop # 17">Shop # 17</option>
+                        <option value="Shop # 18">Shop # 18</option><option value="Shop # 19">Shop # 19</option>
+                        <option value="Shop # 20">Shop # 20</option><option value="Shop # 21">Shop # 21</option>
+                        <option value="Shop # 22">Shop # 22</option><option value="Shop # 23">Shop # 23</option>
+                        <option value="Shop # 24">Shop # 24</option><option value="Shop # 25">Shop # 25</option>
+                        <option value="Shop # 26">Shop # 26</option><option value="Shop # 27">Shop # 27</option>
+                        <option value="Shop # 28">Shop # 28</option><option value="Shop # 29">Shop # 29</option>
+                        <option value="Shop # 30">Shop # 30</option><option value="Shop # 31">Shop # 31</option>
+                        <option value="Shop # 32">Shop # 32</option><option value="Shop # 33">Shop # 33</option>
+                        <option value="Shop # 34">Shop # 34</option><option value="Shop # 35">Shop # 35</option>
+                        <option value="Shop # 36">Shop # 36</option><option value="Shop # 37">Shop # 37</option>
+                        <option value="Shop # 38">Shop # 38</option><option value="Shop # 39">Shop # 39</option>
+                        <option value="Shop # 40">Shop # 40</option><option value="Shop # 41">Shop # 41</option>
+                        <option value="Shop # 42">Shop # 42</option><option value="Shop # 43">Shop # 43</option>
+                        <option value="Shop # 44">Shop # 44</option><option value="Shop # 45">Shop # 45</option>
+                        <option value="Shop # 46">Shop # 46</option><option value="Shop # 47">Shop # 47</option>
+                        <option value="Shop # 48">Shop # 48</option><option value="Shop # 49">Shop # 49</option>
+                        <option value="Shop # 50">Shop # 50</option><option value="Shop # 51">Shop # 51</option>
+                        <option value="Shop # 52">Shop # 52</option>
+                        <option value="Unit # 01">Unit # 01</option><option value="Unit # 02">Unit # 02</option>
+                        <option value="Unit # 03">Unit # 03</option><option value="Unit # 04">Unit # 04</option>
+                        <option value="Unit # 05">Unit # 05</option><option value="Unit # 06">Unit # 06</option>
+                        <option value="Unit # 07">Unit # 07</option><option value="Unit # 08">Unit # 08</option>
+                    </select>
+                </div>
+
+                <div class="input-field-group">
+                    <label for="mobileNum">Mobile Number | <span class="marathi-label">मोबाईल क्रमांक</span> <span style="color:#ff3333;">*</span></label>
+                    <input type="tel" id="mobileNum" placeholder="Your answer" pattern="[0-9]{10,13}" required>
+                </div>
+
+                <div class="input-field-group optional">
+                    <label for="emailAddress">Email address | <span class="marathi-label">ईमेल पत्ता</span></label>
+                    <input type="email" id="emailAddress" placeholder="Your answer">
+                </div>
+
+                <div class="submit-row-container">
+                    <button type="submit" class="submit-btn" id="joinBtn">Join meeting</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 3. LOWER DOCUMENT DASHBOARD AREA -->
 <div class="main-wrapper">
 
-    <!-- LEFT SIDEBAR -->
+    <!-- LEFT SIDEBAR (Dynamic Engine Target) -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-content">
             <div class="sidebar-header">
                 <span>List of Documents</span>
                 <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">&lt;&lt;</button>
             </div>
-            <ul class="sidebar-menu">
-                <li class="sidebar-item" onclick="switchDoc(0)">26 Jun 2026 | Advisory Committee Participation Invitation</li>
-                <li class="sidebar-item" onclick="switchDoc(1)">26 Jun 2026 | Redevlopment Technical Review Committee</li>
-                <li class="sidebar-item" onclick="switchDoc(2)">21 Jun 2026 | SGBM (14Jun2026) Minutes Of Meeting</li>
-                <li class="sidebar-item" onclick="switchDoc(3)">28 May 2026 | SGBM Notice (14Jun2026) - Redevelopment / PMC Recruitment</li>
-                <li class="sidebar-item" onclick="switchDoc(4)">06 Feb 2026 | SGBM (01Feb2026) Minutes Of Meeting</li>
-                <li class="sidebar-item" onclick="switchDoc(5)">13 Jan 2026 | SGBM Notice (01Feb2026) - Redevelopment / PMC Recruitment</li>
+            <ul class="sidebar-menu" id="dynamicSidebarMenu">
+                <!-- Populated dynamically via script from external file -->
             </ul>
         </div>
     </div>
 
-    <!-- FLOATING TOGGLE BUTTON OUTSIDE SIDEBAR -->
     <button class="toggle-btn floating" id="collapsedToggleBtn" onclick="toggleSidebar()" style="display: none;">&gt;&gt;</button>
 
-    <!-- RIGHT SIDE CONTENT CONTAINER -->
+    <!-- RIGHT SIDE CONTENT AREA -->
     <div class="content-area">
         
-        <!-- Welcome Message -->
         <div class="welcome-placeholder" id="welcomeMsg">
             Please select an item from the "List of Documents" to view it.
         </div>
         
-        <!-- Document index 0: 26 Jun 2026 Advisory Committee -->
-        <div class="doc-content" id="doc-0">
-            <h1 class="doc-title">26 Jun 2026 | Advisory Committee Participation Invitation</h1>
-            <div class="ad-card" onclick="openModal(this)">
-                <img src="https://asmitajyoti.info/Images/Advisory_Committee_Participation_Invitation_26Jun2026.jpg" alt="Advisory Committee Invitation">
-            </div>
-        </div>
-
-        <!-- Document index 1: 26 Jun 2026 Technical Review Committee -->
-        <div class="doc-content" id="doc-1">
-            <h1 class="doc-title">26 Jun 2026 | Redevlopment Technical Review Committee</h1>
-            <div class="ad-card" onclick="openModal(this)">
-                <img src="https://AsmitaJyoti.info/Images/Redevlopment_Technical_Review_Committee_26Jun2026.jpg" alt="Redevelopment Technical Review Committee">
-            </div>
-        </div>
-
-        <!-- Document index 2: 21 Jun 2026 -->
-        <div class="doc-content" id="doc-2">
-            <h1 class="doc-title">21 Jun 2026 | SGBM (14Jun2026) Minutes Of Meeting</h1>
-            <a href="https://AsmitaJyoti.info/PDF/SGBM_MINUTES_14Jun2026.pdf" target="_blank" class="mobile-pdf-link-fallback">
-                👉 Click here to Open full PDF Document
-            </a>
-            <div class="pdf-scroll-wrapper">
-                <object class="pdf-object-frame" data="https://AsmitaJyoti.info/PDF/SGBM_MINUTES_14Jun2026.pdf#toolbar=1&navpanes=1" type="application/pdf">
-                    <iframe class="pdf-viewer-frame" src="https://AsmitaJyoti.info/PDF/SGBM_MINUTES_14Jun2026.pdf#toolbar=1&navpanes=1"></iframe>
-                </object>
-            </div>
-        </div>
-
-        <!-- Document index 3: 28 May 2026 -->
-        <div class="doc-content" id="doc-3">
-            <h1 class="doc-title">28 May 2026 | SGBM Notice (14Jun2026) - Redevelopment / PMC Recruitment</h1>
-            <div class="ad-card" onclick="openModal(this)">
-                <img src="https://asmitajyoti.info/Images/AGM_Notice_14Jun2026.jpg" alt="Notice 14Jun2026">
-            </div>
-        </div>
-
-        <!-- Document index 4: 06 Feb 2026 (UPDATED PATH IN 3 LOCATIONS BELOW) -->
-        <div class="doc-content" id="doc-4">
-            <h1 class="doc-title">06 Feb 2026 | SGBM (01Feb2026) Minutes Of Meeting</h1>
-            <!-- Location 1: Mobile Fallback Link -->
-            <a href="https://asmitajyoti.info/PDF/SGBM_MINUTES_01Feb2026.pdf" target="_blank" class="mobile-pdf-link-fallback">
-                👉 Click here to Open full PDF Document
-            </a>
-            <div class="pdf-scroll-wrapper">
-                <!-- Location 2: Object Data Target -->
-                <object class="pdf-object-frame" data="https://asmitajyoti.info/PDF/SGBM_MINUTES_01Feb2026.pdf#toolbar=1&navpanes=1" type="application/pdf">
-                    <!-- Location 3: Iframe Fallback Embed -->
-                    <iframe class="pdf-viewer-frame" src="https://asmitajyoti.info/PDF/SGBM_MINUTES_01Feb2026.pdf#toolbar=1&navpanes=1"></iframe>
-                </object>
-            </div>
-        </div>
-
-        <!-- Document index 5: 13 Jan 2026 -->
-        <div class="doc-content" id="doc-5">
-            <h1 class="doc-title">13 Jan 2026 | SGBM Notice (01Feb2026) - Redevelopment / PMC Recruitment</h1>
-            <div class="ad-card" onclick="openModal(this)">
-                <img src="https://asmitajyoti.info/Images/AGM_Notice_01Feb2026.jpg" alt="Notice 01Feb2026">
-            </div>
+        <!-- Render Template Target Structure Container -->
+        <div class="doc-content" id="activeDocContainer">
+            <h1 class="doc-title" id="renderTitle"></h1>
+            <div id="renderTarget"></div>
         </div>
 
     </div>
 </div>
 
-<!-- Modal View Component -->
 <div class="modal" id="imgModal">
     <span class="modal-close" onclick="closeModal()">×</span>
     <img id="modalImg">
@@ -402,31 +616,162 @@ body {
     <script src="https://cdn.counter.dev/script.js" data-id="6461317c-4e57-4b01-a820-e81a891f2dd6"></script>
 </footer>
 
+<!-- SYSTEM DATA CONTROL INTERFACE & GLOBAL PARAMETERS SECTION -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  // ==========================================
+  //     ALL CONFIGURABLE VALUES GO HERE
+  // ==========================================
+  const CONFIG = {
+      MEETING_CODE: "SGBM_JULY_2026",
+      ZOOM_URL: "https://zoom.us",
+      INITIAL_COLLAPSE_STATE: "YES", // "YES" to load hidden or "NO" to load open
+      
+      FIREBASE_KEYS: {
+          apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
+          authDomain: "asmitajyoti-sgbm.firebaseapp.com",
+          projectId: "asmitajyoti-sgbm",
+          storageBucket: "asmitajyoti-sgbm.firebasestorage.app",
+          messagingSenderId: "85179629629",
+          appId: "1:85179629629:web:81718858a1d21aba752a54",
+          measurementId: "G-D107TNSPL1"
+      }
+  };
+
+  const app = initializeApp(CONFIG.FIREBASE_KEYS);
+  const db = getFirestore(app);
+
+  window.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('attendanceContainer');
+      const wrapper = document.getElementById('slideWrapper');
+      const arrow = document.getElementById('formToggleBtn');
+      if (CONFIG.INITIAL_COLLAPSE_STATE === "YES") {
+          container.classList.add('minimized');
+          wrapper.style.display = 'none';
+          arrow.innerHTML = "▼";
+      }
+  });
+
+  document.getElementById('registryForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const btn = document.getElementById('joinBtn');
+      btn.innerText = "Connecting...";
+      btn.disabled = true;
+
+      try {
+          await addDoc(collection(db, "registrations"), {
+              meetingCode: CONFIG.MEETING_CODE,
+              name: document.getElementById('fullName').value.trim(),
+              buildingNumber: document.getElementById('buildingNum').value,
+              flatNumber: document.getElementById('flatNum').value,
+              mobileNumber: document.getElementById('mobileNum').value.trim(),
+              emailAddress: document.getElementById('emailAddress').value.trim() || "Not Provided",
+              timestamp: new Date()
+          });
+          window.location.href = CONFIG.ZOOM_URL;
+      } catch (error) {
+          console.error(error);
+          alert("Submission failure.");
+          btn.innerText = "Join meeting";
+          btn.disabled = false;
+      }
+  });
+</script>
+
 <script>
+let documentDataList = [];
+
+document.addEventListener('DOMContentLoaded', loadExternalDocuments);
+
+// DYNAMIC LOADER FOR JSON
+async function loadExternalDocuments() {
+    try {
+        const response = await fetch('documents.json');
+        documentDataList = await response.json();
+        
+        const menuContainer = document.getElementById('dynamicSidebarMenu');
+        menuContainer.innerHTML = '';
+
+        documentDataList.forEach((doc, index) => {
+            const listItem = document.createElement('li');
+            listItem.className = 'sidebar-item';
+            listItem.innerText = `${doc.date} | ${doc.title}`;
+            listItem.onclick = () => switchDoc(index, listItem);
+            menuContainer.appendChild(listItem);
+        });
+    } catch (error) {
+        console.error("Failed to load documents mapping index:", error);
+        document.getElementById('welcomeMsg').innerText = "System error loading document directory list.";
+    }
+}
+
+function switchDoc(index, selectedElement) {
+    document.getElementById('welcomeMsg').style.display = 'none';
+    
+    const menuItems = document.querySelectorAll('.sidebar-item');
+    menuItems.forEach(item => item.classList.remove('active'));
+    selectedElement.classList.add('active');
+
+    const doc = documentDataList[index];
+    document.getElementById('renderTitle').innerText = `${doc.date} | ${doc.title}`;
+    
+    const target = document.getElementById('renderTarget');
+    target.innerHTML = ''; 
+
+    if (doc.type === "image") {
+        target.innerHTML = `
+            <div class="ad-card" onclick="openModal(this)">
+                <img src="${doc.url}" alt="${doc.title}">
+            </div>`;
+    } else if (doc.type === "pdf") {
+        target.innerHTML = `
+            <a href="${doc.url}" target="_blank" class="mobile-pdf-link-fallback">
+                👉 Click here to Open full PDF Document
+            </a>
+            <div class="pdf-scroll-wrapper">
+                <object class="pdf-object-frame" data="${doc.url}#toolbar=1&navpanes=1" type="application/pdf">
+                    <iframe class="pdf-viewer-frame" src="${doc.url}#toolbar=1&navpanes=1" style="width:100%; height:100%; border:none;"></iframe>
+                </object>
+            </div>`;
+    }
+
+    document.getElementById('activeDocContainer').classList.add('active');
+}
+
+function toggleAttendanceView() {
+    const container = document.getElementById('attendanceContainer');
+    const wrapper = document.getElementById('slideWrapper');
+    const arrow = document.getElementById('formToggleBtn');
+    
+    if (container.classList.contains('minimized')) {
+        wrapper.style.display = 'block';
+        setTimeout(() => {
+            container.classList.remove('minimized');
+            arrow.innerHTML = "▲";
+        }, 10);
+    } else {
+        container.classList.add('minimized');
+        arrow.innerHTML = "▼";
+        setTimeout(() => {
+            if (container.classList.contains('minimized')) {
+                wrapper.style.display = 'none';
+            }
+        }, 400); 
+    }
+}
+
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const collapsedToggleBtn = document.getElementById('collapsedToggleBtn');
-    
     sidebar.classList.toggle('collapsed');
-    
     if (sidebar.classList.contains('collapsed')) {
         collapsedToggleBtn.style.display = 'block';
     } else {
         collapsedToggleBtn.style.display = 'none';
     }
-}
-
-function switchDoc(index) {
-    document.getElementById('welcomeMsg').style.display = 'none';
-
-    const contents = document.querySelectorAll('.doc-content');
-    contents.forEach(doc => doc.classList.remove('active'));
-
-    const menuItems = document.querySelectorAll('.sidebar-item');
-    menuItems.forEach(item => item.classList.remove('active'));
-
-    document.getElementById(`doc-${index}`).classList.add('active');
-    menuItems[index].classList.add('active');
 }
 
 function openModal(card){
