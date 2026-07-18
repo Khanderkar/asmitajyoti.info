@@ -161,21 +161,15 @@ button.submit-btn:hover {
     background: #e6b800;
 }
 
-/* APP DOWNLOAD WARNING SYSTEM (DYNAMIC BLINKING RED NOTICE) */
+/* APP DOWNLOAD WARNING SYSTEM (WHITE CENTERED TEXT) */
 .zoom-app-warning-disclaimer {
-    text-align: center;
-    color: #ff4d4d;
+    color: #ffffff;
     font-size: 0.88rem;
     font-weight: bold;
-    margin-top: 15px;
+    margin-bottom: 15px;
     text-align: center;
     max-width: 850px;
     line-height: 1.4;
-    animation: blinker 5.5s linear infinite;
-}
-
-@keyframes blinker {
-    10% { opacity: 0; }
 }
 
 /* MINIMIZE / EXPAND TOGGLE ARROW */
@@ -626,14 +620,14 @@ button.submit-btn:hover {
                     <label for="emailAddress">Email address | <span class="marathi-label">ईमेल पत्ता</span></label>
                     <input type="email" id="emailAddress" placeholder="Your answer">
                 </div>
-                    <!-- DYNAMIC BLINKING RED DISCLAIMER NOTICE -->
+
+                <div class="submit-row-container">
+                    <!-- FIXED WHITE CENTER-ALIGNED WARNING TEXT REPOSITIONED ABOVE BUTTON -->
                     <div class="zoom-app-warning-disclaimer">
                         Note : It is recommended that you download the Zoom app from the Apple App Store or Google Play Store and join the meeting through the Zoom app. Features such as participation in Poll and viewing Poll results are available only when joining through the Zoom app, not through a web browser.
                     </div>
-                
-                <div class="submit-row-container">
+
                     <button type="submit" class="submit-btn" id="joinBtn">Join meeting</button>
-                    
                 </div>
 
             </div>
@@ -707,7 +701,7 @@ button.submit-btn:hover {
   const CONFIG = {
       MEETING_CODE: "SGBM_JULY_2026", 
       ZOOM_URL: "https://us06web.zoom.us/j/87145855489?pwd=rRD3dlFDKVQGItpctaiVk9Jj37blJN.1",
-      INITIAL_COLLAPSE_STATE: "No", // Case-insensitive: "YES" or "NO"
+      INITIAL_COLLAPSE_STATE: "No", 
       
       FIREBASE_KEYS: {
           apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
@@ -760,7 +754,7 @@ button.submit-btn:hover {
           // Open Zoom in a new window/tab
           window.open(CONFIG.ZOOM_URL, '_blank');
           
-          // Switch fields layout to show the backup 3-line card on screen
+          // Hide registration form fields and display unified data box
           formElement.style.display = 'none';
           successBlock.style.display = 'block';
       } catch (error) {
