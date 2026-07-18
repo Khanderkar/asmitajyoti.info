@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Asmita Jyoti – Member SBGM</title>
 
+<!-- Favicon configs inherited from your main layout -->
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="shortcut icon" href="/favicon.ico" />
@@ -189,6 +190,40 @@ button.submit-btn:hover {
     background: #ffcc00;
     color: #000;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* --- ZOOM DYNAMIC DETAILS DISPLAY --- */
+.zoom-success-box {
+    display: none;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px dashed #ffcc00;
+    border-radius: 6px;
+    padding: 20px;
+    margin-top: 10px;
+    text-align: center;
+    animation: fadeIn 0.4s ease;
+}
+
+.zoom-success-box h3 {
+    margin-top: 0;
+    color: #ffcc00;
+}
+
+.zoom-link-anchor {
+    display: inline-block;
+    background: #0052cc;
+    color: white;
+    text-decoration: none;
+    padding: 10px 25px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin: 10px 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: background 0.2s ease;
+}
+
+.zoom-link-anchor:hover {
+    background: #0043a4;
 }
 
 /* --- MAIN CONTENTS LOWER SECTION --- */
@@ -449,16 +484,22 @@ button.submit-btn:hover {
 
 <body>
 
+<!-- 1. TOP YELLOW HEADER BOX -->
 <div class="top-header">
     Asmita Jyoti CHSL Redevelopment updates
 </div>
 
+<!-- 2. ATTENDANCE ENTRY MODULE -->
 <div class="form-horizontal-container" id="attendanceContainer">
     
+    <!-- Action Minimize Toggle Button -->
     <button class="form-collapse-arrow-btn" id="formToggleBtn" onclick="toggleAttendanceView()">▲</button>
 
     <div class="form-slide-wrapper" id="slideWrapper">
-        <div class="form-title-inline">Asmita Jyoti CHSL Member SBBM Attendance Entry</div>
+        <!-- Kept completely static as requested -->
+        <div class="form-title-inline">Asmita Jyoti CHSL Member SBBM Attendance Entry (19Jul2026)</div>
+        
+        <!-- Registration Fields Form -->
         <form id="registryForm">
             <div class="horizontal-form-row">
                 
@@ -565,86 +606,54 @@ button.submit-btn:hover {
 
             </div>
         </form>
+
+        <!-- NEW STATIC TEXT ZOOM CREDENTIALS CONTAINER (Hidden initially) -->
+        <div class="zoom-success-box" id="zoomSuccessBlock">
+            <h3>Verification Successful! Attendance Logged.</h3>
+            <p style="margin: 5px 0 15px 0; font-size: 1.1rem;">Click the link below or enter the details manually in the Zoom app:</p>
+            
+            <a href="https://us06web.zoom.us/j/87145855489?pwd=rRD3dlFDKVQGItpctaiVk9Jj37blJN.1" target="_blank" class="zoom-link-anchor">
+                Join Zoom Meeting
+            </a>
+            
+            <div style="margin-top: 15px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 4px; display: inline-block; text-align: left; font-family: monospace; font-size: 1.05rem;">
+                <strong>Meeting ID:</strong> 871 4585 5489<br>
+                <strong>Passcode:</strong> 352325
+            </div>
+        </div>
+
     </div>
 </div>
 
+<!-- 3. LOWER DOCUMENT DASHBOARD AREA -->
 <div class="main-wrapper">
 
+    <!-- LEFT SIDEBAR (Dynamic Engine Target) -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-content">
             <div class="sidebar-header">
                 <span>List of Documents</span>
                 <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">&lt;&lt;</button>
             </div>
-            <ul class="sidebar-menu">
-                <li class="sidebar-item" onclick="switchDoc(0)">26 Jun 2026 | Advisory Committee Participation Invitation</li>
-                <li class="sidebar-item" onclick="switchDoc(1)">26 Jun 2026 | Redevlopment Technical Review Committee</li>
-                <li class="sidebar-item" onclick="switchDoc(2)">21 Jun 2026 | SGBM (14Jun2026) Minutes Of Meeting</li>
-                <li class="sidebar-item" onclick="switchDoc(3)">28 May 2026 | SGBM Notice (14Jun2026) - Redevelopment / PMC Recruitment</li>
-                <li class="sidebar-item" onclick="switchDoc(4)">06 Feb 2026 | SGBM (01Feb2026) Minutes Of Meeting</li>
-                <li class="sidebar-item" onclick="switchDoc(5)">13 Jan 2026 | SGBM Notice (01Feb2026) - Redevelopment / PMC Recruitment</li>
+            <ul class="sidebar-menu" id="dynamicSidebarMenu">
+                <!-- Populated dynamically via script from external file -->
             </ul>
         </div>
     </div>
 
     <button class="toggle-btn floating" id="collapsedToggleBtn" onclick="toggleSidebar()" style="display: none;">&gt;&gt;</button>
 
+    <!-- RIGHT SIDE CONTENT AREA -->
     <div class="content-area">
         
         <div class="welcome-placeholder" id="welcomeMsg">
             Please select an item from the "List of Documents" to view it.
         </div>
         
-        <div class="doc-content" id="doc-0">
-            <h1 class="doc-title">26 Jun 2026 | Advisory Committee Participation Invitation</h1>
-            <div class="ad-card" onclick="openModal(this)">
-                <img src="https://asmitajyoti.info/Images/Advisory_Committee_Participation_Invitation_26Jun2026.jpg" alt="Advisory Committee Invitation">
-            </div>
-        </div>
-
-        <div class="doc-content" id="doc-1">
-            <h1 class="doc-title">26 Jun 2026 | Redevlopment Technical Review Committee</h1>
-            <div class="ad-card" onclick="openModal(this)">
-                <img src="https://AsmitaJyoti.info/Images/Redevlopment_Technical_Review_Committee_26Jun2026.jpg" alt="Redevelopment Technical Review Committee">
-            </div>
-        </div>
-
-        <div class="doc-content" id="doc-2">
-            <h1 class="doc-title">21 Jun 2026 | SGBM (14Jun2026) Minutes Of Meeting</h1>
-            <a href="https://AsmitaJyoti.info/PDF/SGBM_MINUTES_14Jun2026.pdf" target="_blank" class="mobile-pdf-link-fallback">
-                👉 Click here to Open full PDF Document
-            </a>
-            <div class="pdf-scroll-wrapper">
-                <object class="pdf-object-frame" data="https://AsmitaJyoti.info/PDF/SGBM_MINUTES_14Jun2026.pdf#toolbar=1&navpanes=1" type="application/pdf">
-                    <iframe class="pdf-viewer-frame" src="https://AsmitaJyoti.info/PDF/SGBM_MINUTES_14Jun2026.pdf#toolbar=1&navpanes=1"></iframe>
-                </object>
-            </div>
-        </div>
-
-        <div class="doc-content" id="doc-3">
-            <h1 class="doc-title">28 May 2026 | SGBM Notice (14Jun2026) - Redevelopment / PMC Recruitment</h1>
-            <div class="ad-card" onclick="openModal(this)">
-                <img src="https://asmitajyoti.info/Images/AGM_Notice_14Jun2026.jpg" alt="Notice 14Jun2026">
-            </div>
-        </div>
-
-        <div class="doc-content" id="doc-4">
-            <h1 class="doc-title">06 Feb 2026 | SGBM (01Feb2026) Minutes Of Meeting</h1>
-            <a href="https://asmitajyoti.info/PDF/SGBM_MINUTES_01Feb2026.pdf" target="_blank" class="mobile-pdf-link-fallback">
-                👉 Click here to Open full PDF Document
-            </a>
-            <div class="pdf-scroll-wrapper">
-                <object class="pdf-object-frame" data="https://asmitajyoti.info/PDF/SGBM_MINUTES_01Feb2026.pdf#toolbar=1&navpanes=1" type="application/pdf">
-                    <iframe class="pdf-viewer-frame" src="https://asmitajyoti.info/PDF/SGBM_MINUTES_01Feb2026.pdf#toolbar=1&navpanes=1"></iframe>
-                </object>
-            </div>
-        </div>
-
-        <div class="doc-content" id="doc-5">
-            <h1 class="doc-title">13 Jan 2026 | SGBM Notice (01Feb2026) - Redevelopment / PMC Recruitment</h1>
-            <div class="ad-card" onclick="openModal(this)">
-                <img src="https://asmitajyoti.info/Images/AGM_Notice_01Feb2026.jpg" alt="Notice 01Feb2026">
-            </div>
+        <!-- Render Template Target Structure Container -->
+        <div class="doc-content" id="activeDocContainer">
+            <h1 class="doc-title" id="renderTitle"></h1>
+            <div id="renderTarget"></div>
         </div>
 
     </div>
@@ -660,23 +669,26 @@ button.submit-btn:hover {
     <script src="https://cdn.counter.dev/script.js" data-id="6461317c-4e57-4b01-a820-e81a891f2dd6"></script>
 </footer>
 
+<!-- SYSTEM DATA CONTROL INTERFACE & GLOBAL PARAMETERS SECTION -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+  // ==========================================
+  //     ALL CONFIGURABLE VALUES GO HERE
+  // ==========================================
   const CONFIG = {
-      MEETING_CODE: "SGBM_JULY_2026",
-      ZOOM_URL: "https://zoom.us",
-      INITIAL_COLLAPSE_STATE: "NO", 
+      MEETING_CODE: "SGBM_19Jul2026",
+      INITIAL_COLLAPSE_STATE: "No", // Case-insensitive: "YES" or "NO"
       
       FIREBASE_KEYS: {
-  apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
-  authDomain: "asmitajyoti-sgbm.firebaseapp.com",
-  projectId: "asmitajyoti-sgbm",
-  storageBucket: "asmitajyoti-sgbm.firebasestorage.app",
-  messagingSenderId: "85179629629",
-  appId: "1:85179629629:web:81718858a1d21aba752a54",
-  measurementId: "G-D107TNSPL1"
+          apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
+          authDomain: "asmitajyoti-sgbm.firebaseapp.com",
+          projectId: "asmitajyoti-sgbm",
+          storageBucket: "asmitajyoti-sgbm.firebasestorage.app",
+          messagingSenderId: "85179629629",
+          appId: "1:85179629629:web:81718858a1d21aba752a54",
+          measurementId: "G-D107TNSPL1"
       }
   };
 
@@ -687,7 +699,9 @@ button.submit-btn:hover {
       const container = document.getElementById('attendanceContainer');
       const wrapper = document.getElementById('slideWrapper');
       const arrow = document.getElementById('formToggleBtn');
-      if (CONFIG.INITIAL_COLLAPSE_STATE === "YES") {
+      
+      // Enforce case-insensitive check
+      if (CONFIG.INITIAL_COLLAPSE_STATE.toUpperCase() === "YES") {
           container.classList.add('minimized');
           wrapper.style.display = 'none';
           arrow.innerHTML = "▼";
@@ -698,10 +712,14 @@ button.submit-btn:hover {
       e.preventDefault();
       
       const btn = document.getElementById('joinBtn');
+      const formElement = document.getElementById('registryForm');
+      const successBlock = document.getElementById('zoomSuccessBlock');
+      
       btn.innerText = "Connecting...";
       btn.disabled = true;
 
       try {
+          // Log submission array inside firestore
           await addDoc(collection(db, "registrations"), {
               meetingCode: CONFIG.MEETING_CODE,
               name: document.getElementById('fullName').value.trim(),
@@ -711,10 +729,13 @@ button.submit-btn:hover {
               emailAddress: document.getElementById('emailAddress').value.trim() || "Not Provided",
               timestamp: new Date()
           });
-          window.location.href = CONFIG.ZOOM_URL;
+          
+          // Switch visibility from input form to static text block
+          formElement.style.display = 'none';
+          successBlock.style.display = 'block';
       } catch (error) {
           console.error(error);
-          alert("Submission failure.");
+          alert("Submission failure. Please verify connection profile rules.");
           btn.innerText = "Join meeting";
           btn.disabled = false;
       }
@@ -722,30 +743,83 @@ button.submit-btn:hover {
 </script>
 
 <script>
+let documentDataList = [];
+
+document.addEventListener('DOMContentLoaded', loadExternalDocuments);
+
+async function loadExternalDocuments() {
+    try {
+        const response = await fetch('documents.json');
+        documentDataList = await response.json();
+        
+        const menuContainer = document.getElementById('dynamicSidebarMenu');
+        menuContainer.innerHTML = '';
+
+        documentDataList.forEach((doc, index) => {
+            const listItem = document.createElement('li');
+            listItem.className = 'sidebar-item';
+            listItem.innerText = `${doc.date} | ${doc.title}`;
+            listItem.onclick = () => switchDoc(index, listItem);
+            menuContainer.appendChild(listItem);
+        });
+    } catch (error) {
+        console.error("Failed to load documents mapping index:", error);
+        document.getElementById('welcomeMsg').innerText = "System error loading document directory list.";
+    }
+}
+
+function switchDoc(index, selectedElement) {
+    document.getElementById('welcomeMsg').style.display = 'none';
+    
+    const menuItems = document.querySelectorAll('.sidebar-item');
+    menuItems.forEach(item => item.classList.remove('active'));
+    selectedElement.classList.add('active');
+
+    const doc = documentDataList[index];
+    document.getElementById('renderTitle').innerText = `${doc.date} | ${doc.title}`;
+    
+    const target = document.getElementById('renderTarget');
+    target.innerHTML = ''; 
+
+    if (doc.type === "image") {
+        target.innerHTML = `
+            <div class="ad-card" onclick="openModal(this)">
+                <img src="${doc.url}" alt="${doc.title}">
+            </div>`;
+    } else if (doc.type === "pdf") {
+        target.innerHTML = `
+            <a href="${doc.url}" target="_blank" class="mobile-pdf-link-fallback">
+                👉 Click here to Open full PDF Document
+            </a>
+            <div class="pdf-scroll-wrapper">
+                <object class="pdf-object-frame" data="${doc.url}#toolbar=1&navpanes=1" type="application/pdf">
+                    <iframe class="pdf-viewer-frame" src="${doc.url}#toolbar=1&navpanes=1" style="width:100%; height:100%; border:none;"></iframe>
+                </object>
+            </div>`;
+    }
+
+    document.getElementById('activeDocContainer').classList.add('active');
+}
+
 function toggleAttendanceView() {
     const container = document.getElementById('attendanceContainer');
     const wrapper = document.getElementById('slideWrapper');
     const arrow = document.getElementById('formToggleBtn');
     
     if (container.classList.contains('minimized')) {
-        // EXPANDING VIEW
         wrapper.style.display = 'block';
-        // Allow rendering frame context updates before moving height configurations
         setTimeout(() => {
             container.classList.remove('minimized');
             arrow.innerHTML = "▲";
         }, 10);
     } else {
-        // COLLAPSING VIEW
         container.classList.add('minimized');
         arrow.innerHTML = "▼";
-        
-        // Hide structural context layout entirely from layout hierarchy when height rules finish transitioning
         setTimeout(() => {
             if (container.classList.contains('minimized')) {
                 wrapper.style.display = 'none';
             }
-        }, 400); // Matches the 0.4s CSS transition configuration
+        }, 400); 
     }
 }
 
@@ -758,16 +832,6 @@ function toggleSidebar() {
     } else {
         collapsedToggleBtn.style.display = 'none';
     }
-}
-
-function switchDoc(index) {
-    document.getElementById('welcomeMsg').style.display = 'none';
-    const contents = document.querySelectorAll('.doc-content');
-    contents.forEach(doc => doc.classList.remove('active'));
-    const menuItems = document.querySelectorAll('.sidebar-item');
-    menuItems.forEach(item => item.classList.remove('active'));
-    document.getElementById(`doc-${index}`).classList.add('active');
-    menuItems[index].classList.add('active');
 }
 
 function openModal(card){
