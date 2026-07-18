@@ -192,38 +192,63 @@ button.submit-btn:hover {
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
-/* --- ZOOM DYNAMIC DETAILS DISPLAY --- */
+/* --- ZOOM SUCCESS DISPLAY BOX MATCHING LAYOUT PATTERN --- */
 .zoom-success-box {
     display: none;
-    background: rgba(255, 255, 255, 0.15);
-    border: 2px dashed #ffcc00;
-    border-radius: 6px;
-    padding: 20px;
-    margin-top: 10px;
     text-align: center;
+    padding: 10px 0;
     animation: fadeIn 0.4s ease;
 }
 
-.zoom-success-box h3 {
-    margin-top: 0;
+.zoom-status-title {
     color: #ffcc00;
+    font-size: 1.35rem;
+    font-weight: bold;
+    margin: 5px 0 10px 0;
+}
+
+.zoom-status-subtitle {
+    font-size: 1.05rem;
+    margin-bottom: 20px;
+}
+
+.zoom-action-flex-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 10px;
 }
 
 .zoom-link-anchor {
-    display: inline-block;
     background: #0052cc;
     color: white;
     text-decoration: none;
-    padding: 10px 25px;
+    padding: 0 30px;
+    height: 44px;
+    line-height: 44px;
     border-radius: 4px;
     font-weight: bold;
-    margin: 10px 0;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    font-size: 1rem;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    white-space: nowrap;
     transition: background 0.2s ease;
 }
 
 .zoom-link-anchor:hover {
     background: #0043a4;
+}
+
+.zoom-manual-credentials-card {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-align: left;
+    font-family: monospace;
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
 /* --- MAIN CONTENTS LOWER SECTION --- */
@@ -496,10 +521,9 @@ button.submit-btn:hover {
     <button class="form-collapse-arrow-btn" id="formToggleBtn" onclick="toggleAttendanceView()">▲</button>
 
     <div class="form-slide-wrapper" id="slideWrapper">
-        <!-- Kept completely static as requested -->
         <div class="form-title-inline">Asmita Jyoti CHSL Member SBBM Attendance Entry (19Jul2026)</div>
         
-        <!-- Registration Fields Form -->
+        <!-- Registration Input Form -->
         <form id="registryForm">
             <div class="horizontal-form-row">
                 
@@ -607,18 +631,22 @@ button.submit-btn:hover {
             </div>
         </form>
 
-        <!-- NEW STATIC TEXT ZOOM CREDENTIALS CONTAINER (Hidden initially) -->
+        <!-- MATCHING ZOOM SUCCESS LAYOUT WITH AUTO-OPEN BLOCKER RECOVERY -->
         <div class="zoom-success-box" id="zoomSuccessBlock">
-            <h3>Verification Successful! Attendance Logged.</h3>
-            <p style="margin: 5px 0 15px 0; font-size: 1.1rem;">Click the link below or enter the details manually in the Zoom app:</p>
+            <div class="zoom-status-title">Verification Successful! Attendance Logged.</div>
+            <div class="zoom-status-subtitle">Click the link below or enter the details manually in the Zoom app:</div>
             
-            <a href="https://us06web.zoom.us/j/87145855489?pwd=rRD3dlFDKVQGItpctaiVk9Jj37blJN.1" target="_blank" class="zoom-link-anchor">
-                Join Zoom Meeting
-            </a>
-            
-            <div style="margin-top: 15px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 4px; display: inline-block; text-align: left; font-family: monospace; font-size: 1.05rem;">
-                <strong>Meeting ID:</strong> 871 4585 5489<br>
-                <strong>Passcode:</strong> 352325
+            <div class="zoom-action-flex-row">
+                <!-- Anchor Link for Backup Clicks -->
+                <a href="https://us06web.zoom.us/j/87145855489?pwd=rRD3dlFDKVQGItpctaiVk9Jj37blJN.1" target="_blank" class="zoom-link-anchor">
+                    Join Zoom Meeting
+                </a>
+                
+                <!-- Manual Entry Typography Panel -->
+                <div class="zoom-manual-credentials-card">
+                    <strong>Meeting ID:</strong> 871 4585 5489<br>
+                    <strong>Passcode:</strong> 352325
+                </div>
             </div>
         </div>
 
@@ -674,12 +702,10 @@ button.submit-btn:hover {
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // ==========================================
-  //     ALL CONFIGURABLE VALUES GO HERE
-  // ==========================================
   const CONFIG = {
-      MEETING_CODE: "SGBM_JULY_2026",
-      INITIAL_COLLAPSE_STATE: "No", // Case-insensitive: "YES" or "NO"
+      MEETING_CODE: "SGBM_JULY_2026", 
+      ZOOM_URL: "https://us06web.zoom.us/j/87145855489?pwd=rRD3dlFDKVQGItpctaiVk9Jj37blJN.1",
+      INITIAL_COLLAPSE_STATE: "No", 
       
       FIREBASE_KEYS: {
           apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
@@ -700,7 +726,6 @@ button.submit-btn:hover {
       const wrapper = document.getElementById('slideWrapper');
       const arrow = document.getElementById('formToggleBtn');
       
-      // Enforce case-insensitive check
       if (CONFIG.INITIAL_COLLAPSE_STATE.toUpperCase() === "YES") {
           container.classList.add('minimized');
           wrapper.style.display = 'none';
@@ -719,7 +744,7 @@ button.submit-btn:hover {
       btn.disabled = true;
 
       try {
-          // Log submission array inside firestore
+          // 1. Submit form logs data array into Firestore DB setup
           await addDoc(collection(db, "registrations"), {
               meetingCode: CONFIG.MEETING_CODE,
               name: document.getElementById('fullName').value.trim(),
@@ -730,12 +755,15 @@ button.submit-btn:hover {
               timestamp: new Date()
           });
           
-          // Switch visibility from input form to static text block
+          // 2. Launch separate window element running Zoom session link path context
+          window.open(CONFIG.ZOOM_URL, '_blank');
+          
+          // 3. Render backup static credential blocks layout right inside workspace safely
           formElement.style.display = 'none';
           successBlock.style.display = 'block';
       } catch (error) {
           console.error(error);
-          alert("Submission failure. Please verify connection profile rules.");
+          alert("Submission failure. Verify configuration framework.");
           btn.innerText = "Join meeting";
           btn.disabled = false;
       }
