@@ -7,11 +7,12 @@
     <style>
         body { font-family: Arial, sans-serif; background: #f4f6f9; color: #333; margin: 0; padding: 20px; }
         .admin-header { background: #003366; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-        .header-left-group { display: flex; align-items: center; gap: 15px; }
+        .header-left-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .meeting-dropdown-selector { padding: 10px 15px; font-size: 1rem; font-weight: bold; border-radius: 4px; border: 2px solid #ffcc00; background: #fff; color: #003366; cursor: pointer; outline: none; }
         
-        /* NEW BADGE DESIGN FOR THE RECORD COUNT */
-        .count-badge { background: #ffcc00; color: #000; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); margin-left: 5px; }
+        /* COUNTER BADGES DESIGN */
+        .count-badge { background: #ffcc00; color: #000; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .unique-badge { background: #00cc66; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         
         .login-box { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
         .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
@@ -55,8 +56,11 @@
                 <option value="" disabled selected>Loading Meetings...</option>
             </select>
 
-            <!-- LIVE RECORD COUNTER BADGE -->
+            <!-- LIVE RECORD TOTAL COUNTER BADGE -->
             <span class="count-badge" id="meetingCountLabel">Total: 0</span>
+
+            <!-- LIVE UNIQUE RECORD COUNTER BADGE -->
+            <span class="unique-badge" id="meetingUniqueCountLabel">Unique: 0</span>
         </div>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
@@ -83,7 +87,6 @@
   import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
   import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // Configured precisely for your project credentials
   const firebaseConfig = {
     apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
     authDomain: "asmitajyoti-sgbm.firebaseapp.com",
@@ -171,6 +174,7 @@
           if(querySnapshot.empty) {
               tbody.innerHTML = '<tr><td colspan="6">No registration entries found.</td></tr>';
               document.getElementById('meetingCountLabel').innerText = "Total: 0";
+              document.getElementById('meetingUniqueCountLabel').innerText = "Unique: 0";
               return;
           }
 
@@ -205,7 +209,6 @@
               dropdown.appendChild(opt);
           });
 
-          // Automatically select and render the first available meeting choice
           if(allMasterRecords.length > 0) {
               const latestMeetingCode = allMasterRecords[0].meetingCode;
               dropdown.value = latestMeetingCode;
@@ -229,8 +232,17 @@
 
       const filtered = allMasterRecords.filter(r => r.meetingCode === filterCode);
 
-      // DYNAMICALLY UPDATE COUNT CONTENT BOX VALUE
+      // --- CALCULATE UNIQUE SUBMISSIONS USING A COMBINED MAPPING STRING KEY ---
+      const uniqueSubmissionsSet = new Set();
+      filtered.forEach(r => {
+          // Normalize names, mobile numbers, and emails to lowercase/trimmed to prevent space discrepancies from bypassing the filter
+          const normalizedKey = `${r.name.trim().toLowerCase()}|${r.flatInfo.trim().toLowerCase()}|${r.mobile.trim().toLowerCase()}|${r.email.trim().toLowerCase()}`;
+          uniqueSubmissionsSet.add(normalizedKey);
+      });
+
+      // DYNAMICALLY UPDATE BOTH COUTER BADGES
       document.getElementById('meetingCountLabel').innerText = `Total: ${filtered.length}`;
+      document.getElementById('meetingUniqueCountLabel').innerText = `Unique: ${uniqueSubmissionsSet.size}`;
 
       if(filtered.length === 0) {
           tbody.innerHTML = '<tr><td colspan="6">No logs for this meeting code.</td></tr>';
