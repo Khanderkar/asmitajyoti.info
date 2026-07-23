@@ -13,6 +13,7 @@
         /* COUNTER BADGES DESIGN */
         .count-badge { background: #ffcc00; color: #000; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .unique-badge { background: #00cc66; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .flat-badge { background: #0099ff; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         
         .login-box { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
         .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
@@ -61,6 +62,9 @@
 
             <!-- LIVE UNIQUE RECORD COUNTER BADGE -->
             <span class="unique-badge" id="meetingUniqueCountLabel">Unique: 0</span>
+
+            <!-- NEW: LIVE UNIQUE BUILDING/FLAT COUNTER BADGE -->
+            <span class="flat-badge" id="meetingUniqueFlatLabel">Unique Flats: 0</span>
         </div>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
@@ -161,7 +165,6 @@
       signOut(auth);
   });
 
-  // FETCH MASTER DATA & BUILD LOGIC FOR UNIQUE DROPDOWNS
   async function fetchMasterData() {
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '<tr><td colspan="6">Fetching database logs...</td></tr>';
@@ -175,6 +178,7 @@
               tbody.innerHTML = '<tr><td colspan="6">No registration entries found.</td></tr>';
               document.getElementById('meetingCountLabel').innerText = "Total: 0";
               document.getElementById('meetingUniqueCountLabel').innerText = "Unique: 0";
+              document.getElementById('meetingUniqueFlatLabel').innerText = "Unique Flats: 0";
               return;
           }
 
@@ -232,17 +236,24 @@
 
       const filtered = allMasterRecords.filter(r => r.meetingCode === filterCode);
 
-      // --- CALCULATE UNIQUE SUBMISSIONS USING A COMBINED MAPPING STRING KEY ---
+      // --- CALCULATE UNIQUE SUBMISSIONS & UNIQUE FLATS ---
       const uniqueSubmissionsSet = new Set();
+      const uniqueFlatsSet = new Set();
+
       filtered.forEach(r => {
-          // Normalize names, mobile numbers, and emails to lowercase/trimmed to prevent space discrepancies from bypassing the filter
-          const normalizedKey = `${r.name.trim().toLowerCase()}|${r.flatInfo.trim().toLowerCase()}|${r.mobile.trim().toLowerCase()}|${r.email.trim().toLowerCase()}`;
-          uniqueSubmissionsSet.add(normalizedKey);
+          // 1. Full deduplication key (all 4 values match exactly)
+          const normalizedRowKey = `${r.name.trim().toLowerCase()}|${r.flatInfo.trim().toLowerCase()}|${r.mobile.trim().toLowerCase()}|${r.email.trim().toLowerCase()}`;
+          uniqueSubmissionsSet.add(normalizedRowKey);
+
+          // 2. Flat deduplication key (only isolates the building & flat number combo)
+          const normalizedFlatKey = r.flatInfo.trim().toLowerCase();
+          uniqueFlatsSet.add(normalizedFlatKey);
       });
 
-      // DYNAMICALLY UPDATE BOTH COUTER BADGES
+      // DYNAMICALLY UPDATE ALL THREE COUNTER BADGES
       document.getElementById('meetingCountLabel').innerText = `Total: ${filtered.length}`;
       document.getElementById('meetingUniqueCountLabel').innerText = `Unique: ${uniqueSubmissionsSet.size}`;
+      document.getElementById('meetingUniqueFlatLabel').innerText = `Unique Flats: ${uniqueFlatsSet.size}`;
 
       if(filtered.length === 0) {
           tbody.innerHTML = '<tr><td colspan="6">No logs for this meeting code.</td></tr>';
