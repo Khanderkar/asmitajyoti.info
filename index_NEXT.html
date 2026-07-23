@@ -23,6 +23,8 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    /* Smooth scrolling behavior for anchor targets and programmatic scrolls */
+    scroll-behavior: smooth;
 }
 
 /* --- TOP YELLOW HEADER BOX --- */
@@ -436,6 +438,33 @@ button.submit-btn:hover {
     border-radius: 4px;
 }
 
+/* FLOATING SCROLL TO TOP ARROW BUTTON */
+.scroll-top-floating-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: #ffcc00;
+    color: #000;
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    display: none; /* Controlled dynamically by scrolling checks */
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.scroll-top-floating-btn:hover {
+    background: #e6b800;
+    transform: scale(1.05);
+}
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -518,7 +547,7 @@ button.submit-btn:hover {
     <button class="form-collapse-arrow-btn" id="formToggleBtn" onclick="toggleAttendanceView()">▲</button>
 
     <div class="form-slide-wrapper" id="slideWrapper">
-        <div class="form-title-inline">Asmita Jyoti CHSL Member SBBM Attendance Entry (19Jul2026)</div>
+        <div class="form-title-inline">Asmita Jyoti CHSL Member SGBM Attendance Entry (19Jul2026)</div>
         
         <!-- Registration Input Form -->
         <form id="registryForm">
@@ -683,6 +712,9 @@ button.submit-btn:hover {
     </div>
 </div>
 
+<!-- FLOATING RETURN TO TOP ARROW BUTTON -->
+<button class="scroll-top-floating-btn" id="scrollTopBtn" onclick="scrollToTop()" title="Go to Top">▲</button>
+
 <div class="modal" id="imgModal">
     <span class="modal-close" onclick="closeModal()">×</span>
     <img id="modalImg">
@@ -701,7 +733,7 @@ button.submit-btn:hover {
   const CONFIG = {
       MEETING_CODE: "SGBM_JULY_2026", 
       ZOOM_URL: "https://us06web.zoom.us/j/87145855489?pwd=rRD3dlFDKVQGItpctaiVk9Jj37blJN.1",
-      INITIAL_COLLAPSE_STATE: "No", 
+      INITIAL_COLLAPSE_STATE: "No", // Case-insensitive: "YES" or "NO"
       
       FIREBASE_KEYS: {
           apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
@@ -771,6 +803,36 @@ let documentDataList = [];
 
 document.addEventListener('DOMContentLoaded', loadExternalDocuments);
 
+// Monitor main window scrolling patterns to toggle floating arrow visibility parameters
+window.onscroll = function() { trackScrollPosition() };
+
+function trackScrollGroup(element) {
+    const btn = document.getElementById("scrollTopBtn");
+    if (element.scrollTop > 300) {
+        btn.style.display = "flex";
+    } else {
+        btn.style.display = "none";
+    }
+}
+
+function trackScrollPosition() {
+    const btn = document.getElementById("scrollTopBtn");
+    // Check both standard body scrolling and inner-container wrapper flows
+    if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+        btn.style.display = "flex";
+    } else {
+        btn.style.display = "none";
+    }
+}
+
+function scrollToTop() {
+    // Smooth scroll straight back up to global origin zero baseline coordinates
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Also reset responsive internal overflow sections if scrolled separately on mobile viewports
+    document.querySelector('.content-area').scrollTop = 0;
+}
+
 async function loadExternalDocuments() {
     try {
         const response = await fetch('documents.json');
@@ -822,7 +884,15 @@ function switchDoc(index, selectedElement) {
             </div>`;
     }
 
-    document.getElementById('activeDocContainer').classList.add('active');
+    const container = document.getElementById('activeDocContainer');
+    container.classList.add('active');
+
+    // MOBILE OPTIMIZATION DETECTOR: Runs auto-scroll mechanics safely on phone layouts
+    if (window.innerWidth <= 992) {
+        setTimeout(() => {
+            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150); // Small rendering block delay buffer allows frame context content calculations to settle
+    }
 }
 
 function toggleAttendanceView() {
@@ -867,6 +937,11 @@ function openModal(card){
 function closeModal(){
     document.getElementById("imgModal").style.display = "none";
 }
+
+// Attach explicit listener monitoring context content scroll flow parameters directly
+document.querySelector('.content-area').addEventListener('scroll', function() {
+    trackScrollGroup(this);
+});
 </script>
 
 </body>
