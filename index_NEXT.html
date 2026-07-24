@@ -669,7 +669,7 @@ button.submit-btn:hover {
             
             <!-- Unified 3-line Single Box Layout -->
             <div class="zoom-unified-credentials-card">
-                <strong>Zoom URL:</strong> <a href="https://us06web.zoom.us/j/87145855489?pwd=rRD3dlFDKVQGItpctaiVk9Jj37blJN.1" target="_blank">https://us06web.zoom.us/j/87145855489?pwd=rRD3dlFDKVQGItpctaiVk9Jj37blJN.1</a><br>
+                <strong>Zoom URL:</strong> <a href="#" id="dynamicZoomAnchor" target="_blank"></a><br>
                 <strong>Meeting ID:</strong> 871 4585 5489<br>
                 <strong>Passcode:</strong> 352325
             </div>
@@ -767,26 +767,40 @@ button.submit-btn:hover {
       const btn = document.getElementById('joinBtn');
       const formElement = document.getElementById('registryForm');
       const successBlock = document.getElementById('zoomSuccessBlock');
+      const anchorElement = document.getElementById('dynamicZoomAnchor');
       
       btn.innerText = "Connecting...";
       btn.disabled = true;
 
+      // Extract raw data values
+      const attendeeName = document.getElementById('fullName').value.trim();
+      const bldgNo = document.getElementById('buildingNum').value;
+      const flatNo = document.getElementById('flatNum').value;
+
       try {
-          // Submit logs to Firestore
+          // 1. Submit logs to Firestore
           await addDoc(collection(db, "registrations"), {
               meetingCode: CONFIG.MEETING_CODE,
-              name: document.getElementById('fullName').value.trim(),
-              buildingNumber: document.getElementById('buildingNum').value,
-              flatNumber: document.getElementById('flatNum').value,
+              name: attendeeName,
+              buildingNumber: bldgNo,
+              flatNumber: flatNo,
               mobileNumber: document.getElementById('mobileNum').value.trim(),
               emailAddress: document.getElementById('emailAddress').value.trim() || "Not Provided",
               timestamp: new Date()
           });
           
-          // Open Zoom in a new window/tab
-          window.open(CONFIG.ZOOM_URL, '_blank');
+          // 2. Format dynamic display name into exactly: "A1-101 | Kedar Khanderkar"
+          const formattedZoomName = encodeURIComponent(`${bldgNo}-${flatNo} | ${attendeeName}`);
+          const dynamicZoomUrl = `${CONFIG.ZOOM_URL}&name=${formattedZoomName}`;
+
+          // Update backup text link reference elements
+          anchorElement.href = dynamicZoomUrl;
+          anchorElement.innerText = dynamicZoomUrl;
+
+          // 3. Force-open the dynamically customized URL in a separate window/tab
+          window.open(dynamicZoomUrl, '_blank');
           
-          // Hide registration form fields and display unified data box
+          // 4. Hide registration input components and reveal summary panels
           formElement.style.display = 'none';
           successBlock.style.display = 'block';
       } catch (error) {
