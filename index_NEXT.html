@@ -1228,7 +1228,8 @@ function setAligned(isAligned) {
 function showLiveView(live) {
     document.getElementById('faceVideo').style.display = live ? 'block' : 'none';
     document.getElementById('facePreview').style.display = live ? 'none' : 'block';
-    document.getElementById('faceGuides').style.display = live ? 'inline' : 'none';
+    // Hide the whole overlay (oval, guide lines, corners, dimming) on the captured preview
+    document.getElementById('faceOverlay').style.display = live ? 'block' : 'none';
     document.getElementById('faceActionsLive').style.display = live ? 'flex' : 'none';
     document.getElementById('faceActionsReview').style.display = live ? 'none' : 'flex';
     document.getElementById('faceTips').style.display = live ? 'block' : 'none';
