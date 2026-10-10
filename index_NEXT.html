@@ -203,6 +203,40 @@ button.submit-btn:disabled:hover {
     background: rgba(255, 204, 0, 0.18);
 }
 
+.face-id-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+.face-id-btn:disabled:hover {
+    background: rgba(255, 204, 0, 0.08);
+}
+
+/* Checkbox to the left of the Face ID label */
+.face-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.face-toggle-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    margin: 0;
+    flex: 0 0 auto;
+    accent-color: #ffcc00;
+    cursor: pointer;
+}
+
+.face-toggle-label .optional-tag {
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: rgba(255, 255, 255, 0.6);
+}
+
 .face-id-btn.attached {
     border: 1px solid #22c55e;
     background: rgba(34, 197, 94, 0.15);
@@ -890,7 +924,11 @@ button.submit-btn:disabled:hover {
 
                 <!-- NEW: FACE ID ATTACHMENT -->
                 <div class="input-field-group" id="faceIdGroup">
-                    <label for="faceIdBtn">Face ID | <span class="marathi-label">चेहरा ओळख</span> <span id="faceReqMark" style="color:#ff3333;">*</span></label>
+                    <label class="face-toggle-label" for="faceIdToggle">
+                        <input type="checkbox" id="faceIdToggle" checked onchange="onFaceToggle()">
+                        Face ID | <span class="marathi-label">चेहरा ओळख</span>
+                        <span class="optional-tag">(Optional)</span>
+                    </label>
                     <button type="button" class="face-id-btn" id="faceIdBtn" onclick="openFaceModal()">
                         <span id="faceIdBtnIcon">📷</span>
                         <span id="faceIdBtnText">Attach Face ID</span>
@@ -904,7 +942,7 @@ button.submit-btn:disabled:hover {
                     </div>
 
                     <button type="submit" class="submit-btn" id="joinBtn">Join meeting</button>
-                    <div class="join-hint" id="joinHint" style="display:none;">Please attach your Face ID to enable "Join meeting".</div>
+                    <div class="join-hint" id="joinHint" style="display:none;">Please attach your Face ID (or untick the Face ID box) to enable "Join meeting".</div>
                 </div>
 
             </div>
@@ -1039,9 +1077,10 @@ button.submit-btn:disabled:hover {
       ZOOM_URL: "https://us06web.zoom.us/j/85003157466?pwd=CEaJU8wIcUrJcBQKf4DOCXoc6LldJN.1",
       INITIAL_COLLAPSE_STATE: "No", // Case-insensitive: "YES" or "NO"
 
-      // "YES" = Join meeting stays disabled until Face ID is captured.
-      // "NO"  = Face ID is optional; Join meeting is always enabled.
-      FACE_ID_REQUIRED: "YES",
+      // Face ID checkbox state when the page loads ("YES" = ticked, "NO" = unticked).
+      // Ticked   -> member must attach Face ID before Join meeting is enabled.
+      // Unticked -> member skips Face ID and can join straight away.
+      FACE_ID_DEFAULT_TICKED: "YES",
 
       FIREBASE_KEYS: {
           apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
@@ -1054,8 +1093,8 @@ button.submit-btn:disabled:hover {
       }
   };
 
-  // Share Face ID setting with the non-module script
-  window.FACE_ID_REQUIRED = CONFIG.FACE_ID_REQUIRED.toUpperCase() === "YES";
+  // Apply the initial checkbox state (non-module script handles the rest)
+  document.getElementById('faceIdToggle').checked = CONFIG.FACE_ID_DEFAULT_TICKED.toUpperCase() === "YES";
 
   const app = initializeApp(CONFIG.FIREBASE_KEYS);
   const db = getFirestore(app);
@@ -1078,9 +1117,11 @@ button.submit-btn:disabled:hover {
       const btn = document.getElementById('joinBtn');
       const formElement = document.getElementById('registryForm');
       const successBlock = document.getElementById('zoomSuccessBlock');
-      const face = window.getFaceCapture();
+      const faceWanted = window.isFaceIdTicked();
+      // Only send the photo if the member kept the Face ID box ticked
+      const face = faceWanted ? window.getFaceCapture() : null;
 
-      if (window.FACE_ID_REQUIRED && !face) {
+      if (faceWanted && !face) {
           alert("Please attach your Face ID before joining the meeting.");
           return;
       }
@@ -1148,18 +1189,28 @@ const faceState = {
 
 window.getFaceCapture = () => faceState.captured;
 
+function isFaceIdTicked() {
+    return document.getElementById('faceIdToggle').checked;
+}
+window.isFaceIdTicked = isFaceIdTicked;
+
 function updateJoinState() {
-    const required = window.FACE_ID_REQUIRED !== false;
+    const ticked = isFaceIdTicked();
     const btn = document.getElementById('joinBtn');
     const hint = document.getElementById('joinHint');
-    const needFace = required && !faceState.captured;
+    const needFace = ticked && !faceState.captured;
+
     btn.disabled = needFace;
     hint.style.display = needFace ? 'block' : 'none';
 
-    document.getElementById('faceIdGroup').classList.toggle('optional', !required);
-    document.getElementById('faceReqMark').style.display = required ? 'inline' : 'none';
+    // Face ID button is usable only while the box is ticked
+    document.getElementById('faceIdBtn').disabled = !ticked;
 }
 window.updateJoinState = updateJoinState;
+
+function onFaceToggle() {
+    updateJoinState();
+}
 document.addEventListener('DOMContentLoaded', updateJoinState);
 
 function setFaceStatus(text, kind) {
