@@ -9,22 +9,45 @@
         .admin-header { background: #003366; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
         .header-left-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .meeting-dropdown-selector { padding: 10px 15px; font-size: 1rem; font-weight: bold; border-radius: 4px; border: 2px solid #ffcc00; background: #fff; color: #003366; cursor: pointer; outline: none; }
-        
+
         /* COUNTER BADGES DESIGN */
         .count-badge { background: #ffcc00; color: #000; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .unique-badge { background: #00cc66; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .flat-badge { background: #0099ff; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        
+        .face-badge { background: #8e44ad; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
         .login-box { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
         .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
         .login-box button { background: #003366; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 1rem; margin-top: 10px; }
         .dashboard { display: none; }
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
         th { background: #ffcc00; color: black; }
         tr:hover { background: #f9f9f9; }
         .logout-btn { background: #ff3333; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         #recaptcha-container { margin: 15px 0; display: flex; justify-content: center; }
+
+        /* --- FACE ID COLUMN --- */
+        .view-photo-btn { display: inline-flex; align-items: center; gap: 8px; background: #003366; color: #fff; border: none; padding: 4px 12px 4px 4px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.85rem; white-space: nowrap; }
+        .view-photo-btn:hover { background: #00509e; }
+        .view-photo-btn img { width: 30px; height: 36px; object-fit: cover; border-radius: 50% / 45%; border: 2px solid #ffcc00; background: #ddd; }
+        .no-photo { color: #999; font-size: 0.85rem; font-style: italic; white-space: nowrap; }
+
+        /* --- PHOTO POPUP --- */
+        .photo-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
+        .photo-modal.open { display: flex; }
+        .photo-card { background: #fff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); width: 100%; max-width: 400px; max-height: 95vh; overflow-y: auto; position: relative; }
+        .photo-card-header { background: #003366; color: #fff; padding: 12px 45px 12px 16px; font-weight: bold; border-radius: 8px 8px 0 0; }
+        .photo-close { position: absolute; top: 6px; right: 12px; background: transparent; border: none; color: #fff; font-size: 28px; cursor: pointer; line-height: 1; }
+        .photo-card-body { padding: 16px; text-align: center; }
+        .photo-card-body img { height: min(52vh, 440px); max-width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 6px; border: 3px solid #ffcc00; background: #eee; }
+        .photo-meta { text-align: left; font-size: 0.9rem; margin: 12px 0; line-height: 1.7; }
+        .photo-meta span { color: #666; display: inline-block; min-width: 95px; }
+        .photo-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .photo-actions button, .photo-actions a { padding: 9px 18px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; cursor: pointer; text-decoration: none; border: none; }
+        .btn-nav { background: #e9eef5; color: #003366; }
+        .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-download { background: #ffcc00; color: #000; }
     </style>
 </head>
 <body>
@@ -32,7 +55,7 @@
 <!-- PHONE AUTH INTERFACE -->
 <div class="login-box" id="authContainer">
     <h2>Admin Mobile OTP Login</h2>
-    
+
     <div id="phone-step">
         <input type="tel" id="adminPhone" placeholder="Mobile with country code (e.g. +919821334896)">
         <div id="recaptcha-container"></div>
@@ -51,7 +74,7 @@
     <div class="admin-header">
         <div class="header-left-group">
             <h2 style="margin:0;">Online meeting data</h2>
-            
+
             <!-- FILTER DROP-DOWN SELECTOR -->
             <select class="meeting-dropdown-selector" id="meetingFilter" onchange="filterTableByMeeting()">
                 <option value="" disabled selected>Loading Meetings...</option>
@@ -63,12 +86,15 @@
             <!-- LIVE UNIQUE RECORD COUNTER BADGE -->
             <span class="unique-badge" id="meetingUniqueCountLabel">Unique: 0</span>
 
-            <!-- NEW: LIVE UNIQUE BUILDING/FLAT COUNTER BADGE -->
+            <!-- LIVE UNIQUE BUILDING/FLAT COUNTER BADGE -->
             <span class="flat-badge" id="meetingUniqueFlatLabel">Unique Flats: 0</span>
+
+            <!-- NEW: FACE ID ATTACHED COUNTER BADGE -->
+            <span class="face-badge" id="meetingFaceLabel">Face ID: 0</span>
         </div>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
-    
+
     <table id="reportsTable">
         <thead>
             <tr>
@@ -78,12 +104,30 @@
                 <th>Building / Flat</th>
                 <th>Registered Mobile</th>
                 <th>Registered Email</th>
+                <th>Face ID</th>
             </tr>
         </thead>
         <tbody id="tableBody">
             <!-- Loaded dynamically from database collection -->
         </tbody>
     </table>
+</div>
+
+<!-- FACE PHOTO POPUP -->
+<div class="photo-modal" id="photoModal" onclick="if(event.target === this) closePhoto()">
+    <div class="photo-card">
+        <div class="photo-card-header" id="photoTitle">Face ID</div>
+        <button class="photo-close" onclick="closePhoto()" aria-label="Close">×</button>
+        <div class="photo-card-body">
+            <img id="photoImg" alt="Member face photo">
+            <div class="photo-meta" id="photoMeta"></div>
+            <div class="photo-actions">
+                <button class="btn-nav" id="photoPrev" onclick="stepPhoto(-1)">◀ Prev</button>
+                <a class="btn-download" id="photoDownload" download="face.jpg">Download</a>
+                <button class="btn-nav" id="photoNext" onclick="stepPhoto(1)">Next ▶</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script type="module">
@@ -105,8 +149,30 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
+  const COLS = 7;
   let confirmationResultGlobal = null;
-  let allMasterRecords = []; 
+  let allMasterRecords = [];
+  let photoRecords = [];     // records with a photo in the current filtered view
+  let photoIndex = -1;
+
+  // Escape user-entered text before putting it into the table
+  function esc(v) {
+      return String(v ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  }
+
+  // Convert Firestore binary (Bytes) into an image URL
+  function faceToDataUrl(data) {
+      const b = data.faceImage;
+      if (!b) return null;
+      try {
+          const base64 = typeof b.toBase64 === 'function' ? b.toBase64() : null;
+          if (!base64) return null;
+          return `data:${data.faceImageType || 'image/jpeg'};base64,${base64}`;
+      } catch (e) {
+          console.warn('Unable to read face image for', data.name, e);
+          return null;
+      }
+  }
 
   onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -162,23 +228,25 @@
   });
 
   document.getElementById('logoutBtn').addEventListener('click', () => {
+      closePhoto();
       signOut(auth);
   });
 
   async function fetchMasterData() {
       const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = '<tr><td colspan="6">Fetching database logs...</td></tr>';
-      
+      tbody.innerHTML = `<tr><td colspan="${COLS}">Fetching database logs...</td></tr>`;
+
       try {
           const q = query(collection(db, "registrations"), orderBy("timestamp", "desc"));
           const querySnapshot = await getDocs(q);
           allMasterRecords = [];
-          
+
           if(querySnapshot.empty) {
-              tbody.innerHTML = '<tr><td colspan="6">No registration entries found.</td></tr>';
+              tbody.innerHTML = `<tr><td colspan="${COLS}">No registration entries found.</td></tr>`;
               document.getElementById('meetingCountLabel').innerText = "Total: 0";
               document.getElementById('meetingUniqueCountLabel').innerText = "Unique: 0";
               document.getElementById('meetingUniqueFlatLabel').innerText = "Unique Flats: 0";
+              document.getElementById('meetingFaceLabel').innerText = "Face ID: 0";
               return;
           }
 
@@ -196,9 +264,10 @@
                   name: data.name || '',
                   flatInfo: `${data.buildingNumber || ''} - ${data.flatNumber || ''}`,
                   mobile: data.mobileNumber || '',
-                  email: data.emailAddress || ''
+                  email: data.emailAddress || '',
+                  facePhoto: faceToDataUrl(data)
               };
-              
+
               allMasterRecords.push(record);
               uniqueMeetingCodes.add(record.meetingCode);
           });
@@ -221,7 +290,7 @@
 
       } catch (error) {
           console.error(error);
-          tbody.innerHTML = `<tr><td colspan="6" style="color:red;">Access Denied: Rules validation parameter error.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="${COLS}" style="color:red;">Access Denied: Rules validation parameter error.</td></tr>`;
       }
   }
 
@@ -235,6 +304,7 @@
       tbody.innerHTML = '';
 
       const filtered = allMasterRecords.filter(r => r.meetingCode === filterCode);
+      photoRecords = filtered.filter(r => r.facePhoto);
 
       // --- CALCULATE UNIQUE SUBMISSIONS & UNIQUE FLATS ---
       const uniqueSubmissionsSet = new Set();
@@ -250,27 +320,84 @@
           uniqueFlatsSet.add(normalizedFlatKey);
       });
 
-      // DYNAMICALLY UPDATE ALL THREE COUNTER BADGES
+      // DYNAMICALLY UPDATE ALL COUNTER BADGES
       document.getElementById('meetingCountLabel').innerText = `Total: ${filtered.length}`;
       document.getElementById('meetingUniqueCountLabel').innerText = `Unique: ${uniqueSubmissionsSet.size}`;
       document.getElementById('meetingUniqueFlatLabel').innerText = `Unique Flats: ${uniqueFlatsSet.size}`;
+      document.getElementById('meetingFaceLabel').innerText = `Face ID: ${photoRecords.length}`;
 
       if(filtered.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6">No logs for this meeting code.</td></tr>';
+          tbody.innerHTML = `<tr><td colspan="${COLS}">No logs for this meeting code.</td></tr>`;
           return;
       }
 
+      let html = '';
       filtered.forEach(r => {
-          tbody.innerHTML += `<tr>
-              <td>${r.timestamp}</td>
-              <td><span style="background:#003366;color:#fff;padding:2px 6px;border-radius:3px;font-size:0.85rem;">${r.meetingCode}</span></td>
-              <td><strong>${r.name}</strong></td>
-              <td>${r.flatInfo}</td>
-              <td>${r.mobile}</td>
-              <td>${r.email}</td>
+          const faceCell = r.facePhoto
+              ? `<button class="view-photo-btn" onclick="viewPhoto('${r.id}')" title="View Face ID">
+                     <img src="${r.facePhoto}" alt=""> View Photo
+                 </button>`
+              : `<span class="no-photo">Not attached</span>`;
+
+          html += `<tr>
+              <td>${esc(r.timestamp)}</td>
+              <td><span style="background:#003366;color:#fff;padding:2px 6px;border-radius:3px;font-size:0.85rem;">${esc(r.meetingCode)}</span></td>
+              <td><strong>${esc(r.name)}</strong></td>
+              <td>${esc(r.flatInfo)}</td>
+              <td>${esc(r.mobile)}</td>
+              <td>${esc(r.email)}</td>
+              <td>${faceCell}</td>
           </tr>`;
       });
+      tbody.innerHTML = html;
   }
+
+  // --- PHOTO POPUP ---
+  function showPhotoAt(i) {
+      const r = photoRecords[i];
+      if (!r) return;
+      photoIndex = i;
+
+      document.getElementById('photoTitle').textContent = `Face ID – ${r.name}`;
+      document.getElementById('photoImg').src = r.facePhoto;
+      document.getElementById('photoMeta').innerHTML = `
+          <div><span>Name:</span> <strong>${esc(r.name)}</strong></div>
+          <div><span>Building/Flat:</span> ${esc(r.flatInfo)}</div>
+          <div><span>Mobile:</span> ${esc(r.mobile)}</div>
+          <div><span>Submitted:</span> ${esc(r.timestamp)}</div>
+          <div><span>Photo:</span> ${i + 1} of ${photoRecords.length}</div>`;
+
+      const dl = document.getElementById('photoDownload');
+      dl.href = r.facePhoto;
+      dl.download = `FaceID_${r.flatInfo}_${r.name}`.replace(/[^a-z0-9_-]+/gi, '_') + '.jpg';
+
+      document.getElementById('photoPrev').disabled = i <= 0;
+      document.getElementById('photoNext').disabled = i >= photoRecords.length - 1;
+      document.getElementById('photoModal').classList.add('open');
+  }
+
+  window.viewPhoto = function(id) {
+      const i = photoRecords.findIndex(r => r.id === id);
+      if (i >= 0) showPhotoAt(i);
+  };
+
+  window.stepPhoto = function(delta) {
+      showPhotoAt(photoIndex + delta);
+  };
+
+  function closePhoto() {
+      document.getElementById('photoModal').classList.remove('open');
+      document.getElementById('photoImg').removeAttribute('src');
+      photoIndex = -1;
+  }
+  window.closePhoto = closePhoto;
+
+  document.addEventListener('keydown', (e) => {
+      if (!document.getElementById('photoModal').classList.contains('open')) return;
+      if (e.key === 'Escape') closePhoto();
+      if (e.key === 'ArrowLeft' && photoIndex > 0) showPhotoAt(photoIndex - 1);
+      if (e.key === 'ArrowRight' && photoIndex < photoRecords.length - 1) showPhotoAt(photoIndex + 1);
+  });
 </script>
 </body>
 </html>
