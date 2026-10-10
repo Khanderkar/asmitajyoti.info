@@ -1,3 +1,5 @@
+Here is the single page code of my application 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -547,8 +549,8 @@ button.submit-btn:hover {
     <button class="form-collapse-arrow-btn" id="formToggleBtn" onclick="toggleAttendanceView()">▲</button>
 
     <div class="form-slide-wrapper" id="slideWrapper">
-        <div class="form-title-inline">Asmita Jyoti CHSL Member SGBM Attendance Entry (26Jul2026)</div>
-        
+        <!-- <div class="form-title-inline">Asmita Jyoti CHSL Member SGBM Attendance Entry (11Oct2026)</div> --> 
+        <div class="form-title-inline">Asmita Jyoti CHSL Member Meeting Entry (11Oct2026)</div>
         <!-- Registration Input Form -->
         <form id="registryForm">
             <div class="horizontal-form-row">
@@ -669,9 +671,9 @@ button.submit-btn:hover {
             
             <!-- Unified 3-line Single Box Layout -->
             <div class="zoom-unified-credentials-card">
-                <strong>Zoom URL:</strong> <a href="#" id="dynamicZoomAnchor" target="_blank"></a><br>
-                <strong>Meeting ID:</strong> 871 4585 5489<br>
-                <strong>Passcode:</strong> 352325
+                <strong>Zoom URL:</strong> <a href="https://us06web.zoom.us/j/85003157466?pwd=CEaJU8wIcUrJcBQKf4DOCXoc6LldJN.1" target="_blank">https://us06web.zoom.us/j/85003157466?pwd=CEaJU8wIcUrJcBQKf4DOCXoc6LldJN.1</a><br>
+                <strong>Meeting ID:</strong>850 0315 7466<br>
+                <strong>Passcode:</strong> 313280
             </div>
         </div>
 
@@ -731,9 +733,9 @@ button.submit-btn:hover {
   import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const CONFIG = {
-      MEETING_CODE: "Test-Jul2026", 
-      ZOOM_URL: "https://us06web.zoom.us/j/87145855489?pwd=rRD3dlFDKVQGItpctaiVk9Jj37blJN.1",
-      INITIAL_COLLAPSE_STATE: "Yes", // Case-insensitive: "YES" or "NO"
+      MEETING_CODE: "Test-Oct2026", 
+      ZOOM_URL: "https://us06web.zoom.us/j/85003157466?pwd=CEaJU8wIcUrJcBQKf4DOCXoc6LldJN.1",
+      INITIAL_COLLAPSE_STATE: "No", // Case-insensitive: "YES" or "NO"
       
       FIREBASE_KEYS: {
           apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
@@ -767,40 +769,26 @@ button.submit-btn:hover {
       const btn = document.getElementById('joinBtn');
       const formElement = document.getElementById('registryForm');
       const successBlock = document.getElementById('zoomSuccessBlock');
-      const anchorElement = document.getElementById('dynamicZoomAnchor');
       
       btn.innerText = "Connecting...";
       btn.disabled = true;
 
-      // Extract raw data values
-      const attendeeName = document.getElementById('fullName').value.trim();
-      const bldgNo = document.getElementById('buildingNum').value;
-      const flatNo = document.getElementById('flatNum').value;
-
       try {
-          // 1. Submit logs to Firestore
+          // Submit logs to Firestore
           await addDoc(collection(db, "registrations"), {
               meetingCode: CONFIG.MEETING_CODE,
-              name: attendeeName,
-              buildingNumber: bldgNo,
-              flatNumber: flatNo,
+              name: document.getElementById('fullName').value.trim(),
+              buildingNumber: document.getElementById('buildingNum').value,
+              flatNumber: document.getElementById('flatNum').value,
               mobileNumber: document.getElementById('mobileNum').value.trim(),
               emailAddress: document.getElementById('emailAddress').value.trim() || "Not Provided",
               timestamp: new Date()
           });
           
-          // 2. Format dynamic display name into exactly: "A1-101 | Kedar Khanderkar"
-          const formattedZoomName = encodeURIComponent(`${bldgNo}-${flatNo} | ${attendeeName}`);
-          const dynamicZoomUrl = `${CONFIG.ZOOM_URL}&name=${formattedZoomName}`;
-
-          // Update backup text link reference elements
-          anchorElement.href = dynamicZoomUrl;
-          anchorElement.innerText = dynamicZoomUrl;
-
-          // 3. Force-open the dynamically customized URL in a separate window/tab
-          window.open(dynamicZoomUrl, '_blank');
+          // Open Zoom in a new window/tab
+          window.open(CONFIG.ZOOM_URL, '_blank');
           
-          // 4. Hide registration input components and reveal summary panels
+          // Hide registration form fields and display unified data box
           formElement.style.display = 'none';
           successBlock.style.display = 'block';
       } catch (error) {
@@ -960,3 +948,7 @@ document.querySelector('.content-area').addEventListener('scroll', function() {
 
 </body>
 </html>
+
+i would like to add optional "Attach Face ID" for your flat info option where camera will be turned on and will show oval line to capturing full face with gidlines lines and once it is captured it will be saved into firebase db in binary
+
+attach face id button will open pop up and once sucessfull join meeting will be enabled
