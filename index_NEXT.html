@@ -1,5 +1,3 @@
-Here is the single page code of my application 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,8 +29,8 @@ body {
 
 /* --- TOP YELLOW HEADER BOX --- */
 .top-header {
-    background: #ffcc00; 
-    color: #ffffff;      
+    background: #ffcc00;
+    color: #ffffff;
     padding: 15px 20px;
     font-size: 1.6rem;
     font-weight: bold;
@@ -45,7 +43,7 @@ body {
 /* --- TOP HORIZONTAL REGISTRATION FORM CONTAINER --- */
 .form-horizontal-container {
     background: rgba(0, 0, 0, 0.2);
-    padding: 0 40px; 
+    padding: 0 40px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     width: 100%;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
@@ -165,6 +163,244 @@ button.submit-btn:hover {
     background: #e6b800;
 }
 
+button.submit-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+button.submit-btn:disabled:hover {
+    background: #ffcc00;
+}
+
+.join-hint {
+    margin-top: 8px;
+    font-size: 0.82rem;
+    color: #ffcc00;
+    text-align: center;
+}
+
+/* --- FACE ID ATTACH BUTTON (INSIDE FORM ROW) --- */
+.face-id-btn {
+    width: 100%;
+    height: 40px;
+    border-radius: 4px;
+    border: 1px dashed #ffcc00;
+    background: rgba(255, 204, 0, 0.08);
+    color: #ffcc00;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 10px;
+    transition: all 0.2s ease;
+}
+
+.face-id-btn:hover {
+    background: rgba(255, 204, 0, 0.18);
+}
+
+.face-id-btn.attached {
+    border: 1px solid #22c55e;
+    background: rgba(34, 197, 94, 0.15);
+    color: #bbf7d0;
+}
+
+.face-id-btn img {
+    width: 28px;
+    height: 34px;
+    object-fit: cover;
+    border-radius: 50% / 45%;
+    border: 1px solid #22c55e;
+}
+
+/* --- FACE CAPTURE POPUP --- */
+.face-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2100;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+}
+
+.face-modal.open {
+    display: flex;
+}
+
+.face-modal-card {
+    background: #1e3c72;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 420px;
+    max-height: 96vh;
+    overflow-y: auto;
+    padding: 16px 18px 18px;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+}
+
+.face-modal-title {
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: #ffcc00;
+    text-align: center;
+    margin: 0 30px 4px;
+}
+
+.face-modal-sub {
+    font-size: 0.82rem;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 12px;
+}
+
+.face-modal-x {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.face-stage {
+    position: relative;
+    width: min(82vw, 330px);
+    aspect-ratio: 3 / 4;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+}
+
+.face-stage video,
+.face-stage img.face-preview {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Mirror the live feed so it behaves like a mirror for the user */
+.face-stage video {
+    transform: scaleX(-1);
+}
+
+.face-stage img.face-preview {
+    display: none;
+}
+
+.face-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.face-overlay .guide {
+    stroke: rgba(255, 255, 255, 0.55);
+    stroke-width: 1;
+    stroke-dasharray: 4 5;
+    fill: none;
+}
+
+.face-overlay .guide-label {
+    fill: rgba(255, 255, 255, 0.7);
+    font-size: 9px;
+    font-family: Arial, sans-serif;
+}
+
+.face-overlay .corner {
+    stroke: #ffcc00;
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+}
+
+.face-overlay #faceOval {
+    fill: none;
+    stroke: #ffcc00;
+    stroke-width: 3;
+    stroke-dasharray: 10 6;
+    transition: stroke 0.2s ease;
+}
+
+.face-overlay.aligned #faceOval {
+    stroke: #22c55e;
+    stroke-dasharray: none;
+    stroke-width: 4;
+}
+
+.face-overlay.aligned .corner {
+    stroke: #22c55e;
+}
+
+.face-status {
+    margin: 12px auto 4px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.95rem;
+    min-height: 1.3em;
+    color: #ffcc00;
+}
+
+.face-status.ok { color: #4ade80; }
+.face-status.err { color: #ff8080; }
+
+.face-tips {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 6px 0 12px;
+    padding-left: 18px;
+    line-height: 1.5;
+}
+
+.face-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.face-actions button {
+    height: 42px;
+    padding: 0 22px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border: none;
+}
+
+.face-btn-primary {
+    background: #ffcc00;
+    color: #000;
+}
+
+.face-btn-primary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.face-btn-secondary {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+}
+
 /* APP DOWNLOAD WARNING SYSTEM (WHITE CENTERED TEXT) */
 .zoom-app-warning-disclaimer {
     color: #ffffff;
@@ -256,7 +492,7 @@ button.submit-btn:hover {
 .main-wrapper {
     display: flex;
     flex: 1;
-    height: calc(100vh - 250px); 
+    height: calc(100vh - 250px);
     overflow: hidden;
     position: relative;
 }
@@ -544,17 +780,17 @@ button.submit-btn:hover {
 
 <!-- 2. ATTENDANCE ENTRY MODULE -->
 <div class="form-horizontal-container" id="attendanceContainer">
-    
+
     <!-- Action Minimize Toggle Button -->
     <button class="form-collapse-arrow-btn" id="formToggleBtn" onclick="toggleAttendanceView()">▲</button>
 
     <div class="form-slide-wrapper" id="slideWrapper">
-        <!-- <div class="form-title-inline">Asmita Jyoti CHSL Member SGBM Attendance Entry (11Oct2026)</div> --> 
+        <!-- <div class="form-title-inline">Asmita Jyoti CHSL Member SGBM Attendance Entry (11Oct2026)</div> -->
         <div class="form-title-inline">Asmita Jyoti CHSL Member Meeting Entry (11Oct2026)</div>
         <!-- Registration Input Form -->
         <form id="registryForm">
             <div class="horizontal-form-row">
-                
+
                 <div class="input-field-group">
                     <label for="fullName">Full Name <span style="color:#ff3333;">*</span></label>
                     <input type="text" id="fullName" placeholder="Your answer" required>
@@ -652,6 +888,15 @@ button.submit-btn:hover {
                     <input type="email" id="emailAddress" placeholder="Your answer">
                 </div>
 
+                <!-- NEW: FACE ID ATTACHMENT -->
+                <div class="input-field-group" id="faceIdGroup">
+                    <label for="faceIdBtn">Face ID | <span class="marathi-label">चेहरा ओळख</span> <span id="faceReqMark" style="color:#ff3333;">*</span></label>
+                    <button type="button" class="face-id-btn" id="faceIdBtn" onclick="openFaceModal()">
+                        <span id="faceIdBtnIcon">📷</span>
+                        <span id="faceIdBtnText">Attach Face ID</span>
+                    </button>
+                </div>
+
                 <div class="submit-row-container">
                     <!-- FIXED WHITE CENTER-ALIGNED WARNING TEXT REPOSITIONED ABOVE BUTTON -->
                     <div class="zoom-app-warning-disclaimer">
@@ -659,6 +904,7 @@ button.submit-btn:hover {
                     </div>
 
                     <button type="submit" class="submit-btn" id="joinBtn">Join meeting</button>
+                    <div class="join-hint" id="joinHint" style="display:none;">Please attach your Face ID to enable "Join meeting".</div>
                 </div>
 
             </div>
@@ -668,7 +914,7 @@ button.submit-btn:hover {
         <div class="zoom-success-box" id="zoomSuccessBlock">
             <div class="zoom-status-title">Verification Successful! Attendance Logged.</div>
             <div class="zoom-status-subtitle">Click the link below or enter the details manually in the Zoom app:</div>
-            
+
             <!-- Unified 3-line Single Box Layout -->
             <div class="zoom-unified-credentials-card">
                 <strong>Zoom URL:</strong> <a href="https://us06web.zoom.us/j/85003157466?pwd=CEaJU8wIcUrJcBQKf4DOCXoc6LldJN.1" target="_blank">https://us06web.zoom.us/j/85003157466?pwd=CEaJU8wIcUrJcBQKf4DOCXoc6LldJN.1</a><br>
@@ -700,11 +946,11 @@ button.submit-btn:hover {
 
     <!-- RIGHT SIDE CONTENT AREA -->
     <div class="content-area">
-        
+
         <div class="welcome-placeholder" id="welcomeMsg">
             Please select an item from the "List of Documents" to view it.
         </div>
-        
+
         <!-- Render Template Target Structure Container -->
         <div class="doc-content" id="activeDocContainer">
             <h1 class="doc-title" id="renderTitle"></h1>
@@ -722,6 +968,62 @@ button.submit-btn:hover {
     <img id="modalImg">
 </div>
 
+<!-- FACE ID CAPTURE POPUP -->
+<div class="face-modal" id="faceModal" role="dialog" aria-modal="true" aria-labelledby="faceModalTitle">
+    <div class="face-modal-card">
+        <button type="button" class="face-modal-x" onclick="closeFaceModal()" aria-label="Close">×</button>
+        <div class="face-modal-title" id="faceModalTitle">Attach Face ID</div>
+        <div class="face-modal-sub">Fit your full face inside the oval | <span class="marathi-label">चेहरा अंडाकृतीत ठेवा</span></div>
+
+        <div class="face-stage">
+            <video id="faceVideo" autoplay playsinline muted></video>
+            <img class="face-preview" id="facePreview" alt="Captured face">
+
+            <svg class="face-overlay" id="faceOverlay" viewBox="0 0 300 400" preserveAspectRatio="none" aria-hidden="true">
+                <!-- Dim everything outside the oval -->
+                <path fill="rgba(0,0,0,0.5)" fill-rule="evenodd"
+                      d="M0 0H300V400H0Z M150 50 A105 140 0 1 0 150 330 A105 140 0 1 0 150 50 Z"/>
+                <!-- Guide lines -->
+                <g id="faceGuides">
+                    <line class="guide" x1="150" y1="20" x2="150" y2="380"/>
+                    <line class="guide" x1="55"  y1="165" x2="245" y2="165"/>
+                    <line class="guide" x1="95"  y1="255" x2="205" y2="255"/>
+                    <line class="guide" x1="60"  y1="330" x2="240" y2="330"/>
+                    <text class="guide-label" x="248" y="168">eyes</text>
+                    <text class="guide-label" x="208" y="258">mouth</text>
+                    <text class="guide-label" x="243" y="333">chin</text>
+                </g>
+                <!-- Oval outline -->
+                <ellipse id="faceOval" cx="150" cy="190" rx="105" ry="140"/>
+                <!-- Frame corners -->
+                <path class="corner" d="M14 44V14H44"/>
+                <path class="corner" d="M256 14H286V44"/>
+                <path class="corner" d="M14 356V386H44"/>
+                <path class="corner" d="M256 386H286V356"/>
+            </svg>
+        </div>
+
+        <div class="face-status" id="faceStatus">Starting camera…</div>
+
+        <ul class="face-tips" id="faceTips">
+            <li>Good lighting on your face, no strong light behind you.</li>
+            <li>Remove mask / sunglasses; look straight at the camera.</li>
+            <li>Keep forehead to chin inside the oval.</li>
+        </ul>
+
+        <div class="face-actions" id="faceActionsLive">
+            <button type="button" class="face-btn-secondary" onclick="closeFaceModal()">Cancel</button>
+            <button type="button" class="face-btn-primary" id="faceCaptureBtn" onclick="captureFace()" disabled>Capture</button>
+        </div>
+        <div class="face-actions" id="faceActionsReview" style="display:none;">
+            <button type="button" class="face-btn-secondary" onclick="retakeFace()">Retake</button>
+            <button type="button" class="face-btn-primary" onclick="confirmFace()">Use this photo</button>
+        </div>
+
+        <canvas id="faceCanvas" style="display:none;"></canvas>
+    </div>
+</div>
+
 <footer>
     Visitor Count:
     <script src="https://cdn.counter.dev/script.js" data-id="6461317c-4e57-4b01-a820-e81a891f2dd6"></script>
@@ -730,13 +1032,17 @@ button.submit-btn:hover {
 <!-- SYSTEM DATA CONTROL INTERFACE & GLOBAL PARAMETERS SECTION -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, Bytes } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const CONFIG = {
-      MEETING_CODE: "Test-Oct2026", 
+      MEETING_CODE: "Test-Oct2026",
       ZOOM_URL: "https://us06web.zoom.us/j/85003157466?pwd=CEaJU8wIcUrJcBQKf4DOCXoc6LldJN.1",
       INITIAL_COLLAPSE_STATE: "No", // Case-insensitive: "YES" or "NO"
-      
+
+      // "YES" = Join meeting stays disabled until Face ID is captured.
+      // "NO"  = Face ID is optional; Join meeting is always enabled.
+      FACE_ID_REQUIRED: "YES",
+
       FIREBASE_KEYS: {
           apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
           authDomain: "asmitajyoti-sgbm.firebaseapp.com",
@@ -748,6 +1054,9 @@ button.submit-btn:hover {
       }
   };
 
+  // Share Face ID setting with the non-module script
+  window.FACE_ID_REQUIRED = CONFIG.FACE_ID_REQUIRED.toUpperCase() === "YES";
+
   const app = initializeApp(CONFIG.FIREBASE_KEYS);
   const db = getFirestore(app);
 
@@ -755,7 +1064,7 @@ button.submit-btn:hover {
       const container = document.getElementById('attendanceContainer');
       const wrapper = document.getElementById('slideWrapper');
       const arrow = document.getElementById('formToggleBtn');
-      
+
       if (CONFIG.INITIAL_COLLAPSE_STATE.toUpperCase() === "YES") {
           container.classList.add('minimized');
           wrapper.style.display = 'none';
@@ -765,29 +1074,47 @@ button.submit-btn:hover {
 
   document.getElementById('registryForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       const btn = document.getElementById('joinBtn');
       const formElement = document.getElementById('registryForm');
       const successBlock = document.getElementById('zoomSuccessBlock');
-      
+      const face = window.getFaceCapture();
+
+      if (window.FACE_ID_REQUIRED && !face) {
+          alert("Please attach your Face ID before joining the meeting.");
+          return;
+      }
+
       btn.innerText = "Connecting...";
       btn.disabled = true;
 
       try {
-          // Submit logs to Firestore
-          await addDoc(collection(db, "registrations"), {
+          const record = {
               meetingCode: CONFIG.MEETING_CODE,
               name: document.getElementById('fullName').value.trim(),
               buildingNumber: document.getElementById('buildingNum').value,
               flatNumber: document.getElementById('flatNum').value,
               mobileNumber: document.getElementById('mobileNum').value.trim(),
               emailAddress: document.getElementById('emailAddress').value.trim() || "Not Provided",
+              faceIdAttached: !!face,
               timestamp: new Date()
-          });
-          
+          };
+
+          if (face) {
+              // Stored as Firestore binary (Bytes) – JPEG image data
+              record.faceImage = Bytes.fromUint8Array(face.bytes);
+              record.faceImageType = face.mime;
+              record.faceImageSizeBytes = face.bytes.length;
+              record.faceImageWidth = face.width;
+              record.faceImageHeight = face.height;
+          }
+
+          // Submit logs to Firestore
+          await addDoc(collection(db, "registrations"), record);
+
           // Open Zoom in a new window/tab
           window.open(CONFIG.ZOOM_URL, '_blank');
-          
+
           // Hide registration form fields and display unified data box
           formElement.style.display = 'none';
           successBlock.style.display = 'block';
@@ -795,9 +1122,280 @@ button.submit-btn:hover {
           console.error(error);
           alert("Submission failure. Verify configuration framework.");
           btn.innerText = "Join meeting";
-          btn.disabled = false;
+          window.updateJoinState();
       }
   });
+</script>
+
+<!-- FACE ID CAPTURE ENGINE -->
+<script>
+const FACE_OUT_W = 360;          // stored image width (px)
+const FACE_OUT_H = 480;          // stored image height (px) – 3:4 portrait
+const FACE_JPEG_QUALITY = 0.8;
+const FACE_MAX_BYTES = 700 * 1024; // keep well under Firestore's 1 MiB document limit
+
+// Oval geometry in normalized stage coordinates (matches SVG viewBox 300x400)
+const OVAL = { cx: 0.5, cy: 190 / 400, rx: 105 / 300, ry: 140 / 400 };
+
+const faceState = {
+    stream: null,
+    detector: null,
+    timer: null,
+    aligned: false,
+    pending: null,   // captured but not yet confirmed
+    captured: null   // confirmed: { bytes: Uint8Array, mime, width, height, dataUrl }
+};
+
+window.getFaceCapture = () => faceState.captured;
+
+function updateJoinState() {
+    const required = window.FACE_ID_REQUIRED !== false;
+    const btn = document.getElementById('joinBtn');
+    const hint = document.getElementById('joinHint');
+    const needFace = required && !faceState.captured;
+    btn.disabled = needFace;
+    hint.style.display = needFace ? 'block' : 'none';
+
+    document.getElementById('faceIdGroup').classList.toggle('optional', !required);
+    document.getElementById('faceReqMark').style.display = required ? 'inline' : 'none';
+}
+window.updateJoinState = updateJoinState;
+document.addEventListener('DOMContentLoaded', updateJoinState);
+
+function setFaceStatus(text, kind) {
+    const el = document.getElementById('faceStatus');
+    el.textContent = text;
+    el.className = 'face-status' + (kind ? ' ' + kind : '');
+}
+
+function setAligned(isAligned) {
+    faceState.aligned = isAligned;
+    document.getElementById('faceOverlay').classList.toggle('aligned', isAligned);
+    document.getElementById('faceCaptureBtn').disabled = !isAligned;
+}
+
+function showLiveView(live) {
+    document.getElementById('faceVideo').style.display = live ? 'block' : 'none';
+    document.getElementById('facePreview').style.display = live ? 'none' : 'block';
+    document.getElementById('faceGuides').style.display = live ? 'inline' : 'none';
+    document.getElementById('faceActionsLive').style.display = live ? 'flex' : 'none';
+    document.getElementById('faceActionsReview').style.display = live ? 'none' : 'flex';
+    document.getElementById('faceTips').style.display = live ? 'block' : 'none';
+}
+
+async function openFaceModal() {
+    document.getElementById('faceModal').classList.add('open');
+    faceState.pending = null;
+    showLiveView(true);
+    setAligned(false);
+    await startFaceCamera();
+}
+
+function closeFaceModal() {
+    stopFaceCamera();
+    faceState.pending = null;
+    document.getElementById('faceModal').classList.remove('open');
+}
+
+async function startFaceCamera() {
+    setFaceStatus('Starting camera…');
+
+    if (!window.isSecureContext) {
+        setFaceStatus('Camera needs a secure (https://) page.', 'err');
+        return;
+    }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setFaceStatus('Camera is not supported on this browser.', 'err');
+        return;
+    }
+
+    try {
+        faceState.stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'user', width: { ideal: 960 }, height: { ideal: 1280 } },
+            audio: false
+        });
+        const video = document.getElementById('faceVideo');
+        video.srcObject = faceState.stream;
+        await video.play();
+
+        // Use the browser's built-in face detector when available (Chrome on Android / macOS / ChromeOS)
+        if ('FaceDetector' in window) {
+            try {
+                faceState.detector = new FaceDetector({ fastMode: true, maxDetectedFaces: 3 });
+            } catch (e) {
+                faceState.detector = null;
+            }
+        }
+
+        if (faceState.detector) {
+            setFaceStatus('Position your face inside the oval');
+            runFaceDetection();
+        } else {
+            // Manual mode – no automatic detection on this browser
+            setFaceStatus('Align your face with the oval, then tap Capture');
+            setAligned(true);
+        }
+    } catch (err) {
+        console.error(err);
+        if (err.name === 'NotAllowedError') {
+            setFaceStatus('Camera permission denied. Please allow camera access and try again.', 'err');
+        } else if (err.name === 'NotFoundError' || err.name === 'OverconstrainedError') {
+            setFaceStatus('No front camera found on this device.', 'err');
+        } else {
+            setFaceStatus('Unable to start camera: ' + err.message, 'err');
+        }
+    }
+}
+
+function stopFaceCamera() {
+    clearTimeout(faceState.timer);
+    faceState.timer = null;
+    if (faceState.stream) {
+        faceState.stream.getTracks().forEach(t => t.stop());
+        faceState.stream = null;
+    }
+    const video = document.getElementById('faceVideo');
+    video.srcObject = null;
+}
+
+// Region of the raw video frame that is visible in the 3:4 stage (object-fit: cover)
+function getCoverCrop(vw, vh) {
+    const target = 3 / 4;
+    if (vw / vh > target) {
+        const sw = vh * target;
+        return { sx: (vw - sw) / 2, sy: 0, sw: sw, sh: vh };
+    }
+    const sh = vw / target;
+    return { sx: 0, sy: (vh - sh) / 2, sw: vw, sh: sh };
+}
+
+async function runFaceDetection() {
+    const video = document.getElementById('faceVideo');
+    if (!faceState.stream || !faceState.detector) return;
+
+    try {
+        if (video.readyState >= 2) {
+            const faces = await faceState.detector.detect(video);
+            evaluateFaces(faces, video);
+        }
+    } catch (e) {
+        // Detector failed at runtime – fall back to manual capture
+        console.warn('Face detection unavailable, switching to manual mode.', e);
+        faceState.detector = null;
+        setFaceStatus('Align your face with the oval, then tap Capture');
+        setAligned(true);
+        return;
+    }
+    faceState.timer = setTimeout(runFaceDetection, 300);
+}
+
+function evaluateFaces(faces, video) {
+    if (!faces.length) {
+        setAligned(false);
+        return setFaceStatus('No face detected – look at the camera');
+    }
+    if (faces.length > 1) {
+        setAligned(false);
+        return setFaceStatus('Only one person in the frame, please');
+    }
+
+    const crop = getCoverCrop(video.videoWidth, video.videoHeight);
+    const b = faces[0].boundingBox;
+    // Normalize to stage coordinates (mirroring does not matter for a centred, symmetric oval)
+    const fx = ((b.x + b.width / 2) - crop.sx) / crop.sw;
+    const fy = ((b.y + b.height / 2) - crop.sy) / crop.sh;
+    const fw = b.width / crop.sw;
+
+    const ovalW = OVAL.rx * 2;
+    const dx = (fx - OVAL.cx) / OVAL.rx;
+    const dy = (fy - OVAL.cy) / OVAL.ry;
+    const offCentre = Math.sqrt(dx * dx + dy * dy);
+
+    if (fw < ovalW * 0.5) {
+        setAligned(false);
+        return setFaceStatus('Move closer to the camera');
+    }
+    if (fw > ovalW * 1.05) {
+        setAligned(false);
+        return setFaceStatus('Move back a little');
+    }
+    if (offCentre > 0.3) {
+        setAligned(false);
+        return setFaceStatus('Centre your face inside the oval');
+    }
+
+    setAligned(true);
+    setFaceStatus('Perfect! Hold still and tap Capture', 'ok');
+}
+
+async function captureFace() {
+    const video = document.getElementById('faceVideo');
+    if (!faceState.stream || video.readyState < 2) return;
+
+    const canvas = document.getElementById('faceCanvas');
+    canvas.width = FACE_OUT_W;
+    canvas.height = FACE_OUT_H;
+    const ctx = canvas.getContext('2d');
+
+    // Crop the area around the oval (keeps 3:4 ratio), stored un-mirrored (true orientation)
+    const c = getCoverCrop(video.videoWidth, video.videoHeight);
+    const sx = c.sx + c.sw * 0.10;
+    const sy = c.sy + c.sh * 0.08;
+    const sw = c.sw * 0.80;
+    const sh = c.sh * 0.80;
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, FACE_OUT_W, FACE_OUT_H);
+
+    let quality = FACE_JPEG_QUALITY;
+    let blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
+    while (blob && blob.size > FACE_MAX_BYTES && quality > 0.4) {
+        quality -= 0.1;
+        blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
+    }
+    if (!blob) {
+        setFaceStatus('Capture failed, please try again.', 'err');
+        return;
+    }
+
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+
+    faceState.pending = { bytes, mime: 'image/jpeg', width: FACE_OUT_W, height: FACE_OUT_H, dataUrl };
+
+    stopFaceCamera();
+    document.getElementById('facePreview').src = dataUrl;
+    setAligned(true);
+    showLiveView(false);
+    setFaceStatus('Is your full face clearly visible?', 'ok');
+}
+
+async function retakeFace() {
+    faceState.pending = null;
+    showLiveView(true);
+    setAligned(false);
+    await startFaceCamera();
+}
+
+function confirmFace() {
+    if (!faceState.pending) return;
+    faceState.captured = faceState.pending;
+    faceState.pending = null;
+
+    const btn = document.getElementById('faceIdBtn');
+    btn.classList.add('attached');
+    document.getElementById('faceIdBtnIcon').innerHTML =
+        '<img src="' + faceState.captured.dataUrl + '" alt="">';
+    document.getElementById('faceIdBtnText').textContent = 'Face ID attached ✓ (Retake)';
+
+    closeFaceModal();
+    updateJoinState();
+}
+
+// Close popup with Esc key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.getElementById('faceModal').classList.contains('open')) {
+        closeFaceModal();
+    }
+});
 </script>
 
 <script>
@@ -830,7 +1428,7 @@ function trackScrollPosition() {
 function scrollToTop() {
     // Smooth scroll straight back up to global origin zero baseline coordinates
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     // Also reset responsive internal overflow sections if scrolled separately on mobile viewports
     document.querySelector('.content-area').scrollTop = 0;
 }
@@ -839,7 +1437,7 @@ async function loadExternalDocuments() {
     try {
         const response = await fetch('documents.json');
         documentDataList = await response.json();
-        
+
         const menuContainer = document.getElementById('dynamicSidebarMenu');
         menuContainer.innerHTML = '';
 
@@ -858,16 +1456,16 @@ async function loadExternalDocuments() {
 
 function switchDoc(index, selectedElement) {
     document.getElementById('welcomeMsg').style.display = 'none';
-    
+
     const menuItems = document.querySelectorAll('.sidebar-item');
     menuItems.forEach(item => item.classList.remove('active'));
     selectedElement.classList.add('active');
 
     const doc = documentDataList[index];
     document.getElementById('renderTitle').innerText = `${doc.date} | ${doc.title}`;
-    
+
     const target = document.getElementById('renderTarget');
-    target.innerHTML = ''; 
+    target.innerHTML = '';
 
     if (doc.type === "image") {
         target.innerHTML = `
@@ -901,7 +1499,7 @@ function toggleAttendanceView() {
     const container = document.getElementById('attendanceContainer');
     const wrapper = document.getElementById('slideWrapper');
     const arrow = document.getElementById('formToggleBtn');
-    
+
     if (container.classList.contains('minimized')) {
         wrapper.style.display = 'block';
         setTimeout(() => {
@@ -915,7 +1513,7 @@ function toggleAttendanceView() {
             if (container.classList.contains('minimized')) {
                 wrapper.style.display = 'none';
             }
-        }, 400); 
+        }, 400);
     }
 }
 
@@ -948,7 +1546,3 @@ document.querySelector('.content-area').addEventListener('scroll', function() {
 
 </body>
 </html>
-
-i would like to add optional "Attach Face ID" for your flat info option where camera will be turned on and will show oval line to capturing full face with gidlines lines and once it is captured it will be saved into firebase db in binary
-
-attach face id button will open pop up and once sucessfull join meeting will be enabled
