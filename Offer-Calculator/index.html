@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asmita Jyoti CHSL – Redevelopment Offer Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#fff; --ink:#1c2230; --muted:#667085; --line:#e4e7ec;
+    --brand:#0f4c81; --brand-soft:#e8f0f8; --best:#e7f6ec; --best-ink:#1a7f3c; --warn:#fff6e5; --warn-ink:#9a6200;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,"Noto Sans Devanagari",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45}
+  header{background:var(--brand);color:#fff;padding:22px 16px}
+  header h1{margin:0;font-size:1.35rem;font-weight:700}
+  header p{margin:4px 0 0;opacity:.85;font-size:.9rem}
+  main{max-width:1100px;margin:0 auto;padding:20px 16px 48px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:18px}
+  .card h2{margin:0 0 12px;font-size:1.05rem}
+  .marathi-label{font-family:"Noto Sans Devanagari",sans-serif;color:var(--muted);font-weight:400}
+  .selectors{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+  .input-field-group label{display:block;font-weight:600;margin-bottom:6px;font-size:.92rem}
+  select,input[type=number]{width:100%;padding:10px 12px;border:1px solid #cfd4dc;border-radius:8px;font:inherit;background:#fff}
+  select:focus,input:focus{outline:2px solid var(--brand);outline-offset:1px}
+  .flat-info{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+  .pill{background:var(--brand-soft);color:var(--brand);border-radius:8px;padding:8px 12px;font-size:.9rem}
+  .pill b{font-size:1.05rem}
+  .notice{background:var(--warn);color:var(--warn-ink);border-radius:8px;padding:10px 12px;margin-top:12px;font-size:.9rem}
+  .table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:620px}
+  th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+  th:first-child,td:first-child{text-align:left;width:30%}
+  thead th{background:#fafbfc;font-size:.85rem;color:var(--muted);font-weight:600}
+  thead th.dev{color:var(--ink);font-size:.95rem}
+  td.best{background:var(--best);color:var(--best-ink);font-weight:600}
+  tr.total td{font-weight:700;border-top:2px solid var(--ink)}
+  td small,th small{display:block;color:var(--muted);font-weight:400;font-size:.78rem}
+  td.text{text-align:left;font-size:.88rem}
+  .muted{color:var(--muted)}
+  .row-head small{display:block;color:var(--muted);font-size:.78rem;font-weight:400}
+  details summary{cursor:pointer;font-weight:600;margin:6px 0}
+  .legend{font-size:.82rem;color:var(--muted);margin-top:10px}
+  .legend span{background:var(--best);color:var(--best-ink);padding:1px 6px;border-radius:4px}
+  #error{display:none}
+  .hidden{display:none}
+  footer{font-size:.8rem;color:var(--muted);text-align:center;margin-top:20px}
+  @media (max-width:600px){header h1{font-size:1.15rem} th,td{padding:8px} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Redevelopment Offer Calculator | <span style="font-weight:500">पुनर्विकास ऑफर कॅल्क्युलेटर</span></h1>
+  <p>Asmita Jyoti Co-operative Housing Society Ltd. — compare developer offers for your flat</p>
+</header>
+
+<main>
+  <div class="card notice" id="error"></div>
+
+  <section class="card">
+    <h2>Select your flat | <span class="marathi-label">आपली सदनिका निवडा</span></h2>
+    <div class="selectors">
+      <div class="input-field-group">
+        <label for="buildingNum">Building Number | <span class="marathi-label">इमारत क्रमांक</span> <span style="color:#ff3333;">*</span></label>
+        <select id="buildingNum" required><option value="" disabled selected>Loading…</option></select>
+      </div>
+      <div class="input-field-group">
+        <label for="flatNum">Flat Number | <span class="marathi-label">सदनिका क्रमांक</span> <span style="color:#ff3333;">*</span></label>
+        <select id="flatNum" required disabled><option value="" disabled selected>Choose building first</option></select>
+      </div>
+      <div class="input-field-group">
+        <label for="rentMonths">Rent period (months) | <span class="marathi-label">भाडे कालावधी (महिने)</span></label>
+        <input type="number" id="rentMonths" min="1" max="120" step="1">
+      </div>
+    </div>
+    <div class="flat-info hidden" id="flatInfo"></div>
+    <div class="notice hidden" id="areaNotice"></div>
+  </section>
+
+  <section class="card hidden" id="memberCard">
+    <h2>Your offer comparison | <span class="marathi-label">आपल्या सदनिकेसाठी ऑफर तुलना</span></h2>
+    <div class="table-wrap"><table id="memberTable"></table></div>
+    <p class="legend"><span>Green</span> = best value among the three developers for that row. Total cash benefit = rent + brokerage + relocation + hardship compensation (excludes refundable deposit, buyback and corpus).</p>
+    <details>
+      <summary>Year-wise rent | वर्षनिहाय भाडे</summary>
+      <div class="table-wrap"><table id="rentTable"></table></div>
+    </details>
+  </section>
+
+  <section class="card hidden" id="generalCard">
+    <h2>Other per-member offers | <span class="marathi-label">इतर सदस्य लाभ</span></h2>
+    <div class="table-wrap"><table id="generalTable"></table></div>
+  </section>
+
+  <section class="card hidden" id="societyCard">
+    <h2>Society-level offers | <span class="marathi-label">संस्था स्तरावरील ऑफर</span></h2>
+    <div class="table-wrap"><table id="societyTable"></table></div>
+  </section>
+
+  <footer id="footer"></footer>
+</main>
+
+<script>
+const DATA_DIR = 'data/';
+const FILES = ['flats','developers','offers_area','offers_general','settings'];
+const BUILDING_ORDER = ['A1','A2','B1','C1','D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','E1','Shops/Units'];
+const DB = {};
+
+/* ---------- CSV ---------- */
+function parseCSV(text){
+  const rows=[]; let row=[], f='', q=false;
+  text=text.replace(/^﻿/,'');
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c=='"'){ if(text[i+1]=='"'){f+='"';i++;} else q=false; } else f+=c; }
+    else if(c=='"') q=true;
+    else if(c==','){ row.push(f); f=''; }
+    else if(c=='\n'||c=='\r'){ if(c=='\r'&&text[i+1]=='\n') i++; row.push(f); rows.push(row); row=[]; f=''; }
+    else f+=c;
+  }
+  if(f!==''||row.length){ row.push(f); rows.push(row); }
+  const head=rows.shift().map(h=>h.trim());
+  return rows.filter(r=>r.some(v=>v.trim()!=='')).map(r=>Object.fromEntries(head.map((h,i)=>[h,(r[i]??'').trim()])));
+}
+async function loadAll(){
+  await Promise.all(FILES.map(async n=>{
+    const res=await fetch(DATA_DIR+n+'.csv?v='+Date.now(),{cache:'no-store'});
+    if(!res.ok) throw new Error(n+'.csv: HTTP '+res.status);
+    DB[n]=parseCSV(await res.text());
+  }));
+}
+
+/* ---------- helpers ---------- */
+const num=v=>v===''||v==null||isNaN(+v)?null:+v;
+const inr=v=>v==null?'—':'₹ '+Math.round(v).toLocaleString('en-IN');
+const sqft=v=>v==null?'—':(+v).toLocaleString('en-IN',{maximumFractionDigits:1})+' sq ft';
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const flatSort=(a,b)=>{const na=parseInt(a.flat_no.replace(/\D/g,'')),nb=parseInt(b.flat_no.replace(/\D/g,''));
+  const ta=a.flat_no[0],tb=b.flat_no[0]; return ta===tb?na-nb:ta.localeCompare(tb);};
+function setting(k,d){const r=DB.settings.find(s=>s.key===k);return r?r.value:d;}
+function areaItems(dev,type,item){return DB.offers_area.filter(o=>o.dev_id===dev&&o.unit_type===type&&o.item===item);}
+function areaVal(dev,type,item){const r=areaItems(dev,type,item)[0];return r?num(r.value):null;}
+
+/* rent per sq ft for year y (1-based) */
+function rentRate(dev,type,y){
+  const rows=areaItems(dev,type,'rent').filter(r=>num(r.value)!=null);
+  if(!rows.length) return null;
+  const byYear=rows.map(r=>({y:num(r.year)||1,v:num(r.value)})).sort((a,b)=>a.y-b.y);
+  const esc=areaVal(dev,type,'rent_escalation_pct');
+  if(byYear.length===1 && esc) return byYear[0].v*Math.pow(1+esc/100,y-1);
+  let v=byYear[0].v; for(const r of byYear) if(r.y<=y) v=r.v; return v;   // after last listed year, last rate continues
+}
+function rentFor(dev,type,area,months){
+  let total=0; const years=[];
+  for(let m=0;m<months;m++){const y=Math.floor(m/12)+1; const r=rentRate(dev,type,y); if(r==null) return null;
+    total+=r*area; if(!years[y-1]) years[y-1]={year:y,rate:r,months:0,amount:0}; years[y-1].months++; years[y-1].amount+=r*area;}
+  return {total,first:rentRate(dev,type,1)*area,years};
+}
+function brokerageFor(dev,type,area,months,rent){
+  const r=areaItems(dev,type,'brokerage')[0]; if(!r||num(r.value)==null) return null;
+  if(r.basis==='per_sqft_onetime') return num(r.value)*area;
+  const m=r.basis.match(/months_rent_per_(\d+)_months/);
+  if(m && rent){ const blocks=Math.ceil(months/+m[1]); let s=0;
+    for(let b=0;b<blocks;b++){ s+=num(r.value)*rentRate(dev,type,b*(+m[1]/12)+1)*area; } return s; }
+  return null;
+}
+function perSqft(dev,type,item,area){const v=areaVal(dev,type,item);return v==null?null:v*area;}
+function generalAmt(dev,item){const r=DB.offers_general.find(g=>g.dev_id===dev&&g.item===item);return r?num(r.amount):null;}
+
+/* ---------- UI ---------- */
+const $=id=>document.getElementById(id);
+function initSelectors(){
+  const present=[...new Set(DB.flats.map(f=>f.building))];
+  const order=[...BUILDING_ORDER.filter(b=>present.includes(b)),...present.filter(b=>!BUILDING_ORDER.includes(b))];
+  $('buildingNum').innerHTML='<option value="" disabled selected>Choose</option>'+order.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('');
+  $('rentMonths').value=setting('rent_months',36);
+  $('buildingNum').onchange=()=>{
+    const flats=DB.flats.filter(f=>f.building===$('buildingNum').value).sort(flatSort);
+    $('flatNum').innerHTML='<option value="" disabled selected>Choose</option>'+flats.map(f=>`<option value="${esc(f.flat_no)}">${esc(f.flat_no)}</option>`).join('');
+    $('flatNum').disabled=false; hideResults();
+  };
+  $('flatNum').onchange=render; $('rentMonths').oninput=render;
+  $('footer').textContent='Source: Financial Comparative Statement dated '+setting('statement_date','')+'. Figures are indicative; final terms as per Development Agreement.';
+}
+function hideResults(){['flatInfo','areaNotice','memberCard','generalCard','societyCard'].forEach(i=>$(i).classList.add('hidden'));}
+
+function rowHTML(label,sub,vals,fmt,bestMode){
+  const nums=vals.map(v=>typeof v==='number'?v:null).filter(v=>v!=null);
+  const best=bestMode&&nums.length>1?(bestMode==='max'?Math.max(...nums):Math.min(...nums)):null;
+  return `<tr><td class="row-head">${label}${sub?`<small>${sub}</small>`:''}</td>`+
+    vals.map(v=>{ if(typeof v==='number') return `<td class="${v===best&&nums.filter(n=>n===best).length<nums.length?'best':''}">${fmt(v)}</td>`;
+                  return `<td class="muted">${esc(v??'—')}</td>`;}).join('')+'</tr>';
+}
+function devHead(devs){return '<thead><tr><th></th>'+devs.map(d=>`<th class="dev">${esc(d.short_name)}<small>${esc(d.name)}</small></th>`).join('')+'</tr></thead>';}
+
+function render(){
+  const b=$('buildingNum').value,f=$('flatNum').value; if(!b||!f) return;
+  const flat=DB.flats.find(x=>x.building===b&&x.flat_no===f); if(!flat) return;
+  const type=flat.unit_type, area=num(flat.existing_carpet_area_sqft);
+  const months=Math.max(1,parseInt($('rentMonths').value)||+setting('rent_months',36));
+  const devs=DB.developers;
+
+  $('flatInfo').innerHTML=`<div class="pill">Unit <b>${esc(b==='Shops/Units'?f:b+'/'+f)}</b></div>
+    <div class="pill">Type <b>${esc(type)}</b></div>
+    <div class="pill">Existing carpet area <b>${area==null?'Not available':sqft(area)}</b></div>`;
+  $('flatInfo').classList.remove('hidden');
+
+  // general + society tables (always)
+  renderGeneral(devs);
+
+  if(area==null){
+    $('areaNotice').innerHTML='Area not available for this unit yet | <span class="marathi-label">या युनिटचे क्षेत्रफळ उपलब्ध नाही</span>. Showing per-sq ft rates offered for '+esc(type)+' units.';
+    $('areaNotice').classList.remove('hidden');
+    renderRates(devs,type); return;
+  }
+  $('areaNotice').classList.add('hidden');
+
+  const calc=devs.map(d=>{
+    const pct=areaVal(d.dev_id,type,'additional_area_pct');
+    const rent=rentFor(d.dev_id,type,area,months);
+    const brokerage=brokerageFor(d.dev_id,type,area,months,rent);
+    const relocation=generalAmt(d.dev_id,'Relocation (shifting)');
+    const hardship=perSqft(d.dev_id,type,'hardship',area);
+    const deposit=perSqft(d.dev_id,type,'refundable_deposit',area);
+    const buyback=perSqft(d.dev_id,type,'buyback',area);
+    const corpus=perSqft(d.dev_id,type,'corpus',area);
+    const total=[rent?.total,brokerage,relocation,hardship].reduce((s,v)=>s+(v||0),0);
+    return {d,pct,newArea:pct==null?null:area*(1+pct/100),addArea:pct==null?null:area*pct/100,rent,brokerage,relocation,hardship,deposit,buyback,corpus,total};
+  });
+  const depNote=d=>{const g=DB.offers_general.find(x=>x.dev_id===d.dev_id&&x.item==='Refundable deposit');return g?g.detail:'—';};
+
+  let h=devHead(devs)+'<tbody>';
+  h+=rowHTML('New carpet area (RERA)','existing + additional',calc.map(c=>c.newArea),sqft,'max');
+  h+=rowHTML('Additional area',null,calc.map(c=>c.addArea==null?null:c.addArea),v=>sqft(v)+` <small>(${calc.find(c=>c.addArea===v)?.pct??''}%)</small>`,'max');
+  h+=rowHTML('Rent – first month',null,calc.map(c=>c.rent?c.rent.first:null),inr,'max');
+  h+=rowHTML(`Rent – total for ${months} months`,'incl. escalation',calc.map(c=>c.rent?c.rent.total:null),inr,'max');
+  h+=rowHTML('Brokerage',null,calc.map(c=>c.brokerage),inr,'max');
+  h+=rowHTML('Relocation (shifting)',null,calc.map(c=>c.relocation),inr,'max');
+  h+=rowHTML('Hardship compensation',null,calc.map(c=>c.hardship),inr,'max');
+  h+=rowHTML('Corpus fund',null,calc.map(c=>c.corpus??'Amount not given'),inr,'max');
+  h=h.replace(/<\/tbody>$/,'');
+  h+=`<tr class="total"><td>Total cash benefit</td>`+(()=>{const mx=Math.max(...calc.map(c=>c.total));return calc.map(c=>`<td class="${c.total===mx?'best':''}">${inr(c.total)}</td>`).join('');})()+'</tr>';
+  h+=rowHTML('Refundable deposit','not added to total',calc.map(c=>c.deposit??depNote(c.d)),inr,null);
+  h+=rowHTML('Buyback value (optional)','if you sell existing unit to developer',calc.map(c=>c.buyback??'N.A.'),inr,null);
+  h+='</tbody>';
+  $('memberTable').innerHTML=h;
+
+  // year-wise rent
+  const yrs=Math.ceil(months/12);
+  let r=devHead(devs)+'<tbody>';
+  for(let y=1;y<=yrs;y++){
+    const m=calc[0].rent?.years[y-1]?.months??Math.min(12,months-(y-1)*12);
+    r+=`<tr><td>Year ${y}<small>${m} month${m>1?'s':''}</small></td>`+calc.map(c=>{const yr=c.rent?.years[y-1];
+      return yr?`<td>${inr(yr.amount)}<small>₹${yr.rate.toFixed(2)}/sq ft · ${inr(yr.rate*area)}/month</small></td>`:'<td>—</td>';}).join('')+'</tr>';
+  }
+  $('rentTable').innerHTML=r+'</tbody>';
+  $('memberCard').classList.remove('hidden');
+}
+
+function renderRates(devs,type){
+  const v=(d,item)=>areaVal(d.dev_id,type,item);
+  let h=devHead(devs)+'<tbody>';
+  h+=rowHTML('Additional area',null,devs.map(d=>v(d,'additional_area_pct')),x=>x+' %','max');
+  h+=rowHTML('Rent – year 1','per sq ft per month',devs.map(d=>rentRate(d.dev_id,type,1)),inr,'max');
+  h+=rowHTML('Brokerage','per sq ft',devs.map(d=>{const r=areaItems(d.dev_id,type,'brokerage')[0];return r?.basis==='per_sqft_onetime'?num(r.value):(r?.note||'—');}),inr,'max');
+  h+=rowHTML('Hardship compensation','per sq ft',devs.map(d=>v(d,'hardship')),inr,'max');
+  h+=rowHTML('Relocation (shifting)',null,devs.map(d=>generalAmt(d.dev_id,'Relocation (shifting)')),inr,'max');
+  h+='</tbody>';
+  $('memberTable').innerHTML=h; $('rentTable').innerHTML='';
+  $('memberCard').classList.remove('hidden');
+}
+
+function renderGeneral(devs){
+  const build=(cat,id,card)=>{
+    const items=[...new Set(DB.offers_general.filter(g=>g.category===cat&&g.item!=='Relocation (shifting)').map(g=>g.item))];
+    let h=devHead(devs)+'<tbody>';
+    for(const it of items){
+      h+=`<tr><td class="row-head">${esc(it)}</td>`+devs.map(d=>{const g=DB.offers_general.find(x=>x.dev_id===d.dev_id&&x.item===it);
+        return `<td class="text">${esc(g?.detail||'—')}</td>`;}).join('')+'</tr>';
+    }
+    $(id).innerHTML=h+'</tbody>'; $(card).classList.remove('hidden');
+  };
+  build('Per member','generalTable','generalCard');
+  build('Society','societyTable','societyCard');
+}
+
+loadAll().then(initSelectors).catch(e=>{
+  $('error').style.display='block';
+  $('error').innerHTML='Could not load data files ('+esc(e.message)+'). This page must be opened from a web server (e.g. GitHub Pages), not by double-clicking the file.';
+});
+</script>
+</body>
+</html>

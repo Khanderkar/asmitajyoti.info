@@ -1,0 +1,47 @@
+dev_id,unit_type,item,year,value,basis,note
+RAMKY,Residential,additional_area_pct,,58,percent,RERA carpet area
+RAMKY,Commercial,additional_area_pct,,58,percent,RERA carpet area
+MAHINDRA,Residential,additional_area_pct,,57,percent,RERA carpet area
+MAHINDRA,Commercial,additional_area_pct,,40,percent,RERA carpet area
+SUNTECK,Residential,additional_area_pct,,52,percent,RERA carpet area
+SUNTECK,Commercial,additional_area_pct,,40,percent,RERA carpet area
+RAMKY,Residential,rent,1,75,per_sqft_month,7.5% escalation year on year
+RAMKY,Commercial,rent,1,225,per_sqft_month,7.5% escalation year on year
+RAMKY,Residential,rent_escalation_pct,,7.5,percent_yearly,
+RAMKY,Commercial,rent_escalation_pct,,7.5,percent_yearly,
+MAHINDRA,Residential,rent,1,70,per_sqft_month,
+MAHINDRA,Residential,rent,2,77,per_sqft_month,
+MAHINDRA,Residential,rent,3,84,per_sqft_month,
+MAHINDRA,Residential,rent,4,91,per_sqft_month,
+MAHINDRA,Residential,rent,5,98,per_sqft_month,
+MAHINDRA,Residential,rent,6,105,per_sqft_month,
+MAHINDRA,Commercial,rent,1,140,per_sqft_month,
+MAHINDRA,Commercial,rent,2,154,per_sqft_month,
+MAHINDRA,Commercial,rent,3,168,per_sqft_month,
+MAHINDRA,Commercial,rent,4,182,per_sqft_month,
+MAHINDRA,Commercial,rent,5,196,per_sqft_month,
+MAHINDRA,Commercial,rent,6,210,per_sqft_month,
+SUNTECK,Residential,rent,1,70,per_sqft_month,
+SUNTECK,Commercial,rent,1,140,per_sqft_month,
+RAMKY,Residential,brokerage,,150,per_sqft_onetime,One time
+RAMKY,Commercial,brokerage,,450,per_sqft_onetime,One time
+MAHINDRA,Residential,brokerage,,140,per_sqft_onetime,Paid on vacation date
+MAHINDRA,Commercial,brokerage,,280,per_sqft_onetime,Paid on vacation date
+SUNTECK,Residential,brokerage,,1,months_rent_per_36_months,One month rent for every 3 years
+SUNTECK,Commercial,brokerage,,1,months_rent_per_36_months,One month rent for every 3 years
+RAMKY,Residential,hardship,,1500,per_sqft_onetime,
+RAMKY,Commercial,hardship,,1500,per_sqft_onetime,
+MAHINDRA,Residential,hardship,,1000,per_sqft_onetime,
+MAHINDRA,Commercial,hardship,,1000,per_sqft_onetime,
+SUNTECK,Residential,hardship,,1050,per_sqft_onetime,
+SUNTECK,Commercial,hardship,,1050,per_sqft_onetime,
+RAMKY,Residential,refundable_deposit,,225,per_sqft_onetime,3 months' rent; adjusted from corpus at repossession
+RAMKY,Commercial,refundable_deposit,,675,per_sqft_onetime,3 months' rent; adjusted from corpus at repossession
+MAHINDRA,Residential,buyback,,27000,per_sqft_onetime,Optional - if member sells existing unit to developer
+MAHINDRA,Commercial,buyback,,27000,per_sqft_onetime,Optional - if member sells existing unit to developer
+RAMKY,Residential,corpus,,,per_sqft_onetime,Amount not given in comparative statement
+RAMKY,Commercial,corpus,,,per_sqft_onetime,Amount not given in comparative statement
+MAHINDRA,Residential,corpus,,,per_sqft_onetime,Amount not given in comparative statement
+MAHINDRA,Commercial,corpus,,,per_sqft_onetime,Amount not given in comparative statement
+SUNTECK,Residential,corpus,,,per_sqft_onetime,Amount not given in comparative statement
+SUNTECK,Commercial,corpus,,,per_sqft_onetime,Amount not given in comparative statement

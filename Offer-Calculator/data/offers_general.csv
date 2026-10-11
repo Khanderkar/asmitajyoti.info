@@ -1,0 +1,45 @@
+dev_id,category,item,amount,detail
+RAMKY,Per member,Relocation (shifting),60000,"Rs. 30,000 per unit each side (to & fro)"
+MAHINDRA,Per member,Relocation (shifting),25000,"Rs. 25,000 per member (to & fro); paid on vacation date"
+SUNTECK,Per member,Relocation (shifting),25000,"Rs. 25,000"
+RAMKY,Per member,Car parking,,"Minimum 1 car park per unit holder OR as per MCGM norms, whichever is higher"
+MAHINDRA,Per member,Car parking,,"1 car park OR as per MCGM norms, whichever is higher"
+SUNTECK,Per member,Car parking,,As per MCGM norms
+RAMKY,Per member,Additional car parking,1000000,"Rs. 10 Lacs; max 200 additional, first come first serve"
+MAHINDRA,Per member,Additional car parking,,Additional car parking will not be sold
+SUNTECK,Per member,Additional car parking,,Max 1 additional car park subject to availability
+SUNTECK,Per member,Refundable deposit,,"Rs. 70/- (as stated; basis unclear)"
+MAHINDRA,Per member,Refundable deposit,,Won't be provided
+RAMKY,Per member,Extra area purchase (up to 100 sq ft),,"Residential Rs. 25,000/sq ft; Commercial Rs. 60,000/sq ft (RERA carpet)"
+MAHINDRA,Per member,Extra area purchase (up to 100 sq ft),,"33(9): up to 100 sq ft Rs. 25,000/sq ft, above 5% discount on launch price; 33(20B): 5% discount on launch price"
+SUNTECK,Per member,Extra area purchase (up to 100 sq ft),,5% discount on launch rate
+RAMKY,Per member,Buyback of existing premises,,To be discussed & mutually agreed at time of DA
+MAHINDRA,Per member,Buyback of existing premises,,"Rs. 27,000/sq ft on existing carpet area"
+SUNTECK,Per member,Buyback of existing premises,,N.A.
+RAMKY,Per member,Stamp duty / registration / GST,,Borne by Ramky on existing & additional area
+MAHINDRA,Per member,Stamp duty / registration / GST,,"Borne by developer on existing & additional area, incl. DA, PAAA"
+SUNTECK,Per member,Stamp duty / registration / GST,,Not specified
+RAMKY,Per member,Corpus payment schedule,,25% on DA execution; 25% on vacation; 50% on possession offer
+MAHINDRA,Per member,Corpus payment schedule,,25% on vacation date; 75% on possession date
+SUNTECK,Per member,Corpus payment schedule,,15% on DA; 25% on vacating; 60% on repossession
+RAMKY,Society,Bank guarantee,400000000,Rs. 40 Cr OR equivalent insurance surety bonds
+MAHINDRA,Society,Bank guarantee,400000000,"Rs. 40 Cr, construction-linked reducing BG"
+SUNTECK,Society,Bank guarantee,400000000,Rs. 40 Cr
+RAMKY,Society,Lien on sale area,,"50,000 sq ft"
+MAHINDRA,Society,Lien on sale area,,"30,000 sq ft RERA carpet; mechanism at DA"
+SUNTECK,Society,Lien on sale area,,"30,000 sq ft"
+RAMKY,Society,Max extra area purchasable by all members,,"50,000 sq ft RERA carpet (residential)"
+MAHINDRA,Society,Max extra area purchasable by all members,,Up to 20% of developer's sale area
+SUNTECK,Society,Max extra area purchasable by all members,,Max 10% of existing members' area
+RAMKY,Society,Hardship compensation to society,,—
+MAHINDRA,Society,Hardship compensation to society,50000000,Rs. 5 Cr; 25% on DA execution; 75% on vacation date
+SUNTECK,Society,Hardship compensation to society,,—
+RAMKY,Society,Outstanding payments,,—
+MAHINDRA,Society,Outstanding payments,75000000,Outstanding towards land / govt authorities up to Rs. 7.5 Cr paid by developer
+SUNTECK,Society,Outstanding payments,,—
+RAMKY,Society,Project timeline,,Not specified
+MAHINDRA,Society,Project timeline,,60 months from CC + 12 months grace
+SUNTECK,Society,Project timeline,,Not specified
+RAMKY,Society,Amenities,,"Up to 4% of proposed BUA (indicative): club house, gym, pool, banquet, business centre, senior citizen pavilion, kids area, yoga, guest rooms, library, temple; society office 200 sq ft"
+MAHINDRA,Society,Amenities,,To be discussed at time of DA
+SUNTECK,Society,Amenities,,"As per tender, mutually discussed; gym, society office, servant toilet, watchman cabins"
