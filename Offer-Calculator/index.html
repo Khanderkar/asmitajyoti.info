@@ -33,6 +33,11 @@
   th:first-child,td:first-child{text-align:left;width:30%}
   thead th{background:#fafbfc;font-size:.85rem;color:var(--muted);font-weight:600}
   thead th.dev{color:var(--ink);font-size:.95rem}
+  tr.rent-toggle{cursor:pointer}
+  tr.rent-toggle:hover td{background:#fafbfc}
+  .tri{display:inline-block;width:14px;color:var(--brand);font-size:.85rem}
+  tr.rent-year td{background:#f9fafb;font-size:.9rem}
+  tr.rent-year td:first-child{padding-left:30px}
   tr.highlight td{background:var(--brand-soft);color:var(--brand);font-weight:700;font-size:1.02rem}
   .head-row{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
   .updated{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:.85rem;white-space:nowrap}
@@ -93,10 +98,6 @@
     <h2>Your offer comparison | <span class="marathi-label">आपल्या सदनिकेसाठी ऑफर तुलना</span></h2>
     <div class="table-wrap"><table id="memberTable"></table></div>
     <p class="legend">Total cash benefit = rent + brokerage + relocation + hardship compensation (excludes refundable deposit, buyback and corpus).</p>
-    <details>
-      <summary>Year-wise rent | वर्षनिहाय भाडे</summary>
-      <div class="table-wrap"><table id="rentTable"></table></div>
-    </details>
   </section>
 
   <section class="card hidden" id="generalCard">
@@ -113,7 +114,10 @@
 </main>
 
 <script>
-const DATA_DIR = 'data/';
+// Folder (virtual directory) name is case-sensitive: Offer-Calculator
+const VD_NAME = 'Offer-Calculator';
+// Works for /Offer-Calculator, /Offer-Calculator/ and /Offer-Calculator/index.html
+const DATA_DIR = (location.pathname.endsWith('/') || /\.[a-z]+$/i.test(location.pathname)) ? 'data/' : VD_NAME + '/data/';
 const FILES = ['flats','developers','offers_area','offers_general','settings'];
 const BUILDING_ORDER = ['A1','A2','B1','C1','D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','E1','Shops/Units'];
 const DB = {};
@@ -199,7 +203,12 @@ function initSelectors(){
   $('lastUpdated').textContent=setting('offers_last_updated','09-Oct-2026');
   $('footer').textContent='Source: Financial Comparative Statement dated '+setting('statement_date','')+'. Figures are indicative; final terms as per Development Agreement.';
 }
-let shown=false;
+let shown=false, rentOpen=false;
+function toggleRent(){
+  rentOpen=!rentOpen;
+  document.querySelectorAll('#memberTable tr.rent-year').forEach(r=>r.classList.toggle('hidden',!rentOpen));
+  const t=document.querySelector('#memberTable .rent-toggle .tri'); if(t) t.textContent=rentOpen?'▾':'▸';
+}
 function markDirty(){ $('updateBtn').classList.add('dirty'); $('updateHint').classList.remove('hidden'); }
 function hideResults(){['flatInfo','areaNotice','memberCard','generalCard','societyCard'].forEach(i=>$(i).classList.add('hidden'));}
 
@@ -253,7 +262,14 @@ function render(){
   h+=rowHTML('Additional area %','on existing carpet area',calc.map(c=>c.pct),v=>v+' %');
   h+=rowHTML('Additional area',null,calc.map(c=>c.addArea),sqft);
   h+=rowHTML('New carpet area (RERA)','existing + additional',calc.map(c=>c.newArea),sqft,null,'highlight');
-  h+=rowHTML('Rent – first month',null,calc.map(c=>c.rent?c.rent.first:null),inr,'max');
+  // Rent – first month, expandable to year-wise rent
+  h+=`<tr class="rent-toggle" onclick="toggleRent()"><td class="row-head"><span class="tri">${rentOpen?'▾':'▸'}</span> Rent – first month<small>click to see year-wise rent | वर्षनिहाय भाडे</small></td>`+
+     calc.map(c=>`<td>${c.rent?inr(c.rent.first):'—'}</td>`).join('')+'</tr>';
+  for(let y=1;y<=Math.ceil(months/12);y++){
+    const m=Math.min(12,months-(y-1)*12);
+    h+=`<tr class="rent-year${rentOpen?'':' hidden'}"><td class="row-head">Year ${y}<small>${m} month${m>1?'s':''}</small></td>`+calc.map(c=>{const yr=c.rent?.years[y-1];
+      return yr?`<td>${inr(yr.amount)}<small>₹${yr.rate.toFixed(2)}/sq ft · ${inr(yr.rate*area)}/month</small></td>`:'<td>—</td>';}).join('')+'</tr>';
+  }
   h+=rowHTML(`Rent – total for ${months} months`,'incl. escalation',calc.map(c=>c.rent?c.rent.total:null),inr,'max');
   h+=rowHTML('Brokerage',null,calc.map(c=>c.brokerage),inr,'max');
   h+=rowHTML('Relocation (shifting)',null,calc.map(c=>c.relocation),inr,'max');
@@ -266,15 +282,6 @@ function render(){
   h+='</tbody>';
   $('memberTable').innerHTML=h;
 
-  // year-wise rent
-  const yrs=Math.ceil(months/12);
-  let r=devHead(devs)+'<tbody>';
-  for(let y=1;y<=yrs;y++){
-    const m=calc[0].rent?.years[y-1]?.months??Math.min(12,months-(y-1)*12);
-    r+=`<tr><td>Year ${y}<small>${m} month${m>1?'s':''}</small></td>`+calc.map(c=>{const yr=c.rent?.years[y-1];
-      return yr?`<td>${inr(yr.amount)}<small>₹${yr.rate.toFixed(2)}/sq ft · ${inr(yr.rate*area)}/month</small></td>`:'<td>—</td>';}).join('')+'</tr>';
-  }
-  $('rentTable').innerHTML=r+'</tbody>';
   $('memberCard').classList.remove('hidden');
 }
 
@@ -287,7 +294,7 @@ function renderRates(devs,type){
   h+=rowHTML('Hardship compensation','per sq ft',devs.map(d=>v(d,'hardship')),inr,'max');
   h+=rowHTML('Relocation (shifting)',null,devs.map(d=>generalAmt(d.dev_id,'Relocation (shifting)')),inr,'max');
   h+='</tbody>';
-  $('memberTable').innerHTML=h; $('rentTable').innerHTML='';
+  $('memberTable').innerHTML=h;
   $('memberCard').classList.remove('hidden');
 }
 
