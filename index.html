@@ -767,6 +767,21 @@ button.submit-btn:disabled:hover {
 }
 
 @media(max-width: 992px) {
+    /* Stacked fields are much taller on phones – give the form room so Join meeting isn't cut off */
+    .form-slide-wrapper {
+        max-height: 2500px;
+    }
+    /* 16px stops iPhone Safari from auto-zooming (and shifting the page) when a field is tapped */
+    input, select {
+        font-size: 16px;
+    }
+    body {
+        overflow-x: hidden;
+    }
+    /* Leave space under Join meeting so the ▲ collapse arrow doesn't sit on top of the hint */
+    .submit-row-container {
+        margin-bottom: 45px;
+    }
     .horizontal-form-row {
         flex-direction: column;
         align-items: stretch;
@@ -1073,7 +1088,7 @@ button.submit-btn:disabled:hover {
   import { getFirestore, collection, addDoc, Bytes } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const CONFIG = {
-      MEETING_CODE: "Meeting-11Oct2026",
+      MEETING_CODE: "Test-Oct2026",
       ZOOM_URL: "https://us06web.zoom.us/j/85003157466?pwd=CEaJU8wIcUrJcBQKf4DOCXoc6LldJN.1",
       INITIAL_COLLAPSE_STATE: "No", // Case-insensitive: "YES" or "NO"
 
