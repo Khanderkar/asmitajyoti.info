@@ -42,6 +42,9 @@
   .head-row{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
   .updated{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:.85rem;white-space:nowrap}
   .updated b{font-weight:700}
+  .disclaimer{font-size:.75rem;color:#fff;font-weight:600;margin-top:3px;white-space:normal;animation:blink 1.2s step-end infinite}
+  @keyframes blink{50%{opacity:0}}
+  @media (prefers-reduced-motion:reduce){.disclaimer{animation:none}}
   .btn{margin-top:10px;width:100%;padding:10px 12px;border:0;border-radius:8px;background:var(--brand);color:#fff;font:inherit;font-weight:600;cursor:pointer}
   .btn:disabled{background:#c4ccd6;cursor:not-allowed}
   .btn.dirty{box-shadow:0 0 0 3px #f5b94a}
@@ -65,7 +68,8 @@
   <h1>Redevelopment Offer Calculator | <span style="font-weight:500">पुनर्विकास ऑफर कॅल्क्युलेटर</span></h1>
   <p>Asmita Jyoti Co-operative Housing Society Ltd. — compare developer offers for your flat</p>
   </div>
-  <div class="updated">Offers last updated on | <span class="marathi-label" style="color:inherit;opacity:.85">शेवटचे अद्यतन</span>: <b id="lastUpdated">09-Oct-2026</b></div>
+  <div class="updated">Offers last updated on | <span class="marathi-label" style="color:inherit;opacity:.85">शेवटचे अद्यतन</span>: <b id="lastUpdated">09-Oct-2026</b>
+    <div class="disclaimer">Figures are indicative; final terms as per Development Agreement.</div></div>
   </div>
 </header>
 
