@@ -167,7 +167,8 @@ let CUR=null;  // currently selected flat row
 /* rows for dev/type/item; rows whose applies_to matches the flat's building or location_tag override the default (blank) rows */
 function areaItems(dev,type,item){
   const all=DB.offers_area.filter(o=>o.dev_id===dev&&o.unit_type===type&&o.item===item);
-  if(CUR){ const sp=all.filter(o=>o.applies_to&&(o.applies_to===CUR.building||(CUR.location_tag&&o.applies_to===CUR.location_tag)));
+  if(CUR){ const norm=v=>String(v||'').trim().toUpperCase();
+    const sp=all.filter(o=>o.applies_to&&(norm(o.applies_to)===norm(CUR.building)||(CUR.location_tag&&norm(o.applies_to)===norm(CUR.location_tag))));
     if(sp.length) return sp; }
   return all.filter(o=>!o.applies_to);
 }
