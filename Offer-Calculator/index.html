@@ -19,7 +19,8 @@
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:18px}
   .card h2{margin:0 0 12px;font-size:1.05rem}
   .marathi-label{font-family:"Noto Sans Devanagari",sans-serif;color:var(--muted);font-weight:400}
-  .selectors{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+  .selectors{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media (max-width:720px){.selectors{grid-template-columns:1fr}}
   .input-field-group label{display:block;font-weight:600;margin-bottom:6px;font-size:.92rem}
   select,input[type=number]{width:100%;padding:10px 12px;border:1px solid #cfd4dc;border-radius:8px;font:inherit;background:#fff}
   select:focus,input:focus{outline:2px solid var(--brand);outline-offset:1px}
@@ -39,6 +40,8 @@
   tr.rent-year td{background:#f9fafb;font-size:.9rem}
   tr.rent-year td:first-child{padding-left:30px}
   .rent-q{margin-top:16px}
+  .btn-row{margin-top:4px}
+  @media (max-width:720px){.btn-row>div:empty{display:none}}
   td .neg{color:#b42318}
   tr.adv td{background:#fff8e6;font-weight:700}
   tr.highlight td{background:var(--brand-soft);color:var(--brand);font-weight:700;font-size:1.02rem}
@@ -93,8 +96,6 @@
       <div class="input-field-group">
         <label for="rentMonths">Rent period (months) | <span class="marathi-label">भाडे कालावधी (महिने)</span></label>
         <input type="number" id="rentMonths" min="1" max="120" step="1">
-        <button type="button" class="btn" id="updateBtn" disabled>Update | अद्यतनित करा</button>
-        <div class="hint hidden" id="updateHint">Selection changed – click Update to refresh results.</div>
       </div>
     </div>
     <div class="selectors rent-q">
@@ -105,6 +106,13 @@
       <div class="input-field-group hidden" id="curRentGroup">
         <label for="curRent">Current monthly rent you receive (₹) | <span class="marathi-label">सध्याचे मासिक भाडे (₹)</span></label>
         <input type="number" id="curRent" min="0" step="500" placeholder="e.g. 30000">
+      </div>
+    </div>
+    <div class="selectors btn-row">
+      <div></div><div></div>
+      <div class="input-field-group">
+        <button type="button" class="btn" id="updateBtn" disabled>Submit | सबमिट करा</button>
+        <div class="hint hidden" id="updateHint">Selection changed – click Update to refresh results.</div>
       </div>
     </div>
     <div class="flat-info hidden" id="flatInfo"></div>
@@ -243,7 +251,7 @@ function initSelectors(){
     if(shown) markDirty(); else hideResults();
     $('updateBtn').disabled=true;
   };
-  $('flatNum').onchange=()=>{ $('updateBtn').disabled=false; if(!shown) render(); else markDirty(); };
+  $('flatNum').onchange=()=>{ $('updateBtn').disabled=false; if(shown) markDirty(); };
   $('rentMonths').oninput=()=>{ if(shown) markDirty(); };
   $('isRented').onchange=()=>{ $('curRentGroup').classList.toggle('hidden',$('isRented').value!=='yes'); if(shown) markDirty(); };
   $('curRent').oninput=()=>{ if(shown) markDirty(); };
@@ -272,7 +280,7 @@ function devHead(devs){return '<thead><tr><th></th>'+devs.map(d=>`<th class="dev
 function render(){
   const b=$('buildingNum').value,f=$('flatNum').value; if(!b||!f) return;
   const flat=DB.flats.find(x=>x.building===b&&x.flat_no===f); if(!flat) return;
-  CUR=flat; shown=true; $('updateBtn').classList.remove('dirty'); $('updateHint').classList.add('hidden');
+  CUR=flat; shown=true; $('updateBtn').textContent='Update | अद्यतनित करा'; $('updateBtn').classList.remove('dirty'); $('updateHint').classList.add('hidden');
   const type=flat.unit_type, area=num(flat.existing_carpet_area_sqft);
   const months=Math.max(1,parseInt($('rentMonths').value)||+setting('rent_months',48));
   const curRent=$('isRented').value==='yes'?(num($('curRent').value)||0):0;   // current monthly rent the member receives
