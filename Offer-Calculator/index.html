@@ -47,6 +47,8 @@
   @media (max-width:720px){.btn-row>div:empty{display:none}}
   td .neg{color:#b42318}
   tr.adv td{background:#fff8e6;font-weight:700}
+  h3.sub{font-size:.95rem;margin:18px 0 8px;color:var(--brand)}
+  h3.sub:first-child{margin-top:0}
   tr.highlight td{background:var(--brand-soft);color:var(--brand);font-weight:700;font-size:1.02rem}
   .head-row{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
   .updated{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:.85rem;white-space:nowrap}
@@ -143,6 +145,12 @@
     <div class="table-wrap"><table id="societyTable"></table></div>
   </section>
 
+  <section class="card hidden" id="profileCard">
+    <h2>About the developers | <span class="marathi-label">विकासकांची माहिती</span></h2>
+    <div id="profileBody"></div>
+    <p class="legend">Financial figures are as submitted by each developer in Proforma 'D' (tender), converted to ₹ crore. Profile details are compiled from public sources (rating agencies, company filings and press releases) as of Oct-2026 and should be verified independently.</p>
+  </section>
+
   <footer id="footer"></footer>
 </main>
 
@@ -151,7 +159,7 @@
 const VD_NAME = 'Offer-Calculator';
 // Works for /Offer-Calculator, /Offer-Calculator/ and /Offer-Calculator/index.html
 const DATA_DIR = (location.pathname.endsWith('/') || /\.[a-z]+$/i.test(location.pathname)) ? 'data/' : VD_NAME + '/data/';
-const FILES = ['flats','developers','offers_area','offers_general','settings'];
+const FILES = ['flats','developers','offers_area','offers_general','settings','developer_profile'];
 const BUILDING_ORDER = ['A1','A2','B1','C1','D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','E1','Shops/Units'];
 const DB = {};
 
@@ -269,7 +277,7 @@ function toggleRent(){
   const t=document.querySelector('#memberTable .rent-toggle .tri'); if(t) t.textContent=rentOpen?'▾':'▸';
 }
 function markDirty(){ $('updateBtn').classList.add('dirty'); $('updateHint').classList.remove('hidden'); }
-function hideResults(){['flatInfo','areaNotice','memberCard','generalCard','commercialCard','societyCard'].forEach(i=>$(i).classList.add('hidden'));}
+function hideResults(){['flatInfo','areaNotice','memberCard','generalCard','commercialCard','societyCard','profileCard'].forEach(i=>$(i).classList.add('hidden'));}
 
 function rowHTML(label,sub,vals,fmt,bestMode,cls){
   const nums=vals.map(v=>typeof v==='number'?v:null).filter(v=>v!=null);
@@ -372,6 +380,23 @@ function renderRates(devs,type){
   $('memberCard').classList.remove('hidden');
 }
 
+function renderProfile(devs){
+  const rows=DB.developer_profile||[]; if(!rows.length) return;
+  const titles={'Profile':'Company profile | कंपनी माहिती','Financials':'Financials (₹ crore) | आर्थिक माहिती (₹ कोटी)'};
+  let out='';
+  for(const sec of [...new Set(rows.map(r=>r.section))]){
+    const items=[...new Set(rows.filter(r=>r.section===sec).map(r=>r.item))];
+    let h=devHead(devs)+'<tbody>';
+    for(const it of items){
+      h+=`<tr><td class="row-head">${esc(it)}</td>`+devs.map(d=>{const g=rows.find(x=>x.dev_id===d.dev_id&&x.section===sec&&x.item===it);
+        if(!g) return '<td class="text">—</td>';
+        const v=esc(g.value||'—').split(' | ').join('<br>');
+        return `<td class="text">${v}${g.source&&sec!=='Financials'?`<small>${esc(g.source)}</small>`:''}</td>`;}).join('')+'</tr>';
+    }
+    out+=`<h3 class="sub">${esc(titles[sec]||sec)}</h3><div class="table-wrap"><table>${h}</tbody></table></div>`;
+  }
+  $('profileBody').innerHTML=out; $('profileCard').classList.remove('hidden');
+}
 function renderGeneral(devs){
   const build=(cat,id,card)=>{
     const items=[...new Set(DB.offers_general.filter(g=>g.category===cat).map(g=>g.item))];
@@ -385,6 +410,7 @@ function renderGeneral(devs){
   build('Per member','generalTable','generalCard');
   if(CUR && CUR.unit_type!=='Residential') build('Commercial','commercialTable','commercialCard'); else $('commercialCard').classList.add('hidden');
   build('Society','societyTable','societyCard');
+  renderProfile(devs);
 }
 
 loadAll().then(initSelectors).catch(e=>{
