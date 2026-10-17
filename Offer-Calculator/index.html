@@ -71,6 +71,49 @@
   .hidden{display:none}
   footer{font-size:.8rem;color:var(--muted);text-align:center;margin-top:20px}
   @media (max-width:600px){header h1{font-size:1.15rem} th,td{padding:8px} }
+  .actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:-4px 0 18px}
+  .actions.hidden{display:none}
+  .print-stamp{font-size:.8rem;color:var(--muted)}
+  .action-btns{display:flex;gap:10px;flex-wrap:wrap}
+  .btn-sec{padding:9px 16px;border:1px solid var(--brand);border-radius:8px;background:#fff;color:var(--brand);font:inherit;font-weight:600;cursor:pointer}
+  .btn-sec:hover{background:var(--brand-soft)}
+  .btn-sec:disabled{opacity:.6;cursor:wait}
+  .disclaimer-card{border-left:4px solid #f5b94a}
+  .disclaimer-card p{margin:6px 0;font-size:.9rem}
+  .print-only{display:none}
+  a.ref{font-size:.72rem;font-weight:600;color:var(--brand);text-decoration:none;background:var(--brand-soft);padding:0 4px;border-radius:4px;white-space:nowrap}
+  a.ref:hover{text-decoration:underline}
+  h2 a.ref{vertical-align:middle}
+  .refs{display:inline-block;margin-left:2px}
+  .ref-list{list-style:none;padding:0;margin:0;font-size:.85rem}
+  .ref-list li{padding:7px 0;border-bottom:1px solid var(--line);word-break:break-all}
+  .ref-list li:target{background:#fff8e6}
+  .ref-list a{color:var(--brand)}
+  /* ---- print / PDF layout ---- */
+  @media print{
+    @page{size:A4;margin:10mm}
+    body{background:#fff;font-size:11px}
+    header,.updated{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .disclaimer{animation:none!important;opacity:1!important}
+    .selectors,.btn-row,#updateHint,.action-btns,.legend + details{display:none!important}
+    .print-only{display:inline-block!important}
+    main{padding:8px 0}
+    .card{border:1px solid #ccc;break-inside:auto;padding:10px;margin-bottom:10px}
+    .card h2{break-after:avoid}
+    table{min-width:0;font-size:10px}
+    th,td{padding:5px 6px}
+    tr{break-inside:avoid}
+    tr.rent-year{display:table-row!important}
+    .tri,tr.rent-toggle small{display:none}
+    tr.highlight td,tr.adv td,thead th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .actions{margin:0 0 6px}
+  }
+  body.pdf-mode .selectors,body.pdf-mode .btn-row,body.pdf-mode #updateHint,body.pdf-mode .action-btns{display:none!important}
+  body.pdf-mode .print-only{display:inline-block!important}
+  body.pdf-mode tr.rent-year{display:table-row!important}
+  body.pdf-mode .tri,body.pdf-mode tr.rent-toggle small{display:none}
+  body.pdf-mode .disclaimer{animation:none!important;opacity:1!important}
+  body.pdf-mode tr{break-inside:avoid}
 </style>
 </head>
 <body>
@@ -124,31 +167,50 @@
     <div class="notice hidden" id="areaNotice"></div>
   </section>
 
+  <div class="actions hidden" id="actions">
+    <span class="print-stamp" id="printStamp"></span>
+    <div class="action-btns">
+      <button type="button" class="btn-sec" id="printBtn">🖨 Print | प्रिंट</button>
+      <button type="button" class="btn-sec" id="pdfBtn">⬇ Export to PDF | PDF डाउनलोड</button>
+    </div>
+  </div>
+
   <section class="card hidden" id="memberCard">
-    <h2>Your offer comparison | <span class="marathi-label">आपल्या सदनिकेसाठी ऑफर तुलना</span></h2>
+    <h2>Your offer comparison | <span class="marathi-label">आपल्या सदनिकेसाठी ऑफर तुलना</span> <a class="ref" href="#ref-2">#2</a></h2>
     <div class="table-wrap"><table id="memberTable"></table></div>
     <p class="legend" id="legend">Total cash benefit = rent + brokerage + relocation + corpus / hardship compensation (excludes refundable deposit and buyback).</p>
   </section>
 
   <section class="card hidden" id="generalCard">
-    <h2>Other per-member offers | <span class="marathi-label">इतर सदस्य लाभ</span></h2>
+    <h2>Other per-member offers | <span class="marathi-label">इतर सदस्य लाभ</span> <a class="ref" href="#ref-2">#2</a></h2>
     <div class="table-wrap"><table id="generalTable"></table></div>
   </section>
 
   <section class="card hidden" id="commercialCard">
-    <h2>Shops &amp; first-floor units | <span class="marathi-label">दुकाने व व्यावसायिक युनिट्स</span></h2>
+    <h2>Shops &amp; first-floor units | <span class="marathi-label">दुकाने व व्यावसायिक युनिट्स</span> <a class="ref" href="#ref-2">#2</a></h2>
     <div class="table-wrap"><table id="commercialTable"></table></div>
   </section>
 
   <section class="card hidden" id="societyCard">
-    <h2>Society-level offers | <span class="marathi-label">संस्था स्तरावरील ऑफर</span></h2>
+    <h2>Society-level offers | <span class="marathi-label">संस्था स्तरावरील ऑफर</span> <a class="ref" href="#ref-2">#2</a></h2>
     <div class="table-wrap"><table id="societyTable"></table></div>
   </section>
 
   <section class="card hidden" id="profileCard">
     <h2>About the developers | <span class="marathi-label">विकासकांची माहिती</span></h2>
     <div id="profileBody"></div>
-    <p class="legend">Financial figures are as submitted by each developer in Proforma 'D' (tender), converted to ₹ crore. Profile details are compiled from public sources (rating agencies, company filings and press releases) as of Oct-2026 and should be verified independently.</p>
+    <p class="legend">Financial figures <a class="ref" href="#ref-3">#3</a> are as submitted by each developer in Proforma 'D' (tender), converted to ₹ crore. Profile details are compiled from public sources (rating agencies, company filings and press releases) as of Oct-2026 and should be verified independently.</p>
+  </section>
+
+  <section class="card disclaimer-card hidden" id="finalDisclaimer">
+    <h2>Disclaimer | <span class="marathi-label">अस्वीकरण</span></h2>
+    <p>The figures shown are indicative and have been calculated from the offers submitted by the developers and the existing carpet area records of the Society. Actual entitlements, areas, amounts and all other terms will be <b>as per the final Development Agreement (DA)</b> executed between the Society and the selected developer.</p>
+    <p class="marathi-label">येथे दर्शविलेले आकडे केवळ अंदाजे आहेत. प्रत्यक्ष क्षेत्रफळ, रक्कम व इतर सर्व अटी संस्था व निवडलेल्या विकासकामध्ये होणाऱ्या अंतिम विकास करारानुसार (Development Agreement) राहतील.</p>
+  </section>
+
+  <section class="card hidden" id="refCard">
+    <h2>References / Sources | <span class="marathi-label">संदर्भ</span></h2>
+    <ol class="ref-list" id="refList"></ol>
   </section>
 
   <footer id="footer"></footer>
@@ -159,7 +221,7 @@
 const VD_NAME = 'Offer-Calculator';
 // Works for /Offer-Calculator, /Offer-Calculator/ and /Offer-Calculator/index.html
 const DATA_DIR = (location.pathname.endsWith('/') || /\.[a-z]+$/i.test(location.pathname)) ? 'data/' : VD_NAME + '/data/';
-const FILES = ['flats','developers','offers_area','offers_general','settings','developer_profile'];
+const FILES = ['flats','developers','offers_area','offers_general','settings','developer_profile','sources'];
 const BUILDING_ORDER = ['A1','A2','B1','C1','D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','E1','Shops/Units'];
 const DB = {};
 
@@ -267,17 +329,43 @@ function initSelectors(){
   $('isRented').onchange=()=>{ $('curRentGroup').classList.toggle('hidden',!$('isRented').checked); if(shown) markDirty(); };
   $('curRent').oninput=()=>{ if(shown) markDirty(); };
   $('updateBtn').onclick=render;
+  $('printBtn').onclick=()=>window.print();
+  $('pdfBtn').onclick=exportPDF;
   $('lastUpdated').textContent=setting('offers_last_updated','09-Oct-2026');
   $('footer').textContent='Source: Comparative statement of offers (Deodhar Associates, PMC) dated '+setting('statement_date','')+'. Figures are indicative; final terms as per Development Agreement.';
 }
 let shown=false, rentOpen=false;
+function unitLabel(){ if(!CUR) return 'Offer'; return (CUR.building==='Shops/Units'?CUR.flat_no:CUR.building+'-'+CUR.flat_no).replace(/[^A-Za-z0-9-]+/g,'_'); }
+function loadPdfLib(){
+  if(typeof html2pdf!=='undefined') return Promise.resolve(true);
+  return new Promise(res=>{const sc=document.createElement('script');
+    sc.src=DATA_DIR.replace(/data\/$/,'')+'lib/html2pdf.bundle.min.js';
+    sc.onload=()=>res(true); sc.onerror=()=>res(false); document.head.appendChild(sc);});
+}
+async function exportPDF(){
+  const name='Offer_Comparison_'+unitLabel()+'.pdf';
+  await loadPdfLib();
+  if(typeof html2pdf==='undefined'){            // library could not load (offline / blocked): fall back to browser print → Save as PDF
+    const t=document.title; document.title=name.replace('.pdf',''); window.print(); document.title=t; return; }
+  const btn=$('pdfBtn'); btn.disabled=true; const old=btn.textContent; btn.textContent='Preparing PDF…';
+  document.body.classList.add('pdf-mode');
+  try{
+    await html2pdf().set({
+      margin:[8,6,8,6], filename:name,
+      image:{type:'jpeg',quality:0.95},
+      html2canvas:{scale:2,useCORS:true,windowWidth:1100,scrollY:0},
+      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, enableLinks:true,
+      pagebreak:{mode:['css','legacy'],avoid:['tr','.card h2','.pill']}
+    }).from(document.body).save();
+  } finally { document.body.classList.remove('pdf-mode'); btn.disabled=false; btn.textContent=old; }
+}
 function toggleRent(){
   rentOpen=!rentOpen;
   document.querySelectorAll('#memberTable tr.rent-year').forEach(r=>r.classList.toggle('hidden',!rentOpen));
   const t=document.querySelector('#memberTable .rent-toggle .tri'); if(t) t.textContent=rentOpen?'▾':'▸';
 }
 function markDirty(){ $('updateBtn').classList.add('dirty'); $('updateHint').classList.remove('hidden'); }
-function hideResults(){['flatInfo','areaNotice','memberCard','generalCard','commercialCard','societyCard','profileCard'].forEach(i=>$(i).classList.add('hidden'));}
+function hideResults(){['flatInfo','areaNotice','memberCard','generalCard','commercialCard','societyCard','profileCard','actions','finalDisclaimer','refCard'].forEach(i=>$(i).classList.add('hidden'));}
 
 function rowHTML(label,sub,vals,fmt,bestMode,cls){
   const nums=vals.map(v=>typeof v==='number'?v:null).filter(v=>v!=null);
@@ -300,7 +388,11 @@ function render(){
 
   $('flatInfo').innerHTML=`<div class="pill">Unit <b>${esc(b==='Shops/Units'?f:b+'/'+f)}</b></div>
     <div class="pill">Type <b>${esc(type)}</b></div>
-    <div class="pill">Existing carpet area <b>${area==null?'Not available':sqft(area)}</b></div>`;
+    <div class="pill">Existing carpet area <b>${area==null?'Not available':sqft(area)}</b></div>
+    <div class="pill print-only">Rent period <b>${months} months</b></div>
+    ${curRent>0?`<div class="pill print-only">Current rent received <b>${inr(curRent)}/month</b></div>`:''}`;
+  $('actions').classList.remove('hidden'); $('finalDisclaimer').classList.remove('hidden');
+  $('printStamp').textContent='Generated on '+new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})+' · Offers as of '+setting('offers_last_updated','');
   $('flatInfo').classList.remove('hidden');
 
   // general + society tables (always)
@@ -380,6 +472,12 @@ function renderRates(devs,type){
   $('memberCard').classList.remove('hidden');
 }
 
+function refs(ids){ return String(ids||'').split(/[;,\s]+/).filter(Boolean).map(i=>`<a class="ref" href="#ref-${esc(i)}">#${esc(i)}</a>`).join(' '); }
+function renderReferences(){
+  const rows=DB.sources||[]; if(!rows.length) return;
+  $('refList').innerHTML=rows.map(r=>`<li id="ref-${esc(r.ref_id)}"><b>#${esc(r.ref_id)}</b> ${esc(r.title)}${r.note?` <span class="muted">— ${esc(r.note)}</span>`:''}${r.url?`<br><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a>`:''}</li>`).join('');
+  $('refCard').classList.remove('hidden');
+}
 function renderProfile(devs){
   const rows=DB.developer_profile||[]; if(!rows.length) return;
   const titles={'Profile':'Company profile | कंपनी माहिती','Financials':'Financials (₹ crore) | आर्थिक माहिती (₹ कोटी)'};
@@ -391,7 +489,7 @@ function renderProfile(devs){
       h+=`<tr><td class="row-head">${esc(it)}</td>`+devs.map(d=>{const g=rows.find(x=>x.dev_id===d.dev_id&&x.section===sec&&x.item===it);
         if(!g) return '<td class="text">—</td>';
         const v=esc(g.value||'—').split(' | ').join('<br>');
-        return `<td class="text">${v}${g.source&&sec!=='Financials'?`<small>${esc(g.source)}</small>`:''}</td>`;}).join('')+'</tr>';
+        return `<td class="text">${v}${g.ref_ids?` <span class="refs">${refs(g.ref_ids)}</span>`:''}</td>`;}).join('')+'</tr>';
     }
     out+=`<h3 class="sub">${esc(titles[sec]||sec)}</h3><div class="table-wrap"><table>${h}</tbody></table></div>`;
   }
@@ -410,7 +508,7 @@ function renderGeneral(devs){
   build('Per member','generalTable','generalCard');
   if(CUR && CUR.unit_type!=='Residential') build('Commercial','commercialTable','commercialCard'); else $('commercialCard').classList.add('hidden');
   build('Society','societyTable','societyCard');
-  renderProfile(devs);
+  renderProfile(devs); renderReferences();
 }
 
 loadAll().then(initSelectors).catch(e=>{
