@@ -38,6 +38,9 @@
   .tri{display:inline-block;width:14px;color:var(--brand);font-size:.85rem}
   tr.rent-year td{background:#f9fafb;font-size:.9rem}
   tr.rent-year td:first-child{padding-left:30px}
+  .rent-q{margin-top:16px}
+  td .neg{color:#b42318}
+  tr.adv td{background:#fff8e6;font-weight:700}
   tr.highlight td{background:var(--brand-soft);color:var(--brand);font-weight:700;font-size:1.02rem}
   .head-row{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
   .updated{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:.85rem;white-space:nowrap}
@@ -92,6 +95,16 @@
         <input type="number" id="rentMonths" min="1" max="120" step="1">
         <button type="button" class="btn" id="updateBtn" disabled>Update | अद्यतनित करा</button>
         <div class="hint hidden" id="updateHint">Selection changed – click Update to refresh results.</div>
+      </div>
+    </div>
+    <div class="selectors rent-q">
+      <div class="input-field-group">
+        <label for="isRented">Is your flat / shop on rent? | <span class="marathi-label">आपली सदनिका / दुकान भाड्याने दिली आहे का?</span></label>
+        <select id="isRented"><option value="no" selected>No | नाही</option><option value="yes">Yes | होय</option></select>
+      </div>
+      <div class="input-field-group hidden" id="curRentGroup">
+        <label for="curRent">Current monthly rent you receive (₹) | <span class="marathi-label">सध्याचे मासिक भाडे (₹)</span></label>
+        <input type="number" id="curRent" min="0" step="500" placeholder="e.g. 30000">
       </div>
     </div>
     <div class="flat-info hidden" id="flatInfo"></div>
@@ -222,7 +235,7 @@ function initSelectors(){
   const present=[...new Set(DB.flats.map(f=>f.building))];
   const order=[...BUILDING_ORDER.filter(b=>present.includes(b)),...present.filter(b=>!BUILDING_ORDER.includes(b))];
   $('buildingNum').innerHTML='<option value="" disabled selected>Choose</option>'+order.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('');
-  $('rentMonths').value=setting('rent_months',36);
+  $('rentMonths').value=setting('rent_months',48);
   $('buildingNum').onchange=()=>{
     const flats=DB.flats.filter(f=>f.building===$('buildingNum').value).sort(flatSort);
     $('flatNum').innerHTML='<option value="" disabled selected>Choose</option>'+flats.map(f=>`<option value="${esc(f.flat_no)}">${esc(f.flat_no)}</option>`).join('');
@@ -232,6 +245,8 @@ function initSelectors(){
   };
   $('flatNum').onchange=()=>{ $('updateBtn').disabled=false; if(!shown) render(); else markDirty(); };
   $('rentMonths').oninput=()=>{ if(shown) markDirty(); };
+  $('isRented').onchange=()=>{ $('curRentGroup').classList.toggle('hidden',$('isRented').value!=='yes'); if(shown) markDirty(); };
+  $('curRent').oninput=()=>{ if(shown) markDirty(); };
   $('updateBtn').onclick=render;
   $('lastUpdated').textContent=setting('offers_last_updated','09-Oct-2026');
   $('footer').textContent='Source: Comparative statement of offers (Deodhar Associates, PMC) dated '+setting('statement_date','')+'. Figures are indicative; final terms as per Development Agreement.';
@@ -259,7 +274,9 @@ function render(){
   const flat=DB.flats.find(x=>x.building===b&&x.flat_no===f); if(!flat) return;
   CUR=flat; shown=true; $('updateBtn').classList.remove('dirty'); $('updateHint').classList.add('hidden');
   const type=flat.unit_type, area=num(flat.existing_carpet_area_sqft);
-  const months=Math.max(1,parseInt($('rentMonths').value)||+setting('rent_months',36));
+  const months=Math.max(1,parseInt($('rentMonths').value)||+setting('rent_months',48));
+  const curRent=$('isRented').value==='yes'?(num($('curRent').value)||0):0;   // current monthly rent the member receives
+  const signed=v=>v==null?'—':`<span class="${v<0?'neg':''}">${v<0?'− ':'+ '}${inr(Math.abs(v))}</span>`;
   const devs=DB.developers;
 
   $('flatInfo').innerHTML=`<div class="pill">Unit <b>${esc(b==='Shops/Units'?f:b+'/'+f)}</b></div>
@@ -305,12 +322,15 @@ function render(){
     h+=`<tr class="rent-year${rentOpen?'':' hidden'}"><td class="row-head">Year ${y}<small>${m} month${m>1?'s':''}</small></td>`+calc.map(c=>{const yr=c.rent?.years[y-1];
       return yr?`<td>${inr(yr.amount)}<small>₹${yr.rate.toFixed(2)}/sq ft · ${inr(yr.rate*area)}/month</small></td>`:'<td>—</td>';}).join('')+'</tr>';
   }
+  if(curRent>0) h+=rowHTML('Monthly rent advantage (year 1)',`vs your current rent ${inr(curRent)}/month`,calc.map(c=>c.rent?c.rent.first-curRent:null),signed,null,'adv');
   h+=rowHTML(`Rent – total for ${months} months`,'incl. escalation',calc.map(c=>c.rent?c.rent.total:null),inr,'max');
+  if(curRent>0) h+=rowHTML(`Rent advantage – ${months} months`,`vs your current rent ${inr(curRent)} × ${months} = ${inr(curRent*months)}`,calc.map(c=>c.rent?c.rent.total-curRent*months:null),signed,null,'adv');
   h+=rowHTML('Brokerage',null,calc.map(c=>c.brokerage),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'brokerage'))}</small>`,'max');
   h+=rowHTML('Relocation (shifting)',null,calc.map(c=>c.relocation),inr,'max');
   h+=rowHTML('Corpus / hardship compensation',null,calc.map(c=>c.hardship),inr,'max');
   h=h.replace(/<\/tbody>$/,'');
   h+=`<tr class="total"><td>Total cash benefit</td>`+calc.map(c=>`<td>${inr(c.total)}</td>`).join('')+'</tr>';
+  if(curRent>0) h+=rowHTML('Net gain over your current rent income',`total cash benefit − current rent for ${months} months (${inr(curRent*months)})`,calc.map(c=>c.total-curRent*months),signed,null,'adv');
   h+=rowHTML('Refundable deposit','not added to total',calc.map(c=>c.deposit??'Not stated'),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'refundable_deposit'))}</small>`,null);
   h+=rowHTML('Buyback value (optional)','if you sell existing unit to developer',calc.map(c=>c.buyback??'N.A.'),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'buyback'))}</small>`,null);
   h+='</tbody>';
