@@ -127,7 +127,7 @@
   #report .sec{break-inside:auto}
   #report .pb{break-before:page;page-break-before:always}
   @media print{
-    @page{size:A4;margin:10mm}
+    @page{size:A4;margin:10mm 10mm 14mm;@bottom-right{content:"Page " counter(page) " of " counter(pages);font-size:8pt;color:#666}@bottom-left{content:"Asmita Jyoti CHSL - Offer comparison";font-size:8pt;color:#666}}
     body{background:#fff!important}
     body > *:not(#printHost){display:none!important}
     #printHost{display:block!important}
@@ -462,7 +462,17 @@ async function exportPDF(){
       html2canvas:{scale:2,useCORS:true,scrollX:0,scrollY:0,backgroundColor:'#ffffff'},
       jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, enableLinks:true,
       pagebreak:{mode:[]}
-    }).from(el).save();
+    }).from(el).toPdf().get('pdf').then(pdf=>{
+      // footer on every page: unit on the left, "Page X of Y" on the right
+      const n=pdf.internal.getNumberOfPages(), pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
+      const left='Asmita Jyoti CHSL - Offer comparison - '+(LAST&&LAST.unit?LAST.unit:'');
+      for(let i=1;i<=n;i++){
+        pdf.setPage(i); pdf.setFontSize(8); pdf.setTextColor(110);
+        pdf.setDrawColor(210); pdf.line(M,ph-M+2,pw-M,ph-M+2);
+        pdf.text(left,M,ph-M+6);
+        pdf.text('Page '+i+' of '+n,pw-M,ph-M+6,{align:'right'});
+      }
+    }).save();
   } finally { wrap.remove(); window.scrollTo(sx,sy); btn.disabled=false; btn.textContent=old; }
 }
 function toggleRent(){
