@@ -798,44 +798,62 @@ sr_no,building,flat_no,unit_type,location_tag,existing_carpet_area_sqft
 797,E1,74,Residential,,314
 798,E1,75,Residential,,314
 799,E1,76,Residential,,314
-800,Shops/Units,Shop # 02,Shop,,
-801,Shops/Units,Shop # 03,Shop,,
-802,Shops/Units,Shop # 04,Shop,,
-803,Shops/Units,Shop # 05,Shop,,
-804,Shops/Units,Shop # 06,Shop,,
-805,Shops/Units,Shop # 09,Shop,,
-806,Shops/Units,Shop # 12,Shop,,
-807,Shops/Units,Shop # 13,Shop,,
-808,Shops/Units,Shop # 16,Shop,,
-809,Shops/Units,Shop # 17,Shop,,
-810,Shops/Units,Shop # 19,Shop,,
-811,Shops/Units,Shop # 22,Shop,,
-812,Shops/Units,Shop # 24,Shop,,
-813,Shops/Units,Shop # 25,Shop,,
-814,Shops/Units,Shop # 26,Shop,,
-815,Shops/Units,Shop # 27,Shop,,
-816,Shops/Units,Shop # 28,Shop,,
-817,Shops/Units,Shop # 29,Shop,,
-818,Shops/Units,Shop # 30,Shop,,
-819,Shops/Units,Shop # 31,Shop,,
-820,Shops/Units,Shop # 32,Shop,,
-821,Shops/Units,Shop # 33,Shop,,
-822,Shops/Units,Shop # 34,Shop,,
-823,Shops/Units,Shop # 35,Shop,,
-824,Shops/Units,Shop # 36,Shop,,
-825,Shops/Units,Shop # 37,Shop,,
-826,Shops/Units,Shop # 38,Shop,,
-827,Shops/Units,Shop # 39,Shop,,
-828,Shops/Units,Shop # 40,Shop,,
-829,Shops/Units,Shop # 41,Shop,,
-830,Shops/Units,Shop # 45,Shop,,
-831,Shops/Units,Shop # 47,Shop,,
-832,Shops/Units,Shop # 49,Shop,,
-833,Shops/Units,Shop # 50,Shop,,
-834,Shops/Units,Shop # 51,Shop,,
-835,Shops/Units,Unit # 01,Unit,,
-836,Shops/Units,Unit # 03,Unit,,
-837,Shops/Units,Unit # 05,Unit,,
-838,Shops/Units,Unit # 06,Unit,,
-839,Shops/Units,Unit # 07,Unit,,
-840,Shops/Units,Unit # 08,Unit,,
+800,Shops/Units,Shop # 01,Shop,FRONT SIDE,202
+801,Shops/Units,Shop # 02,Shop,FRONT SIDE,202
+802,Shops/Units,Shop # 03,Shop,FRONT SIDE,202
+803,Shops/Units,Shop # 04,Shop,FRONT SIDE,202
+804,Shops/Units,Shop # 05,Shop,FRONT SIDE,262
+805,Shops/Units,Shop # 06,Shop,FRONT SIDE,202
+806,Shops/Units,Shop # 07,Shop,FRONT SIDE,202
+807,Shops/Units,Shop # 08,Shop,FRONT SIDE,202
+808,Shops/Units,Shop # 09,Shop,FRONT SIDE,202
+809,Shops/Units,Shop # 10,Shop,FRONT SIDE,202
+810,Shops/Units,Shop # 11,Shop,FRONT SIDE,262
+811,Shops/Units,Shop # 12,Shop,FRONT SIDE,202
+812,Shops/Units,Shop # 13,Shop,FRONT SIDE,202
+813,Shops/Units,Shop # 14,Shop,FRONT SIDE,202
+814,Shops/Units,Shop # 15,Shop,SCHOOL FACING ,103
+815,Shops/Units,Shop # 16,Shop,BACKSIDE FACING,103
+816,Shops/Units,Shop # 17,Shop,BACKSIDE FACING,103
+817,Shops/Units,Shop # 18,Shop,BACKSIDE FACING,134
+818,Shops/Units,Shop # 19,Shop,BACKSIDE FACING,103
+819,Shops/Units,Shop # 20,Shop,BACKSIDE FACING,103
+820,Shops/Units,Shop # 21,Shop,BACKSIDE FACING,103
+821,Shops/Units,Shop # 22,Shop,BACKSIDE FACING,103
+822,Shops/Units,Shop # 23,Shop,BACKSIDE FACING,103
+823,Shops/Units,Shop # 24,Shop,BACKSIDE FACING,103
+824,Shops/Units,Shop # 25,Shop,BACKSIDE FACING,134
+825,Shops/Units,Shop # 26,Shop,BACKSIDE FACING,103
+826,Shops/Units,Shop # 27,Shop,BACKSIDE FACING,103
+827,Shops/Units,Shop # 28,Shop,MARVE ROAD FACING,103
+828,Shops/Units,Shop # 29,Shop,MARVE ROAD FACING,103
+829,Shops/Units,Shop # 30,Shop,BACKSIDE FACING,103
+830,Shops/Units,Shop # 31,Shop,BACKSIDE FACING,103
+831,Shops/Units,Shop # 32,Shop,BACKSIDE FACING,70
+832,Shops/Units,Shop # 33,Shop,BACKSIDE FACING,103
+833,Shops/Units,Shop # 34,Shop,BACKSIDE FACING,90
+834,Shops/Units,Shop # 35,Shop,BACKSIDE FACING,103
+835,Shops/Units,Shop # 36,Shop,BACKSIDE FACING,103
+836,Shops/Units,Shop # 37,Shop,BACKSIDE FACING,90
+837,Shops/Units,Shop # 38,Shop,BACKSIDE FACING,103
+838,Shops/Units,Shop # 39,Shop,BACKSIDE FACING,70
+839,Shops/Units,Shop # 40,Shop,BACKSIDE FACING,103
+840,Shops/Units,Shop # 41,Shop,BACKSIDE FACING,103
+841,Shops/Units,Shop # 42,Shop,SCHOOL FACING ,103
+842,Shops/Units,Shop # 43,Shop,BACKSIDE FACING,168
+843,Shops/Units,Shop # 44,Shop,BACKSIDE FACING,168
+844,Shops/Units,Shop # 45,Shop,BACKSIDE FACING,168
+845,Shops/Units,Shop # 46,Shop,BACKSIDE FACING,168
+846,Shops/Units,Shop # 47,Shop,BACKSIDE FACING,168
+847,Shops/Units,Shop # 48,Shop,BACKSIDE FACING,168
+848,Shops/Units,Shop # 49,Shop,BACKSIDE FACING,168
+849,Shops/Units,Shop # 50,Shop,BACKSIDE FACING,168
+850,Shops/Units,Shop # 51,Shop,MARVE ROAD FACING,168
+851,Shops/Units,Unit # 01,Unit,FIRST FLOOR,560
+852,Shops/Units,Unit # 02,Unit,FIRST FLOOR,432
+853,Shops/Units,Unit # 03,Unit,FIRST FLOOR,432
+854,Shops/Units,Unit # 04,Unit,FIRST FLOOR,560
+855,Shops/Units,Unit # 05,Unit,FIRST FLOOR,514
+856,Shops/Units,Unit # 06,Unit,FIRST FLOOR,429
+857,Shops/Units,Unit # 07,Unit,FIRST FLOOR,542
+858,Shops/Units,Unit # 08,Unit,FIRST FLOOR,458
