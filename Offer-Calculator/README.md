@@ -7,7 +7,7 @@ Upload this folder to the `Offer-Calculator` virtual directory (the name is case
 | `data/flats.csv` | One row per flat, shop or unit. `unit_type` = Residential / Shop / Unit. For shops, `location_tag` = FRONT SIDE / MARVE ROAD FACING / SCHOOL FACING / BACKSIDE FACING / FIRST FLOOR (matching ignores case and extra spaces) (it decides Ramky's shop rent and brokerage). **Fill `existing_carpet_area_sqft` for shops and units.** |
 | `data/developers.csv` | Developer names and addresses. Row order = column order on the page. |
 | `data/offers_area.csv` | Offers that depend on the unit, as dev_id + unit_type + item + value + basis. A blank `applies_to` is the default. If `applies_to` holds a building (e.g. `E1`) or a shop location tag, that row overrides the default for that unit. |
-| `data/offers_general.csv` | Text offers grouped by `category`: Per member, Commercial (shown only for shops and units), and Society. |
+| `data/offers_general.csv` | Text offers grouped by `category`: Per member, Commercial (shown only for shops and units), Society, and Tender compliance (in `item`, text after ` | ` shows as the tender requirement). |
 | `data/developer_profile.csv` | Developer background shown at the end of the page: `section` = Profile / Financials. Use ` \| ` inside a value to start a new line. |
 | `data/sources.csv` | Numbered references (`ref_id`, title, URL, note). Pages show them as #1, #2…, listed with full URLs at the end. In `developer_profile.csv` the `ref_ids` column links each value to these (e.g. `5;4`). |
 | `data/settings.csv` | `rent_months`, `statement_date`, `offers_last_updated` |

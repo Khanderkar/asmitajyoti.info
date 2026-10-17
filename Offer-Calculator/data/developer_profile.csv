@@ -1,7 +1,7 @@
 dev_id,section,item,value,ref_ids
-MAHINDRA,Profile,Bidding entity,Mahindra Lifespace Developers Ltd. (MLDL),1
-RAMKY,Profile,Bidding entity,Ramky Estates & Farms Ltd. (REFL) jointly with Ramky Infrastructure Ltd. (RIL); to be executed through SPV RUHPL,1;2
-SUNTECK,Profile,Bidding entity,Sunteck Realtors Pvt. Ltd. (as per offer). Note: Proforma D financials carry the seal of Sunteck Realty Ltd. - entity to be clarified,1;3
+MAHINDRA,Profile,Bidding entity,"Mahindra Lifespace Developers Ltd. (MLDL, CIN L45200MH1999PLC118949); DA to be signed directly with MLDL",1;12
+RAMKY,Profile,Bidding entity,"Ramky Estates & Farms Ltd. (REFL) jointly with Ramky Infrastructure Ltd. (RIL); to be executed through Ramky Urban Homes Pvt. Ltd. (RUHPL), a 100% subsidiary of REFL; construction by RIL",1;2;12
+SUNTECK,Profile,Bidding entity,"Sunteck Realtors Pvt. Ltd. (private company, CIN U70109MH2022PTC381460). Project to be executed through a 100% subsidiary / sister concern of Sunteck Realty Ltd. (listed), to be named before DA. Proforma D financials carry the seal of Sunteck Realty Ltd.",1;12;3
 MAHINDRA,Profile,Group / parent,Mahindra Group - Mahindra & Mahindra Ltd. holds ~51%,4
 RAMKY,Profile,Group / parent,"Ramky Group (founder A. Ayodhya Rami Reddy); group also in EPC, waste management, life sciences",8
 SUNTECK,Profile,Group / parent,Sunteck Realty Ltd. - Mumbai (MMR) focused developer,11

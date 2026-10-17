@@ -215,6 +215,12 @@
     <div class="table-wrap"><table id="societyTable"></table></div>
   </section>
 
+  <section class="card hidden" id="complianceCard">
+    <h2>Tender compliance &amp; clarifications | <span class="marathi-label">निविदा अटींचे पालन व स्पष्टीकरण</span> <a class="ref" href="#ref-12">#12</a></h2>
+    <p class="legend" style="margin-top:0">Each developer's final position (letters dated 15-Oct-2026) on points where its offer differs from, or did not address, the tender conditions. The tender requirement is shown under each topic.</p>
+    <div class="table-wrap"><table id="complianceTable"></table></div>
+  </section>
+
   <section class="card hidden" id="profileCard">
     <h2>About the developers | <span class="marathi-label">विकासकांची माहिती</span></h2>
     <div id="profileBody"></div>
@@ -393,6 +399,7 @@ function buildReport(){
     ${sec('Other per-member offers | इतर सदस्य लाभ'+ref2, clone('generalTable'))}
     ${sec('Shops &amp; first-floor units | दुकाने व व्यावसायिक युनिट्स'+ref2, clone('commercialTable'))}
     ${sec('Society-level offers | संस्था स्तरावरील ऑफर'+ref2, clone('societyTable'))}
+    ${sec('Tender compliance &amp; clarifications | निविदा अटींचे पालन <a class="ref" href="#ref-12">#12</a>', clone('complianceTable'))}
     ${profile?`<div class="sec pb"><h2>About the developers | विकासकांची माहिती</h2>${profile}<p class="note">Financial figures <a class="ref" href="#ref-3">#3</a> as submitted in Proforma 'D', converted to ₹ crore. Profile details compiled from public sources as of Oct-2026; verify independently.</p></div>`:''}
     <div class="sec"><h2>Disclaimer | अस्वीकरण</h2><div class="disc">${$('finalDisclaimer').querySelectorAll('p')[0].innerHTML?'<p>'+$('finalDisclaimer').querySelectorAll('p')[0].innerHTML+'</p><p>'+$('finalDisclaimer').querySelectorAll('p')[1].innerHTML+'</p>':''}</div></div>
     ${refs?sec('References / Sources | संदर्भ',`<ol class="refs">${refs}</ol>`):''}
@@ -464,7 +471,7 @@ function toggleRent(){
   const t=document.querySelector('#memberTable .rent-toggle .tri'); if(t) t.textContent=rentOpen?'▾':'▸';
 }
 function markDirty(){ $('updateBtn').classList.add('dirty'); $('updateHint').classList.remove('hidden'); }
-function hideResults(){['flatInfo','areaNotice','memberCard','generalCard','commercialCard','societyCard','profileCard','actions','finalDisclaimer','refCard'].forEach(i=>$(i).classList.add('hidden'));}
+function hideResults(){['flatInfo','areaNotice','memberCard','generalCard','commercialCard','societyCard','complianceCard','profileCard','actions','finalDisclaimer','refCard'].forEach(i=>$(i).classList.add('hidden'));}
 
 function rowHTML(label,sub,vals,fmt,bestMode,cls){
   const nums=vals.map(v=>typeof v==='number'?v:null).filter(v=>v!=null);
@@ -598,7 +605,8 @@ function renderGeneral(devs){
     const items=[...new Set(DB.offers_general.filter(g=>g.category===cat).map(g=>g.item))];
     let h=devHead(devs)+'<tbody>';
     for(const it of items){
-      h+=`<tr><td class="row-head">${esc(it)}</td>`+devs.map(d=>{const g=DB.offers_general.find(x=>x.dev_id===d.dev_id&&x.item===it);
+      const [lab,...sub]=it.split(' | ');
+      h+=`<tr><td class="row-head">${esc(lab)}${sub.length?`<small>${esc(sub.join(' | '))}</small>`:''}</td>`+devs.map(d=>{const g=DB.offers_general.find(x=>x.dev_id===d.dev_id&&x.item===it);
         return `<td class="text">${esc(g?.detail||'—')}</td>`;}).join('')+'</tr>';
     }
     $(id).innerHTML=h+'</tbody>'; $(card).classList.remove('hidden');
@@ -606,6 +614,7 @@ function renderGeneral(devs){
   build('Per member','generalTable','generalCard');
   if(CUR && CUR.unit_type!=='Residential') build('Commercial','commercialTable','commercialCard'); else $('commercialCard').classList.add('hidden');
   build('Society','societyTable','societyCard');
+  build('Tender compliance','complianceTable','complianceCard');
   renderProfile(devs); renderReferences();
 }
 

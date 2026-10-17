@@ -44,6 +44,54 @@ SUNTECK,Society,Bank guarantee / lien,,"Rs 40 crore BG; area security 30,000 sq 
 MAHINDRA,Society,Completion period (clarified),,60 months for Members' OC / Part OC and possession; 72 months for Full OC
 RAMKY,Society,Completion period (clarified),,Phase 1 (members' and sale): OC within 48 months + 6 months grace; full project OC: 60 months + 12 months grace
 SUNTECK,Society,Completion period (clarified),,Members' units: 48 months from mutually agreed vacation date + 12 months grace; with OC for members' units
-MAHINDRA,Society,Clear internal height - flats / commercial (clarified),,"Will endeavour to provide 10 ft clear height, subject to design, approvals and FSI optimisation; uniform floor-to-floor height for sale and rehab units"
-RAMKY,Society,Clear internal height - flats / commercial (clarified),,Minimum committed 9'6'' / 12 ft; will endeavour to provide 10 ft / 14 ft; members' flats same height as sale flats
+MAHINDRA,Society,Clear internal height - flats / commercial (clarified),,"Will endeavour to provide 10 ft clear height, subject to design, approvals and FSI optimisation (deviation letter of 17-Sep-2026 stated 9.35 ft for flats, 14 ft commercial); uniform floor-to-floor height for sale and rehab units"
+RAMKY,Society,Clear internal height - flats / commercial (clarified),,"Minimum committed 9'6"" (flats) / 12 ft (commercial); will endeavour 10 ft / 14 ft; members' flats same height as sale flats"
 SUNTECK,Society,Clear internal height - flats / commercial (clarified),,"Agreed, subject to planning constraints; to be detailed in design presentation"
+MAHINDRA,Tender compliance,Rent escalation | Tender: min 10% every 12 months,,Rs 4 per sq ft per year (~5% of Yr 1 rate); shops 5%. Accepts PMC reading
+RAMKY,Tender compliance,Rent escalation | Tender: min 10% every 12 months,,Approx. 5%. Justified by higher base rent (Rs 90 vs Rs 70 benchmark; commercial Rs 225/200/150 vs Rs 140)
+SUNTECK,Tender compliance,Rent escalation | Tender: min 10% every 12 months,,5% per year
+MAHINDRA,Tender compliance,Corpus / hardship payment schedule | Tender: min 25% at DA and min 25% at vacating,,Nil at DA; 25% at vacation; 75% at possession (kept for commercial viability)
+RAMKY,Tender compliance,Corpus / hardship payment schedule | Tender: min 25% at DA and min 25% at vacating,,25% at DA; 25% at vacation; 50% at repossession
+SUNTECK,Tender compliance,Corpus / hardship payment schedule | Tender: min 25% at DA and min 25% at vacating,,15% at DA; 25% at vacating; 60% at repossession
+MAHINDRA,Tender compliance,"Additional displacement (brokerage) | Tender: 2 months' rent every 12 months, +10%",,"2 months' rent, one time"
+RAMKY,Tender compliance,"Additional displacement (brokerage) | Tender: 2 months' rent every 12 months, +10%",,Rs 180/sq ft one time (residential) - stated as best and final
+SUNTECK,Tender compliance,"Additional displacement (brokerage) | Tender: 2 months' rent every 12 months, +10%",,1 month at vacating + 1 month at start of Yr 3; shops 1 month every 2 years
+MAHINDRA,Tender compliance,Rent payment mechanics | Tender: 12 months in one cheque before vacating; quarterly PDCs,,"Each year's 12-month rent paid upfront in a single cheque, handed over on Vacation Date. Rent quoted for 5 years; payable till Possession Date (linked to Part OC) - can be discussed at DA"
+RAMKY,Tender compliance,Rent payment mechanics | Tender: 12 months in one cheque before vacating; quarterly PDCs,,Agreed: 12 months in advance by single cheque at vacation & handover; quarterly PDCs thereafter
+SUNTECK,Tender compliance,Rent payment mechanics | Tender: 12 months in one cheque before vacating; quarterly PDCs,,"First 12 months in advance; thereafter 12 monthly PDCs / RTGS, handed over 60 days before the previous period ends"
+MAHINDRA,Tender compliance,"Stamp duty, registration, GST & taxes | Tender: borne by developer",,"Borne by developer on existing & additional area, incl. DA and PAAA (as per offer)"
+RAMKY,Tender compliance,"Stamp duty, registration, GST & taxes | Tender: borne by developer",,"Borne by Ramky under 33(9). If an alternative scheme is needed, taxes incl. capital gains / income tax for Plot B members shifting to Plot A to be borne by those members; final treatment at DA"
+SUNTECK,Tender compliance,"Stamp duty, registration, GST & taxes | Tender: borne by developer",,"GST, stamp duty & registration borne by developer. Property tax paid by members till all vacate; developer pays from handover till repossession"
+MAHINDRA,Tender compliance,"Area tolerance & shortfall compensation | Tender: ±1%; Rs 50,000 (resi) / Rs 80,000 (comm) per sq ft",,±3%; difference settled at launch rate
+RAMKY,Tender compliance,"Area tolerance & shortfall compensation | Tender: ±1%; Rs 50,000 (resi) / Rs 80,000 (comm) per sq ft",,"±2%; shortfall at Rs 30,000 (resi) / Rs 50,000 (comm) per sq ft"
+SUNTECK,Tender compliance,"Area tolerance & shortfall compensation | Tender: ±1%; Rs 50,000 (resi) / Rs 80,000 (comm) per sq ft",,"±3% (RERA); shortfall at Rs 28,000 (resi) / Rs 60,000 (comm) per sq ft"
+MAHINDRA,Tender compliance,"Members' car parks - type | Tender: podium level, non-mechanised",,"Surface, non-mechanical / non-stack"
+RAMKY,Tender compliance,"Members' car parks - type | Tender: podium level, non-mechanised",,Non-mechanised car parks
+SUNTECK,Tender compliance,"Members' car parks - type | Tender: podium level, non-mechanised",,"Will endeavour all surface car parks, subject to planning; details in design presentation"
+MAHINDRA,Tender compliance,Freehold conversion | Tender: cost in project; pay within 90 days of MOU; failure not to affect offer,,Offer applies only on successful conversion; 120 days; DA and 33(9) consents to be held in escrow before payment
+RAMKY,Tender compliance,Freehold conversion | Tender: cost in project; pay within 90 days of MOU; failure not to affect offer,,Joint effort; premium at concession rates up to 31-Dec-2026. Extra cost due to Society's delay (MOU / appointment) to be borne by Society / members
+SUNTECK,Tender compliance,Freehold conversion | Tender: cost in project; pay within 90 days of MOU; failure not to affect offer,,"Committed, but if timelines are missed the commercial offer is subject to mutual review"
+MAHINDRA,Tender compliance,Scheme & Plot B members | Tender: preferably 33(9); Plot B members shifted to Plot A,,"Plots A and B uploaded separately; shifting of members 'will not be possible', to be endeavoured. Entitlement 60% resi / 45% comm on both plots, whichever scheme"
+RAMKY,Tender compliance,Scheme & Plot B members | Tender: preferably 33(9); Plot B members shifted to Plot A,,"33(9) for Plots A + B; if amalgamation not approved, Plot B under 33(7) with 33(20)(B) or 33(11) in-situ; concession to be sought from HPC"
+SUNTECK,Tender compliance,Scheme & Plot B members | Tender: preferably 33(9); Plot B members shifted to Plot A,,Subject to final design and planning; to be detailed in design presentation
+MAHINDRA,Tender compliance,Reoccupation & sale-unit handover | Tender: only after full OC,,Possession only to units whose OC is received; sale units 7 days after Part OC
+RAMKY,Tender compliance,Reoccupation & sale-unit handover | Tender: only after full OC,,Phase 1 (members + sale) OC in 48 + 6 months; shops may get early repossession through Part OC
+SUNTECK,Tender compliance,Reoccupation & sale-unit handover | Tender: only after full OC,,Only upon OC for members' units in the respective building / wing
+MAHINDRA,Tender compliance,Increase in FSI | Tender: belongs to the Society,,FSI increase after OC belongs to Society; before that developer may use it and Society gets 20% of sale proceeds after full OC
+RAMKY,Tender compliance,Increase in FSI | Tender: belongs to the Society,,To be agreed at DA
+SUNTECK,Tender compliance,Increase in FSI | Tender: belongs to the Society,,To be shared between developer and Society; ratio to be agreed at DA
+MAHINDRA,Tender compliance,Liquidated damages & delay interest | Tender: Rs 1 Cr per fortnight; 18% interest,,LD to be discussed at DA; interest at SBI MCLR + 2%
+RAMKY,Tender compliance,Liquidated damages & delay interest | Tender: Rs 1 Cr per fortnight; 18% interest,,To be agreed at DA
+SUNTECK,Tender compliance,Liquidated damages & delay interest | Tender: Rs 1 Cr per fortnight; 18% interest,,To be agreed by legal counsels before DA
+MAHINDRA,Tender compliance,"Bid validity | Tender: valid until DA, min 180 days; no withdrawal",,May withdraw if no meaningful progress / selection for 180 days
+RAMKY,Tender compliance,"Bid validity | Tender: valid until DA, min 180 days; no withdrawal",,May withdraw if no progress / selection for 180 days
+SUNTECK,Tender compliance,"Bid validity | Tender: valid until DA, min 180 days; no withdrawal",,Valid until DA if selected; delays despite best efforts → offer subject to mutual review
+MAHINDRA,Tender compliance,EMD | Tender: kept till 79A; security deposit till end of DLP; forfeited if DA not signed,,180 days validity; refund if not selected; returned on Vacation Date; forfeiture only on developer's default
+RAMKY,Tender compliance,EMD | Tender: kept till 79A; security deposit till end of DLP; forfeited if DA not signed,,"Kept till 79A; refunded if not selected in 180 days; if selected, held as security deposit till end of DLP"
+SUNTECK,Tender compliance,EMD | Tender: kept till 79A; security deposit till end of DLP; forfeited if DA not signed,,Kept till 79A if selected; forfeiture NOT agreed
+MAHINDRA,Tender compliance,Due diligence | Tender: bidder to verify all documents; no later claims,,"Offer subject to technical, legal & title due diligence and MLDL Board approval"
+RAMKY,Tender compliance,Due diligence | Tender: bidder to verify all documents; no later claims,,Relied on carpet areas given by PMC / Society; any shortfall may affect FSI
+SUNTECK,Tender compliance,Due diligence | Tender: bidder to verify all documents; no later claims,,Preliminary review done; detailed due diligence to be completed before DA
+MAHINDRA,Tender compliance,Executing entity & guarantee | Tender: bidder executes; parent confirming party with irrevocable guarantee,,"DA signed directly with MLDL. If an SPV is formed, MLDL keeps majority control, stays responsible and is a confirming party"
+RAMKY,Tender compliance,Executing entity & guarantee | Tender: bidder executes; parent confirming party with irrevocable guarantee,,"Through Ramky Urban Homes Pvt. Ltd. (RUHPL), 100% subsidiary of REFL. REFL and RIL confirming parties with irrevocable performance guarantee; construction by RIL"
+SUNTECK,Tender compliance,Executing entity & guarantee | Tender: bidder executes; parent confirming party with irrevocable guarantee,,"Through a subsidiary / sister concern 100% owned by Sunteck Realty Ltd. (listed), to be decided before DA. Sunteck Realtors Pvt. Ltd. to be confirming party with irrevocable guarantee"
