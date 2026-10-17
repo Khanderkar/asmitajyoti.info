@@ -28,10 +28,10 @@ SUNTECK,Residential,,rent,1,75,per_sqft_month,5% per year
 SUNTECK,Residential,,rent_escalation_pct,,5,percent_yearly,
 MAHINDRA,Shop,,rent,1,160,per_sqft_month,All shops
 MAHINDRA,Shop,,rent_escalation_pct,,5,percent_yearly,
-RAMKY,Shop,Front,rent,1,225,per_sqft_month,Front shops (14)
-RAMKY,Shop,Marve Road,rent,1,225,per_sqft_month,Marve Road shops (3)
-RAMKY,Shop,School-facing,rent,1,225,per_sqft_month,School-facing shops (2)
-RAMKY,Shop,Back,rent,1,200,per_sqft_month,Back shops (32)
+RAMKY,Shop,FRONT SIDE,rent,1,225,per_sqft_month,Front shops (14)
+RAMKY,Shop,MARVE ROAD FACING,rent,1,225,per_sqft_month,Marve Road shops (3)
+RAMKY,Shop,SCHOOL FACING,rent,1,225,per_sqft_month,School-facing shops (2)
+RAMKY,Shop,BACKSIDE FACING,rent,1,200,per_sqft_month,Back shops (32)
 RAMKY,Shop,,rent_escalation_pct,,5,percent_yearly,
 SUNTECK,Shop,,rent,1,150,per_sqft_month,All shops
 SUNTECK,Shop,,rent_escalation_pct,,5,percent_yearly,
@@ -46,10 +46,10 @@ RAMKY,Residential,,brokerage,,180,per_sqft_onetime,Rs 180/sq ft of existing area
 SUNTECK,Residential,,brokerage,1,1,months_rent,1 month's rent at vacation
 SUNTECK,Residential,,brokerage,3,1,months_rent,+ 1 month's rent at start of Yr 3
 MAHINDRA,Shop,,brokerage,1,2,months_rent,2 months' rent
-RAMKY,Shop,Front,brokerage,,450,per_sqft_onetime,Front / Marve Rd / school-facing; one time
-RAMKY,Shop,Marve Road,brokerage,,450,per_sqft_onetime,
-RAMKY,Shop,School-facing,brokerage,,450,per_sqft_onetime,
-RAMKY,Shop,Back,brokerage,,400,per_sqft_onetime,Back shops; one time
+RAMKY,Shop,FRONT SIDE,brokerage,,450,per_sqft_onetime,Front / Marve Rd / school-facing; one time
+RAMKY,Shop,MARVE ROAD FACING,brokerage,,450,per_sqft_onetime,
+RAMKY,Shop,SCHOOL FACING,brokerage,,450,per_sqft_onetime,
+RAMKY,Shop,BACKSIDE FACING,brokerage,,400,per_sqft_onetime,Back shops; one time
 SUNTECK,Shop,,brokerage,,1,months_rent_per_24_months,1 month's rent every 2 years
 MAHINDRA,Unit,,brokerage,1,2,months_rent,2 months' rent
 RAMKY,Unit,,brokerage,,300,per_sqft_onetime,One time
