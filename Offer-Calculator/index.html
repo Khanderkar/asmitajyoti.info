@@ -40,6 +40,9 @@
   tr.rent-year td{background:#f9fafb;font-size:.9rem}
   tr.rent-year td:first-child{padding-left:30px}
   .rent-q{margin-top:16px}
+  .check-group{display:flex;align-items:flex-end}
+  label.check{display:flex;gap:10px;align-items:center;cursor:pointer;font-weight:600;font-size:.92rem;margin:0;padding:8px 12px;border:1px solid #cfd4dc;border-radius:8px;background:#fff;width:100%;min-height:44px}
+  label.check input{width:20px;height:20px;accent-color:var(--brand);flex:none;cursor:pointer}
   .btn-row{margin-top:4px}
   @media (max-width:720px){.btn-row>div:empty{display:none}}
   td .neg{color:#b42318}
@@ -99,9 +102,9 @@
       </div>
     </div>
     <div class="selectors rent-q">
-      <div class="input-field-group">
-        <label for="isRented">Is your flat / shop on rent? | <span class="marathi-label">आपली सदनिका / दुकान भाड्याने दिली आहे का?</span></label>
-        <select id="isRented"><option value="no" selected>No | नाही</option><option value="yes">Yes | होय</option></select>
+      <div class="input-field-group check-group">
+        <label class="check"><input type="checkbox" id="isRented">
+          <span>I have given my flat / shop on rent<br><span class="marathi-label">मी माझी सदनिका / दुकान भाड्याने दिली आहे</span></span></label>
       </div>
       <div class="input-field-group hidden" id="curRentGroup">
         <label for="curRent">Current monthly rent you receive (₹) | <span class="marathi-label">सध्याचे मासिक भाडे (₹)</span></label>
@@ -253,7 +256,7 @@ function initSelectors(){
   };
   $('flatNum').onchange=()=>{ $('updateBtn').disabled=false; if(shown) markDirty(); };
   $('rentMonths').oninput=()=>{ if(shown) markDirty(); };
-  $('isRented').onchange=()=>{ $('curRentGroup').classList.toggle('hidden',$('isRented').value!=='yes'); if(shown) markDirty(); };
+  $('isRented').onchange=()=>{ $('curRentGroup').classList.toggle('hidden',!$('isRented').checked); if(shown) markDirty(); };
   $('curRent').oninput=()=>{ if(shown) markDirty(); };
   $('updateBtn').onclick=render;
   $('lastUpdated').textContent=setting('offers_last_updated','09-Oct-2026');
@@ -283,7 +286,7 @@ function render(){
   CUR=flat; shown=true; $('updateBtn').textContent='Update | अद्यतनित करा'; $('updateBtn').classList.remove('dirty'); $('updateHint').classList.add('hidden');
   const type=flat.unit_type, area=num(flat.existing_carpet_area_sqft);
   const months=Math.max(1,parseInt($('rentMonths').value)||+setting('rent_months',48));
-  const curRent=$('isRented').value==='yes'?(num($('curRent').value)||0):0;   // current monthly rent the member receives
+  const curRent=$('isRented').checked?(num($('curRent').value)||0):0;   // current monthly rent the member receives
   const signed=v=>v==null?'—':`<span class="${v<0?'neg':''}">${v<0?'− ':'+ '}${inr(Math.abs(v))}</span>`;
   const devs=DB.developers;
 
