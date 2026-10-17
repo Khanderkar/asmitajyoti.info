@@ -101,12 +101,17 @@
   <section class="card hidden" id="memberCard">
     <h2>Your offer comparison | <span class="marathi-label">आपल्या सदनिकेसाठी ऑफर तुलना</span></h2>
     <div class="table-wrap"><table id="memberTable"></table></div>
-    <p class="legend">Total cash benefit = rent + brokerage + relocation + hardship compensation (excludes refundable deposit, buyback and corpus).</p>
+    <p class="legend" id="legend">Total cash benefit = rent + brokerage + relocation + corpus / hardship compensation (excludes refundable deposit and buyback).</p>
   </section>
 
   <section class="card hidden" id="generalCard">
     <h2>Other per-member offers | <span class="marathi-label">इतर सदस्य लाभ</span></h2>
     <div class="table-wrap"><table id="generalTable"></table></div>
+  </section>
+
+  <section class="card hidden" id="commercialCard">
+    <h2>Shops &amp; first-floor units | <span class="marathi-label">दुकाने व व्यावसायिक युनिट्स</span></h2>
+    <div class="table-wrap"><table id="commercialTable"></table></div>
   </section>
 
   <section class="card hidden" id="societyCard">
@@ -158,17 +163,32 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const flatSort=(a,b)=>{const na=parseInt(a.flat_no.replace(/\D/g,'')),nb=parseInt(b.flat_no.replace(/\D/g,''));
   const ta=a.flat_no[0],tb=b.flat_no[0]; return ta===tb?na-nb:ta.localeCompare(tb);};
 function setting(k,d){const r=DB.settings.find(s=>s.key===k);return r?r.value:d;}
-function areaItems(dev,type,item){return DB.offers_area.filter(o=>o.dev_id===dev&&o.unit_type===type&&o.item===item);}
+let CUR=null;  // currently selected flat row
+/* rows for dev/type/item; rows whose applies_to matches the flat's building or location_tag override the default (blank) rows */
+function areaItems(dev,type,item){
+  const all=DB.offers_area.filter(o=>o.dev_id===dev&&o.unit_type===type&&o.item===item);
+  if(CUR){ const sp=all.filter(o=>o.applies_to&&(o.applies_to===CUR.building||(CUR.location_tag&&o.applies_to===CUR.location_tag)));
+    if(sp.length) return sp; }
+  return all.filter(o=>!o.applies_to);
+}
+function grouped(rows,fmt){const g={};rows.forEach(x=>{(g[x.value]=g[x.value]||[]).push(x.applies_to);});
+  return Object.entries(g).map(([v,t])=>fmt(v)+' ('+t.join(', ')+')').join('; ');}
+function variants(dev,type,item){return DB.offers_area.filter(o=>o.dev_id===dev&&o.unit_type===type&&o.item===item);}
 function areaVal(dev,type,item){const r=areaItems(dev,type,item)[0];return r?num(r.value):null;}
 
-/* rent per sq ft for year y (1-based) */
+/* rent per sq ft for year y (1-based); after the last quoted year the escalation rule continues */
 function rentRate(dev,type,y){
   const rows=areaItems(dev,type,'rent').filter(r=>num(r.value)!=null);
   if(!rows.length) return null;
   const byYear=rows.map(r=>({y:num(r.year)||1,v:num(r.value)})).sort((a,b)=>a.y-b.y);
-  const esc=areaVal(dev,type,'rent_escalation_pct');
-  if(byYear.length===1 && esc) return byYear[0].v*Math.pow(1+esc/100,y-1);
-  let v=byYear[0].v; for(const r of byYear) if(r.y<=y) v=r.v; return v;   // after last listed year, last rate continues
+  let v=byYear[0].v, ly=byYear[0].y; for(const r of byYear) if(r.y<=y){v=r.v;ly=r.y;}
+  const last=byYear[byYear.length-1];
+  if(y>last.y){
+    const pct=areaVal(dev,type,'rent_escalation_pct'), abs=areaVal(dev,type,'rent_escalation_abs');
+    if(pct) return last.v*Math.pow(1+pct/100,y-last.y);
+    if(abs) return last.v+abs*(y-last.y);
+  }
+  return v;
 }
 function rentFor(dev,type,area,months){
   let total=0; const years=[];
@@ -176,14 +196,22 @@ function rentFor(dev,type,area,months){
     total+=r*area; if(!years[y-1]) years[y-1]={year:y,rate:r,months:0,amount:0}; years[y-1].months++; years[y-1].amount+=r*area;}
   return {total,first:rentRate(dev,type,1)*area,years};
 }
-function brokerageFor(dev,type,area,months,rent){
-  const r=areaItems(dev,type,'brokerage')[0]; if(!r||num(r.value)==null) return null;
-  if(r.basis==='per_sqft_onetime') return num(r.value)*area;
-  const m=r.basis.match(/months_rent_per_(\d+)_months/);
-  if(m && rent){ const blocks=Math.ceil(months/+m[1]); let s=0;
-    for(let b=0;b<blocks;b++){ s+=num(r.value)*rentRate(dev,type,b*(+m[1]/12)+1)*area; } return s; }
-  return null;
+/* generic amount: per_sqft_onetime | lumpsum | months_rent (year col = which year's rent; counted only if that year falls in the period) | months_rent_per_N_months */
+function amountFor(dev,type,item,area,months){
+  const rows=areaItems(dev,type,item).filter(r=>num(r.value)!=null); if(!rows.length) return null;
+  let s=0;
+  for(const r of rows){
+    const v=num(r.value);
+    if(r.basis==='per_sqft_onetime') s+=v*area;
+    else if(r.basis==='lumpsum') s+=v;
+    else if(r.basis==='months_rent'){ const y=num(r.year)||1; if((y-1)*12<months){ const rr=rentRate(dev,type,y); if(rr==null) return null; s+=v*rr*area; } }
+    else { const m=r.basis.match(/months_rent_per_(\d+)_months/); if(!m) return null;
+      const per=+m[1], blocks=Math.ceil(months/per);
+      for(let b=0;b<blocks;b++){ const rr=rentRate(dev,type,Math.floor(b*per/12)+1); if(rr==null) return null; s+=v*rr*area; } }
+  }
+  return s;
 }
+function noteFor(dev,type,item){return areaItems(dev,type,item).map(r=>r.note).filter(Boolean).join(' ');}
 function perSqft(dev,type,item,area){const v=areaVal(dev,type,item);return v==null?null:v*area;}
 function generalAmt(dev,item){const r=DB.offers_general.find(g=>g.dev_id===dev&&g.item===item);return r?num(r.amount):null;}
 
@@ -205,7 +233,7 @@ function initSelectors(){
   $('rentMonths').oninput=()=>{ if(shown) markDirty(); };
   $('updateBtn').onclick=render;
   $('lastUpdated').textContent=setting('offers_last_updated','09-Oct-2026');
-  $('footer').textContent='Source: Financial Comparative Statement dated '+setting('statement_date','')+'. Figures are indicative; final terms as per Development Agreement.';
+  $('footer').textContent='Source: Comparative statement of offers (Deodhar Associates, PMC) dated '+setting('statement_date','')+'. Figures are indicative; final terms as per Development Agreement.';
 }
 let shown=false, rentOpen=false;
 function toggleRent(){
@@ -214,13 +242,13 @@ function toggleRent(){
   const t=document.querySelector('#memberTable .rent-toggle .tri'); if(t) t.textContent=rentOpen?'▾':'▸';
 }
 function markDirty(){ $('updateBtn').classList.add('dirty'); $('updateHint').classList.remove('hidden'); }
-function hideResults(){['flatInfo','areaNotice','memberCard','generalCard','societyCard'].forEach(i=>$(i).classList.add('hidden'));}
+function hideResults(){['flatInfo','areaNotice','memberCard','generalCard','commercialCard','societyCard'].forEach(i=>$(i).classList.add('hidden'));}
 
 function rowHTML(label,sub,vals,fmt,bestMode,cls){
   const nums=vals.map(v=>typeof v==='number'?v:null).filter(v=>v!=null);
   const best=bestMode&&nums.length>1?(bestMode==='max'?Math.max(...nums):Math.min(...nums)):null;
   return `<tr class="${cls||''}"><td class="row-head">${label}${sub?`<small>${sub}</small>`:''}</td>`+
-    vals.map(v=>{ if(typeof v==='number') return `<td>${fmt(v)}</td>`;
+    vals.map((v,i)=>{ if(typeof v==='number') return `<td>${fmt(v,i)}</td>`;
                   return `<td class="muted">${esc(v??'—')}</td>`;}).join('')+'</tr>';
 }
 function devHead(devs){return '<thead><tr><th></th>'+devs.map(d=>`<th class="dev">${esc(d.short_name)}<small>${esc(d.name)}</small></th>`).join('')+'</tr></thead>';}
@@ -228,7 +256,7 @@ function devHead(devs){return '<thead><tr><th></th>'+devs.map(d=>`<th class="dev
 function render(){
   const b=$('buildingNum').value,f=$('flatNum').value; if(!b||!f) return;
   const flat=DB.flats.find(x=>x.building===b&&x.flat_no===f); if(!flat) return;
-  shown=true; $('updateBtn').classList.remove('dirty'); $('updateHint').classList.add('hidden');
+  CUR=flat; shown=true; $('updateBtn').classList.remove('dirty'); $('updateHint').classList.add('hidden');
   const type=flat.unit_type, area=num(flat.existing_carpet_area_sqft);
   const months=Math.max(1,parseInt($('rentMonths').value)||+setting('rent_months',36));
   const devs=DB.developers;
@@ -242,30 +270,32 @@ function render(){
   renderGeneral(devs);
 
   if(area==null){
-    $('areaNotice').innerHTML='Area not available for this unit yet | <span class="marathi-label">या युनिटचे क्षेत्रफळ उपलब्ध नाही</span>. Showing per-sq ft rates offered for '+esc(type)+' units.';
+    $('areaNotice').innerHTML='Area not available for this unit yet | <span class="marathi-label">या युनिटचे क्षेत्रफळ उपलब्ध नाही</span>. Showing rates offered for '+(type==='Shop'?'ground-floor shops':'first-floor commercial units')+'.';
     $('areaNotice').classList.remove('hidden');
     renderRates(devs,type); return;
   }
-  $('areaNotice').classList.add('hidden');
+  $('areaNotice').classList.add('hidden'); $('legend').classList.remove('hidden');
 
   const calc=devs.map(d=>{
     const pct=areaVal(d.dev_id,type,'additional_area_pct');
+    const fixed=areaVal(d.dev_id,type,'new_area_fixed');
+    const newArea=fixed!=null?fixed:(pct==null?null:Math.round(area*(1+pct/100)));
     const rent=rentFor(d.dev_id,type,area,months);
-    const brokerage=brokerageFor(d.dev_id,type,area,months,rent);
-    const relocation=generalAmt(d.dev_id,'Relocation (shifting)');
-    const hardship=perSqft(d.dev_id,type,'hardship',area);
-    const deposit=perSqft(d.dev_id,type,'refundable_deposit',area);
+    const brokerage=amountFor(d.dev_id,type,'brokerage',area,months);
+    const relocation=amountFor(d.dev_id,type,'relocation',area,months);
+    const hardship=amountFor(d.dev_id,type,'hardship',area,months);
+    const deposit=amountFor(d.dev_id,type,'refundable_deposit',area,months);
     const buyback=perSqft(d.dev_id,type,'buyback',area);
-    const corpus=perSqft(d.dev_id,type,'corpus',area);
+    const parking=areaVal(d.dev_id,type,'free_parking');
     const total=[rent?.total,brokerage,relocation,hardship].reduce((s,v)=>s+(v||0),0);
-    return {d,pct,newArea:pct==null?null:area*(1+pct/100),addArea:pct==null?null:area*pct/100,rent,brokerage,relocation,hardship,deposit,buyback,corpus,total};
+    return {d,pct,fixed,newArea,addArea:newArea==null?null:newArea-area,rent,brokerage,relocation,hardship,deposit,buyback,parking,total};
   });
-  const depNote=d=>{const g=DB.offers_general.find(x=>x.dev_id===d.dev_id&&x.item==='Refundable deposit');return g?g.detail:'—';};
 
   let h=devHead(devs)+'<tbody>';
-  h+=rowHTML('Additional area %','on existing carpet area',calc.map(c=>c.pct),v=>v+' %');
+  h+=rowHTML('Additional area %','on existing carpet area',calc.map(c=>(c.fixed!=null&&!(c.pct!=null&&Math.abs(Math.round(area*(1+c.pct/100))-c.fixed)<=1))?(c.addArea/area*100):c.pct),v=>(Math.round(v*10)/10)+' %');
   h+=rowHTML('Additional area',null,calc.map(c=>c.addArea),sqft);
   h+=rowHTML('New carpet area (RERA)','existing + additional',calc.map(c=>c.newArea),sqft,null,'highlight');
+  if(calc.some(c=>c.parking!=null)) h+=rowHTML('Free car parking',null,calc.map(c=>c.parking),v=>v+(v>1?' car parks':' car park'),null);
   // Rent – first month, expandable to year-wise rent
   h+=`<tr class="rent-toggle" onclick="toggleRent()"><td class="row-head"><span class="tri">${rentOpen?'▾':'▸'}</span> Rent – first month<small>click to see year-wise rent | वर्षनिहाय भाडे</small></td>`+
      calc.map(c=>`<td>${c.rent?inr(c.rent.first):'—'}</td>`).join('')+'</tr>';
@@ -275,14 +305,13 @@ function render(){
       return yr?`<td>${inr(yr.amount)}<small>₹${yr.rate.toFixed(2)}/sq ft · ${inr(yr.rate*area)}/month</small></td>`:'<td>—</td>';}).join('')+'</tr>';
   }
   h+=rowHTML(`Rent – total for ${months} months`,'incl. escalation',calc.map(c=>c.rent?c.rent.total:null),inr,'max');
-  h+=rowHTML('Brokerage',null,calc.map(c=>c.brokerage),inr,'max');
+  h+=rowHTML('Brokerage',null,calc.map(c=>c.brokerage),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'brokerage'))}</small>`,'max');
   h+=rowHTML('Relocation (shifting)',null,calc.map(c=>c.relocation),inr,'max');
-  h+=rowHTML('Hardship compensation',null,calc.map(c=>c.hardship),inr,'max');
-  h+=rowHTML('Corpus fund',null,calc.map(c=>c.corpus??'Amount not given'),inr,'max');
+  h+=rowHTML('Corpus / hardship compensation',null,calc.map(c=>c.hardship),inr,'max');
   h=h.replace(/<\/tbody>$/,'');
   h+=`<tr class="total"><td>Total cash benefit</td>`+calc.map(c=>`<td>${inr(c.total)}</td>`).join('')+'</tr>';
-  h+=rowHTML('Refundable deposit','not added to total',calc.map(c=>c.deposit??depNote(c.d)),inr,null);
-  h+=rowHTML('Buyback value (optional)','if you sell existing unit to developer',calc.map(c=>c.buyback??'N.A.'),inr,null);
+  h+=rowHTML('Refundable deposit','not added to total',calc.map(c=>c.deposit??'Not stated'),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'refundable_deposit'))}</small>`,null);
+  h+=rowHTML('Buyback value (optional)','if you sell existing unit to developer',calc.map(c=>c.buyback??'N.A.'),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'buyback'))}</small>`,null);
   h+='</tbody>';
   $('memberTable').innerHTML=h;
 
@@ -290,21 +319,30 @@ function render(){
 }
 
 function renderRates(devs,type){
-  const v=(d,item)=>areaVal(d.dev_id,type,item);
+  const pctTxt=d=>{const v=areaVal(d.dev_id,type,'additional_area_pct');return v==null?'—':v;};
+  const rentTxt=d=>{const r=areaItems(d.dev_id,type,'rent');
+    if(r.length) return num(r[0].value);
+    const vs=variants(d.dev_id,type,'rent').filter(x=>x.applies_to);
+    return vs.length?grouped(vs,v=>'₹'+v):null;};
+  const brkTxt=d=>{const r=areaItems(d.dev_id,type,'brokerage');
+    if(r.length) return r[0].basis==='per_sqft_onetime'?'₹'+r[0].value+' per sq ft':(r.map(x=>x.note).join(' ')||'—');
+    const vs=variants(d.dev_id,type,'brokerage').filter(x=>x.applies_to);
+    return vs.length?grouped(vs,v=>'₹'+v+'/sq ft'):'—';};
   let h=devHead(devs)+'<tbody>';
-  h+=rowHTML('Additional area %',null,devs.map(d=>v(d,'additional_area_pct')),x=>x+' %');
-  h+=rowHTML('Rent – year 1','per sq ft per month',devs.map(d=>rentRate(d.dev_id,type,1)),inr,'max');
-  h+=rowHTML('Brokerage','per sq ft',devs.map(d=>{const r=areaItems(d.dev_id,type,'brokerage')[0];return r?.basis==='per_sqft_onetime'?num(r.value):(r?.note||'—');}),inr,'max');
-  h+=rowHTML('Hardship compensation','per sq ft',devs.map(d=>v(d,'hardship')),inr,'max');
-  h+=rowHTML('Relocation (shifting)',null,devs.map(d=>generalAmt(d.dev_id,'Relocation (shifting)')),inr,'max');
+  h+=rowHTML('Additional area %',null,devs.map(pctTxt),x=>x+' %');
+  h+=rowHTML('Rent – year 1','per sq ft per month',devs.map(rentTxt),inr);
+  h+=rowHTML('Rent escalation',null,devs.map(d=>{const p=areaVal(d.dev_id,type,'rent_escalation_pct');return p==null?'—':p+'% per year';}),x=>x);
+  h+=rowHTML('Brokerage',null,devs.map(brkTxt),x=>x);
+  h+=rowHTML('Corpus / hardship compensation','per sq ft',devs.map(d=>areaVal(d.dev_id,type,'hardship')),inr);
+  h+=rowHTML('Relocation (shifting)',null,devs.map(d=>amountFor(d.dev_id,type,'relocation',0,1)),inr);
   h+='</tbody>';
-  $('memberTable').innerHTML=h;
+  $('memberTable').innerHTML=h; $('legend').classList.add('hidden');
   $('memberCard').classList.remove('hidden');
 }
 
 function renderGeneral(devs){
   const build=(cat,id,card)=>{
-    const items=[...new Set(DB.offers_general.filter(g=>g.category===cat&&g.item!=='Relocation (shifting)').map(g=>g.item))];
+    const items=[...new Set(DB.offers_general.filter(g=>g.category===cat).map(g=>g.item))];
     let h=devHead(devs)+'<tbody>';
     for(const it of items){
       h+=`<tr><td class="row-head">${esc(it)}</td>`+devs.map(d=>{const g=DB.offers_general.find(x=>x.dev_id===d.dev_id&&x.item===it);
@@ -313,6 +351,7 @@ function renderGeneral(devs){
     $(id).innerHTML=h+'</tbody>'; $(card).classList.remove('hidden');
   };
   build('Per member','generalTable','generalCard');
+  if(CUR && CUR.unit_type!=='Residential') build('Commercial','commercialTable','commercialCard'); else $('commercialCard').classList.add('hidden');
   build('Society','societyTable','societyCard');
 }
 
