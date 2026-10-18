@@ -81,6 +81,7 @@
   .disclaimer-card{border-left:4px solid #f5b94a}
   .disclaimer-card p{margin:6px 0;font-size:.9rem}
   .print-only{display:none}
+  body.no-refs a.ref,body.no-refs .refs{display:none!important}
   a.ref{font-size:.72rem;font-weight:600;color:var(--brand);text-decoration:none;background:var(--brand-soft);padding:0 4px;border-radius:4px;white-space:nowrap}
   a.ref:hover{text-decoration:underline}
   h2 a.ref{vertical-align:middle}
@@ -127,7 +128,7 @@
   #report .sec{break-inside:auto}
   #report .pb{break-before:page;page-break-before:always}
   @media print{
-    @page{size:A4;margin:10mm 10mm 14mm;@bottom-right{content:"Page " counter(page) " of " counter(pages);font-size:8pt;color:#666}@bottom-left{content:"Asmita Jyoti CHSL - Offer comparison";font-size:8pt;color:#666}}
+    @page{size:A4;margin:14mm 18mm 16mm 18mm;@bottom-right{content:"Page " counter(page) " of " counter(pages);font-size:8pt;color:#666}@bottom-left{content:"Asmita Jyoti CHSL - Offer comparison";font-size:8pt;color:#666}}
     body{background:#fff!important}
     body > *:not(#printHost){display:none!important}
     #printHost{display:block!important}
@@ -401,8 +402,8 @@ function buildReport(){
     ${sec('Society-level offers | संस्था स्तरावरील ऑफर'+ref2, clone('societyTable'))}
     ${sec('Tender compliance &amp; clarifications | निविदा अटींचे पालन <a class="ref" href="#ref-12">#12</a>', clone('complianceTable'))}
     ${profile?`<div class="sec pb"><h2>About the developers | विकासकांची माहिती</h2>${profile}<p class="note">Financial figures <a class="ref" href="#ref-3">#3</a> as submitted in Proforma 'D', converted to ₹ crore. Profile details compiled from public sources as of Oct-2026; verify independently.</p></div>`:''}
-    <div class="sec"><h2>Disclaimer | अस्वीकरण</h2><div class="disc">${$('finalDisclaimer').querySelectorAll('p')[0].innerHTML?'<p>'+$('finalDisclaimer').querySelectorAll('p')[0].innerHTML+'</p><p>'+$('finalDisclaimer').querySelectorAll('p')[1].innerHTML+'</p>':''}</div></div>
-    ${refs?sec('References / Sources | संदर्भ',`<ol class="refs">${refs}</ol>`):''}
+    ${!show('closing_disclaimer')?'':`<div class="sec"><h2>Disclaimer | अस्वीकरण</h2><div class="disc">${$('finalDisclaimer').querySelectorAll('p')[0].innerHTML?'<p>'+$('finalDisclaimer').querySelectorAll('p')[0].innerHTML+'</p><p>'+$('finalDisclaimer').querySelectorAll('p')[1].innerHTML+'</p>':''}</div></div>`}
+    ${refs&&show('references')?sec('References / Sources | संदर्भ',`<ol class="refs">${refs}</ol>`):''}
   </div>`;
   return $('report');
 }
@@ -453,11 +454,13 @@ async function exportPDF(){
   if(!ok||typeof html2pdf==='undefined'){ const t=document.title; document.title=name.replace('.pdf',''); window.print(); document.title=t; btn.disabled=false; btn.textContent=old; return; }
   const sx=window.scrollX, sy=window.scrollY;
   window.scrollTo(0,0);
-  const M=10, W=Math.floor((210-2*M)/25.4*96), H=Math.floor(W*2*(297-2*M)/(210-2*M))/2;   // A4 content box in CSS px (same rounding as html2pdf at scale 2)
+  const MT=14, MS=18, MB=16;                        // page margins in mm: top, sides, bottom (footer sits in the bottom margin)
+  const cw=210-2*MS, ch=297-MT-MB;
+  const W=Math.floor(cw/25.4*96), H=Math.floor(W*2*ch/cw)/2;   // A4 content box in CSS px (same rounding as html2pdf at scale 2)
   const wrap=paginate(el,W,H);
   try{
     await html2pdf().set({
-      margin:[M,M,M,M], filename:name,
+      margin:[MT,MS,MB,MS], filename:name,
       image:{type:'jpeg',quality:0.92},
       html2canvas:{scale:2,useCORS:true,scrollX:0,scrollY:0,backgroundColor:'#ffffff'},
       jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, enableLinks:true,
@@ -468,9 +471,9 @@ async function exportPDF(){
       const left='Asmita Jyoti CHSL - Offer comparison - '+(LAST&&LAST.unit?LAST.unit:'');
       for(let i=1;i<=n;i++){
         pdf.setPage(i); pdf.setFontSize(8); pdf.setTextColor(110);
-        pdf.setDrawColor(210); pdf.line(M,ph-M+2,pw-M,ph-M+2);
-        pdf.text(left,M,ph-M+6);
-        pdf.text('Page '+i+' of '+n,pw-M,ph-M+6,{align:'right'});
+        pdf.setDrawColor(210); pdf.line(MS,ph-MB+5,pw-MS,ph-MB+5);
+        pdf.text(left,MS,ph-MB+9);
+        pdf.text('Page '+i+' of '+n,pw-MS,ph-MB+9,{align:'right'});
       }
     }).save();
   } finally { wrap.remove(); window.scrollTo(sx,sy); btn.disabled=false; btn.textContent=old; }
@@ -506,7 +509,7 @@ function render(){
     <div class="pill">Type <b>${esc(type)}</b></div>
     <div class="pill">Existing carpet area <b>${area==null?'Not available':sqft(area)}</b></div>`;
   LAST={unit:(b==='Shops/Units'?f:b+'/'+f),type,area,months,curRent};
-  $('actions').classList.remove('hidden'); $('finalDisclaimer').classList.remove('hidden');
+  $('actions').classList.toggle('hidden',!show('print_pdf_buttons')); $('finalDisclaimer').classList.toggle('hidden',!show('closing_disclaimer'));
   $('printStamp').textContent='Generated on '+new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})+' · Offers as of '+setting('offers_last_updated','');
   $('flatInfo').classList.remove('hidden');
 
@@ -610,6 +613,8 @@ function renderProfile(devs){
   }
   $('profileBody').innerHTML=out; $('profileCard').classList.remove('hidden');
 }
+/* Section switches (data/settings.csv): 1 = show, 0 = hide. Missing key = hidden. */
+const show=k=>String(setting('show_'+k,'0')).trim()==='1';
 function renderGeneral(devs){
   const build=(cat,id,card)=>{
     const items=[...new Set(DB.offers_general.filter(g=>g.category===cat).map(g=>g.item))];
@@ -621,11 +626,14 @@ function renderGeneral(devs){
     }
     $(id).innerHTML=h+'</tbody>'; $(card).classList.remove('hidden');
   };
-  build('Per member','generalTable','generalCard');
-  if(CUR && CUR.unit_type!=='Residential') build('Commercial','commercialTable','commercialCard'); else $('commercialCard').classList.add('hidden');
-  build('Society','societyTable','societyCard');
-  build('Tender compliance','complianceTable','complianceCard');
-  renderProfile(devs); renderReferences();
+  const gate=(flag,card)=>{ if(!show(flag)){ $(card).classList.add('hidden'); return false; } return true; };
+  if(gate('other_offers','generalCard')) build('Per member','generalTable','generalCard');
+  if(CUR && CUR.unit_type!=='Residential' && show('commercial_terms')) build('Commercial','commercialTable','commercialCard'); else $('commercialCard').classList.add('hidden');
+  if(gate('society_offers','societyCard')) build('Society','societyTable','societyCard');
+  if(gate('tender_compliance','complianceCard')) build('Tender compliance','complianceTable','complianceCard');
+  if(gate('developer_profile','profileCard')) renderProfile(devs);
+  if(gate('references','refCard')) renderReferences();
+  document.body.classList.toggle('no-refs',!show('references'));
 }
 
 loadAll().then(initSelectors).catch(e=>{
