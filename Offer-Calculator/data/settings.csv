@@ -2,3 +2,11 @@ key,value,note
 rent_months,48,Temporary accommodation period used for rent total (same for all developers)
 statement_date,16-Oct-2026,Date of comparative statement of offers (Deodhar Associates)
 offers_last_updated,16-Oct-2026,Shown in page header
+show_other_offers,0,Section switch (1 = show / 0 = hide): Other per-member offers
+show_commercial_terms,0,Section switch: Shops & first-floor units (only appears for shops / units)
+show_society_offers,0,Section switch: Society-level offers
+show_tender_compliance,0,Section switch: Tender compliance & clarifications
+show_developer_profile,0,Section switch: About the developers (profile & financials)
+show_closing_disclaimer,0,Section switch: Disclaimer box at the end (header disclaimer line always shows)
+show_references,0,Section switch: References list at the end and the #1 #2 source markers
+show_print_pdf_buttons,1,Print and Export to PDF buttons above the results
