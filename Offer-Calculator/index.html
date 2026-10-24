@@ -12,8 +12,8 @@
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:Inter,var(--lfont,"Noto Sans Devanagari"),"Noto Sans Devanagari",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45}
-  .lang-pick{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:.85rem}
-  .lang-pick select{width:auto;padding:5px 8px;font-size:.88rem;border-radius:6px;border:1px solid rgba(255,255,255,.45);background:#fff;color:var(--ink)}
+  .lang-group{grid-column:3}
+  @media (max-width:720px){.lang-group{grid-column:auto}}
   .lang-note{background:var(--brand-soft);color:var(--brand);border-radius:8px;padding:8px 12px;margin-top:12px;font-size:.85rem}
   .words{margin-top:16px;border:1px solid var(--line);border-left:4px solid var(--brand);border-radius:8px;padding:12px 14px;background:#fbfcfe}
   .words h3{margin:0 0 6px;font-size:.98rem;color:var(--brand)}
@@ -160,8 +160,6 @@
   <div class="head-row"><div>
   <h1 data-i18n="title">Redevelopment Offer Calculator</h1>
   <p data-i18n="subtitle">Asmita Jyoti Co-operative Housing Society Ltd. — compare developer offers for your flat</p>
-  <div class="lang-pick"><label for="langSel">🌐 <span data-i18n="language">Language</span></label>
-    <select id="langSel" aria-label="Language"></select></div>
   </div>
   <div class="updated"><span data-i18n="last_updated">Offers last updated on</span>: <b id="lastUpdated">09-Oct-2026</b>
     <div class="disclaimer" data-i18n="indicative">Figures are indicative; final terms as per Development Agreement.</div></div>
@@ -195,6 +193,10 @@
       <div class="input-field-group hidden" id="curRentGroup">
         <label for="curRent" data-i18n="cur_rent">Current monthly rent you receive (₹)</label>
         <input type="number" id="curRent" min="0" step="500" placeholder="e.g. 30000">
+      </div>
+      <div class="input-field-group lang-group">
+        <label for="langSel">🌐 <span data-i18n="language">Language</span></label>
+        <select id="langSel" aria-label="Language"></select>
       </div>
     </div>
     <div class="selectors btn-row">
@@ -810,6 +812,9 @@ function render(redraw){
   }
   $('areaNotice').classList.add('hidden'); $('legend').classList.remove('hidden');
 
+  // member does not pay society maintenance / property tax while the building is being redeveloped (same for every developer)
+  const mMaint=num(flat.monthly_maintenance)||0, mTax=num(flat.monthly_property_tax)||0;
+  const maintSave=mMaint*months, taxSave=mTax*months;
   const calc=devs.map(d=>{
     const pct=areaVal(d.dev_id,type,'additional_area_pct');
     const fixed=areaVal(d.dev_id,type,'new_area_fixed');
@@ -821,7 +826,7 @@ function render(redraw){
     const deposit=amountFor(d.dev_id,type,'refundable_deposit',area,months);
     const buyback=perSqft(d.dev_id,type,'buyback',area);
     const parking=areaVal(d.dev_id,type,'free_parking');
-    const total=[rent?.total,brokerage,relocation,hardship].reduce((s,v)=>s+(v||0),0);
+    const total=[rent?.total,brokerage,relocation,hardship,maintSave,taxSave].reduce((s,v)=>s+(v||0),0);
     return {d,pct,fixed,newArea,addArea:newArea==null?null:newArea-area,rent,brokerage,relocation,hardship,deposit,buyback,parking,total};
   });
   const e=k=>esc(T(k)), ev=(k,v)=>esc(T(k,v));
@@ -845,6 +850,8 @@ function render(redraw){
   h+=rowHTML(e('brokerage'),null,calc.map(c=>c.brokerage),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'brokerage'))}</small>`,'max');
   h+=rowHTML(e('relocation'),null,calc.map(c=>c.relocation),inr,'max');
   h+=rowHTML(e('corpus'),null,calc.map(c=>c.hardship),inr,'max');
+  if(mMaint) h+=rowHTML(ev('maint_save',{n:months}),ev('save_sub',{amt:inr(mMaint),n:months}),calc.map(()=>maintSave),inr);
+  if(mTax) h+=rowHTML(ev('tax_save',{n:months}),ev('save_sub',{amt:inr(mTax),n:months}),calc.map(()=>taxSave),inr);
   h+=`<tr class="total"><td>${e('total')}</td>`+calc.map(c=>`<td>${inr(c.total)}</td>`).join('')+'</tr>';
   if(curRent>0) h+=rowHTML(e('net_gain'),ev('net_gain_sub',{n:months,amt:inr(curRent*months)}),calc.map(c=>c.total-curRent*months),signed,null,'adv');
   h+=rowHTML(e('deposit'),e('not_added'),calc.map(c=>c.deposit??T('not_stated')),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'refundable_deposit'))}</small>`,null);
