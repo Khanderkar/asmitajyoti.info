@@ -668,7 +668,7 @@ function initSelectors(){
   $('updateBtn').onclick=render;
   $('printBtn').onclick=doPrint;
   $('pdfBtn').onclick=exportPDF;
-  window.addEventListener('beforeprint',()=>{ if(shown) prepPrint(); });
+  window.addEventListener('beforeprint',()=>{ if(shown && !PRINT_IMG) prepPrint(); });
   $('lastUpdated').textContent=setting('offers_last_updated','09-Oct-2026');
   applyLang();
 }
@@ -771,6 +771,10 @@ function measure(el,w){ const wrap=document.createElement('div'); wrap.className
   document.body.appendChild(wrap); wrap.appendChild(el); const h=el.getBoundingClientRect().height; return {wrap,h}; }
 function fitWidth(el,W,H){
   let w=W, m=measure(el,w);
+  if(m.h*W/w<=H){   // short report: use a narrower layout so it is scaled UP and fills more of the page
+    while(w>W*0.72){ const w2=Math.round(w*0.95); const m2=(m.wrap.remove(),measure(el,w2));
+      if(m2.h*W/w2>H){ m2.wrap.remove(); m=measure(el,w); break; } w=w2; m=m2; }
+  }
   while(m.h*W/w>H && w<W*2.6){ m.wrap.remove(); w=Math.round(w*1.06); m=measure(el,w); }   // wider layout = smaller when scaled to the page
   return {wrap:m.wrap,w};
 }
@@ -784,7 +788,35 @@ function prepPrint(){
   }
   return el;
 }
-function doPrint(){ prepPrint(); setTimeout(()=>window.print(),50); }
+async function doPrint(){
+  if(reportStyle()!=='graphics'){ prepPrint(); setTimeout(()=>window.print(),50); return; }
+  // Graphics: render exactly the one-page layout used for the PDF and print it as one full-width A4 image
+  const btn=$('printBtn'); btn.disabled=true;
+  try{
+    const ok=await loadPdfLib(); if(!ok||typeof html2pdf==='undefined'){ prepPrint(); setTimeout(()=>window.print(),50); return; }
+    const {target,wrap}=await onePageBox();
+    const canvas=await html2pdf().set({html2canvas:{scale:3,useCORS:true,backgroundColor:'#ffffff'}}).from(target).toCanvas().get('canvas');
+    wrap.remove();
+    $('printHost').innerHTML=`<img id="printImg" src="${canvas.toDataURL('image/png')}" style="display:block;width:100%;height:auto;max-height:264mm;object-fit:contain">`;
+    PRINT_IMG=true; await $('printImg').decode().catch(()=>{});
+    setTimeout(()=>{ window.print(); PRINT_IMG=false; },50);
+  } finally { btn.disabled=false; }
+}
+let PRINT_IMG=false;
+/* Build the report and fit it into one A4 content box (174 x 267 mm) via a wider layout + CSS scale */
+async function onePageBox(){
+  const el=buildReport();
+  await Promise.all([...el.querySelectorAll('img')].map(i=>i.decode().catch(()=>{})));
+  try{ await document.fonts.ready; }catch(e){}
+  const MT=14, MS=18, MB=16, cw=210-2*MS, ch=297-MT-MB;
+  const W=Math.floor(cw/25.4*96), H=Math.floor(W*2*ch/cw)/2;
+  const f=fitWidth(el,W,H), sc=W/f.w, h=el.getBoundingClientRect().height;
+  const wrap=f.wrap; wrap.style.width=W+'px';
+  const box=document.createElement('div'); box.style.cssText=`width:${W}px;height:${Math.ceil(h*sc)+2}px;overflow:hidden;background:#fff`;
+  wrap.appendChild(box); box.appendChild(el);
+  el.style.width=f.w+'px'; el.style.transformOrigin='0 0'; el.style.transform=`scale(${sc})`;
+  return {target:box,wrap,W,H};
+}
 async function exportPDF(){
   const name='Offer_Comparison_'+unitLabel()+'.pdf';
   const btn=$('pdfBtn'); btn.disabled=true; const old=btn.innerHTML; btn.textContent=T('preparing');
@@ -800,15 +832,7 @@ async function exportPDF(){
   const G=reportStyle()==='graphics';
   let wrap;
   let target=el;
-  if(G){ // one page: lay the report out wider, then scale it down (CSS transform) into an A4-sized box
-    await Promise.all([...el.querySelectorAll('img')].map(i=>i.decode().catch(()=>{})));
-    const f=fitWidth(el,W,H), sc=W/f.w, h=el.getBoundingClientRect().height;
-    wrap=f.wrap; wrap.style.width=W+'px';
-    const box=document.createElement('div'); box.style.cssText=`width:${W}px;height:${Math.ceil(h*sc)+2}px;overflow:hidden;background:#fff`;
-    wrap.appendChild(box); box.appendChild(el);
-    el.style.width=f.w+'px'; el.style.transformOrigin='0 0'; el.style.transform=`scale(${sc})`;
-    target=box;
-  }
+  if(G){ const o=await onePageBox(); target=o.target; wrap=o.wrap; }   // one page: wider layout scaled into an A4-sized box
   else wrap=paginate(el,W,H);
   try{
     await html2pdf().set({
@@ -929,7 +953,7 @@ function render(redraw){
   h+='</tbody>';
   $('memberTable').innerHTML=h;
   renderSavings(mMaint,mTax,months);
-  renderWords(calc,curRent,months);
+  renderWords(calc,curRent,months,(mMaint+mTax)*months);
 
   $('memberCard').classList.remove('hidden');
 }
@@ -949,7 +973,8 @@ function renderSavings(mMaint,mTax,months){
 }
 
 /* Benefit in words, in the selected language only. Shows the range across developers WITHOUT naming any developer. */
-function renderWords(calc,curRent,months){
+function renderWords(calc,curRent,months,sav){   // sav = maintenance + property tax saving, added to both ranges
+  sav=sav||0;
   const box=$('wordsBox');
   const tots=calc.map(c=>c.total).filter(v=>v>0);
   if(!tots.length){ box.classList.add('hidden'); return; }
@@ -959,10 +984,11 @@ function renderWords(calc,curRent,months){
     return Math.round(lo)===Math.round(hi) ? `<p>${esc(intro)}</p>`+line('',lo)
          : `<p>${esc(intro)}</p>`+line(T('words_from'),lo)+line(T('words_to'),hi); };
   let h=`<h3>${esc(T('words_title'))}</h3>`;
-  const cols=[range(T(new Set(tots.map(Math.round)).size>1?'words_intro':'words_single'),tots)];
-  if(curRent>0) cols.push(range(T('words_net_intro'),calc.filter(c=>c.total>0).map(c=>c.total-curRent*months)));
+  const multi=new Set(tots.map(Math.round)).size>1;
+  const cols=[range(T(sav?(multi?'words_intro_s':'words_single'):(multi?'words_intro':'words_single')),tots.map(v=>v+sav))];
+  if(curRent>0) cols.push(range(T(sav?'words_net_intro_s':'words_net_intro'),calc.filter(c=>c.total>0).map(c=>c.total-curRent*months+sav)));
   h+=`<div class="w-cols${cols.length>1?' two':''}">`+cols.map(c=>`<div class="w-col">${c}</div>`).join('')+'</div>';   // rented: total and net gain side by side
-  h+=`<p class="w-note">${esc(T('words_note'))}</p>`;
+  h+=`<p class="w-note">${sav?esc(T('words_incl',{amt:inr(sav)}))+' ':''}${esc(T('words_note'))}</p>`;
   box.innerHTML=h; box.setAttribute('lang',LANG); box.classList.remove('hidden');
 }
 
