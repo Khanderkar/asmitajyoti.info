@@ -124,10 +124,31 @@
   #report .rh-g h1{font-size:17px;margin:0 0 4px;line-height:1.2}
   #report .rh-g .sub{font-size:9.5px;opacity:.95}
   #report .rh-g .unitbadge{display:inline-block;margin-top:8px;background:rgba(255,255,255,.92);color:#0f4c81;border-radius:6px;padding:4px 10px;font-weight:700;font-size:12px;text-shadow:none}
-  #report .rh-g .meta{position:absolute;left:16px;bottom:10px;font-size:8.5px;opacity:.95}
+  #report .rh-g .meta{position:absolute;left:16px;bottom:10px;font-size:10px;font-weight:600;text-align:left;opacity:.95;text-shadow:0 1px 3px rgba(0,0,0,.45)}
   #report.g .sec{margin-top:0}
   #report.t{padding:0 6mm;box-sizing:border-box}   /* Text style: extra space at left and right (on top of the page margin) */
   #report.g h2{margin:10px 0 5px}
+  .hash{font-weight:800;color:#000;font-size:1.05em}
+  #report.g .rentnote{font-size:10.5px}
+  /* Graphics style: larger text (same layout); the one-page fit scales the whole page to A4 */
+  #report.g{font-size:12px}
+  #report.g h2{font-size:14px}
+  #report.g th,#report.g td{font-size:11.5px;padding:4px 6px}
+  #report.g td small{font-size:9.5px}
+  #report.g tr.highlight td{font-size:12px}
+  #report.g .sumtbl td{font-size:12px}
+  #report.g .note{font-size:10.5px;margin:5px 0}
+  #report.g .words{padding:8px 12px}
+  #report.g .words h3{font-size:13px}
+  #report.g .words p,#report.g .words .w-amt{font-size:12px}
+  #report.g .words .w-line b{font-size:11.5px}
+  #report.g .words .w-amt small{font-size:11px}
+  #report.g .words .w-line b small{font-size:9.5px}
+  #report.g .words .w-note{font-size:10px}
+  #report.g .rh-g img{height:150px;object-fit:cover;object-position:center 62%}
+  #report.g .rh-g h1{font-size:19px}
+  #report.g .rh-g .sub{font-size:10.5px}
+  #report.g .rh-g .unitbadge{font-size:13px}
   .btn-sec{padding:9px 16px;border:1px solid var(--brand);border-radius:8px;background:#fff;color:var(--brand);font:inherit;font-weight:600;cursor:pointer}
   .btn-sec:hover{background:var(--brand-soft)}
   .btn-sec:disabled{opacity:.6;cursor:wait}
@@ -263,6 +284,7 @@
     <h2><span data-i18n="your_comparison">Your offer comparison</span> <a class="ref" href="#ref-2">#2</a></h2>
     <div class="table-wrap"><table id="memberTable"></table></div>
     <p class="legend" id="legend" data-i18n="legend">Total cash benefit = rent + brokerage + relocation + corpus / hardship compensation (excludes refundable deposit and buyback).</p>
+    <p class="legend" id="rentNote" style="font-weight:800;color:#000"><span id="rentNoteTxt">Please note that all three developers have provided written confirmation that rent will be paid until possession of the new homes is handed over. The 48-month period is used solely for calculation purposes for all three developers and does not limit the rent payment period.</span></p>
     <div class="words savings hidden" id="savingsBox"></div>
     <div class="words hidden" id="wordsBox"></div>
   </section>
@@ -573,6 +595,7 @@ function flatLang(f){ const l=(f.language||'').trim(); return LANGS.some(x=>x[0]
 function applyLang(){
   document.documentElement.lang=LANG;
   document.body.style.setProperty('--lfont',FONTS[LANG]?'"'+FONTS[LANG]+'"':'"Noto Sans Devanagari"');
+  if($('rentNoteTxt')) $('rentNoteTxt').innerHTML=rentNoteHTML();
   document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent=T(el.dataset.i18n); if(LANG==='ur') el.dir='auto'; else el.removeAttribute('dir'); });
   $('updateBtn').textContent=T(shown?'update':'submit');
   const bo=$('buildingNum').querySelector('option[value=""]'); if(bo) bo.textContent=T('choose');
@@ -719,7 +742,7 @@ function buildReport(){
       <div class="txt"><h1>${esc(T('report_title'))}</h1>
         <div class="sub">Asmita Jyoti Co-operative Housing Society Ltd., Charkop Naka, Marve Road, Malad (W), Mumbai</div>
         <div class="unitbadge">${esc(T('unit'))} ${esc(L.unit||'')}</div></div>
-      <div class="meta">${esc(T('last_updated'))}: <b>${esc(setting('offers_last_updated',''))}</b> · ${esc(T('generated_on'))}: ${gen} · ${esc(T('indicative'))}</div></div>`
+      <div class="meta">${esc(T('indicative'))}</div></div>`
     :`<div class="rh"><h1>${esc(T('report_title'))}</h1>
       <div class="sub">Asmita Jyoti Co-operative Housing Society Ltd., Charkop Naka, Marve Road, Malad (W), Mumbai</div>
       <div class="meta"><span>${esc(T('last_updated'))}: <b>${esc(setting('offers_last_updated',''))}</b></span><span>${esc(T('generated_on'))}: ${gen}</span></div>
@@ -727,7 +750,7 @@ function buildReport(){
   host.innerHTML=`<div id="report" class="${G?'g':'t'}" lang="${LANG}">
     ${head}
     ${sec(esc(T('your_unit')),sum)}
-    ${sec(esc(T('offer_comparison'))+ref2, clone('memberTable')+`<p class="note">${esc(T('legend'))}</p>`+words)}
+    ${sec(esc(T('offer_comparison'))+ref2, clone('memberTable')+`<p class="note">${esc(T('legend'))}</p>`+words+`<p class="note rentnote" style="font-weight:800;color:#000">${rentNoteHTML()}</p>`)}
     ${sec(esc(T('sec_other'))+ref2, clone('generalTable'))}
     ${sec(esc(T('sec_commercial'))+ref2, clone('commercialTable'))}
     ${sec(esc(T('sec_society'))+ref2, clone('societyTable'))}
@@ -864,7 +887,7 @@ async function onePageBox(){
   const wrap=f.wrap; wrap.style.width=W+'px';
   const box=document.createElement('div'); box.style.cssText=`width:${W}px;height:${Math.ceil(h*sc)+2}px;overflow:hidden;background:#fff`;
   wrap.appendChild(box); box.appendChild(el);
-  el.style.width=f.w+'px'; el.style.transformOrigin='0 0'; el.style.transform=`scale(${sc})`;
+  el.style.width=f.w+'px'; el.style.maxWidth='none'; el.style.transformOrigin='0 0'; el.style.transform=`scale(${sc})`;
   return {target:box,wrap,W,H};
 }
 async function exportPDF(){
@@ -912,6 +935,9 @@ function toggleRent(){
 function markDirty(){ $('updateBtn').classList.add('dirty'); $('updateHint').classList.remove('hidden'); }
 function hideResults(){['flatInfo','areaNotice','memberCard','wordsBox','savingsBox','generalCard','commercialCard','societyCard','complianceCard','profileCard','actions','finalDisclaimer','refCard'].forEach(i=>$(i).classList.add('hidden'));}
 
+/* '# note' under the comparison: first sentence on line 1, the rest (48-month period ...) on line 2 */
+function rentNoteHTML(){ const t=T('rent_note'), m=t.match(/^(.+?[.।۔])\s+(.+)$/s);
+  return '# '+(m?esc(m[1])+'<br>'+esc(m[2]):esc(t)); }
 function rowHTML(label,sub,vals,fmt,bestMode,cls){
   const nums=vals.map(v=>typeof v==='number'?v:null).filter(v=>v!=null);
   const best=bestMode&&nums.length>1?(bestMode==='max'?Math.max(...nums):Math.min(...nums)):null;
@@ -956,7 +982,7 @@ function render(redraw){
     $('areaNotice').classList.remove('hidden'); $('wordsBox').classList.add('hidden'); $('savingsBox').classList.add('hidden');
     renderRates(devs,type); schedulePrintImage(); return;
   }
-  $('areaNotice').classList.add('hidden'); $('legend').classList.remove('hidden');
+  $('areaNotice').classList.add('hidden'); $('legend').classList.remove('hidden'); $('rentNote').classList.remove('hidden');
 
   // member does not pay society maintenance / property tax while the building is being redeveloped (same for every developer)
   const mMaint=num(flat.monthly_maintenance)||0, mTax=num(flat.monthly_property_tax)||0;
@@ -991,7 +1017,7 @@ function render(redraw){
       return yr?`<td>${inr(yr.amount)}<small>₹${yr.rate.toFixed(2)}/${e('sqft')} · ${inr(yr.rate*area)} ${e('per_month')}</small></td>`:'<td>—</td>';}).join('')+'</tr>';
   }
   if(curRent>0) h+=rowHTML(e('adv_month'),ev('vs_rent',{amt:inr(curRent)}),calc.map(c=>c.rent?c.rent.first-curRent:null),signed,null,'adv');
-  h+=rowHTML(ev('rent_total',{n:months}),e('incl_esc'),calc.map(c=>c.rent?c.rent.total:null),inr,'max');
+  h+=rowHTML(ev('rent_total',{n:months})+' <span class="hash">#</span>',e('incl_esc'),calc.map(c=>c.rent?c.rent.total:null),inr,'max');
   if(curRent>0) h+=rowHTML(ev('rent_adv',{n:months}),ev('vs_rent_total',{amt:inr(curRent),n:months,tot:inr(curRent*months)}),calc.map(c=>c.rent?c.rent.total-curRent*months:null),signed,null,'adv');
   h+=rowHTML(e('brokerage'),null,calc.map(c=>c.brokerage),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'brokerage'))}</small>`,'max');
   h+=rowHTML(e('relocation'),null,calc.map(c=>c.relocation),inr,'max');
@@ -1065,7 +1091,7 @@ function renderRates(devs,type){
   h+=rowHTML(e('corpus'),e('per_sqft'),devs.map(d=>areaVal(d.dev_id,type,'hardship')),inr);
   h+=rowHTML(e('relocation'),null,devs.map(d=>amountFor(d.dev_id,type,'relocation',0,1)),inr);
   h+='</tbody>';
-  $('memberTable').innerHTML=h; $('legend').classList.add('hidden');
+  $('memberTable').innerHTML=h; $('legend').classList.add('hidden'); $('rentNote').classList.add('hidden');
   $('memberCard').classList.remove('hidden');
 }
 
