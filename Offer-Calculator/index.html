@@ -823,7 +823,13 @@ async function preparePrintImage(){
     try{
       const ok=await loadPdfLib(); if(!ok||typeof html2pdf==='undefined') return null;
       const {target,wrap}=await onePageBox();
-      const canvas=await html2pdf().set({html2canvas:{scale:3,useCORS:true,backgroundColor:'#ffffff'}}).from(target).toCanvas().get('canvas');
+      const bw=target.offsetWidth, bh=target.offsetHeight;
+      // same A4 page set-up as the PDF, and capture exactly the one-page box (no blank area to the right / below)
+      const full=await html2pdf().set({margin:[PM,PM,PM,PM],jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+        html2canvas:{scale:3,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0}}).from(target).toCanvas().get('canvas');
+      // keep only the one-page box (top-left), dropping any blank area to the right / below
+      const k=3, canvas=document.createElement('canvas'); canvas.width=Math.min(full.width,Math.round(bw*k)); canvas.height=Math.min(full.height,Math.round(bh*k));
+      canvas.getContext('2d').drawImage(full,0,0,canvas.width,canvas.height,0,0,canvas.width,canvas.height);
       wrap.remove();
       PRINT_CACHE=canvas.toDataURL('image/png'); PRINT_KEY=key; return PRINT_CACHE;
     }catch(e){ return null; } finally{ PRINT_BUSY=null; }
