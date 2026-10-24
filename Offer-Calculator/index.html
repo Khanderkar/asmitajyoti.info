@@ -11,7 +11,26 @@
     --brand:#0f4c81; --brand-soft:#e8f0f8; --best:#e7f6ec; --best-ink:#1a7f3c; --warn:#fff6e5; --warn-ink:#9a6200;
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,"Noto Sans Devanagari",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45}
+  body{margin:0;font-family:Inter,var(--lfont,"Noto Sans Devanagari"),"Noto Sans Devanagari",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45}
+  .lang-pick{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:.85rem}
+  .lang-pick select{width:auto;padding:5px 8px;font-size:.88rem;border-radius:6px;border:1px solid rgba(255,255,255,.45);background:#fff;color:var(--ink)}
+  .lang-note{background:var(--brand-soft);color:var(--brand);border-radius:8px;padding:8px 12px;margin-top:12px;font-size:.85rem}
+  .words{margin-top:16px;border:1px solid var(--line);border-left:4px solid var(--brand);border-radius:8px;padding:12px 14px;background:#fbfcfe}
+  .words h3{margin:0 0 6px;font-size:.98rem;color:var(--brand)}
+  .words p{margin:6px 0;font-size:.9rem}
+  .words .w-line{display:grid;grid-template-columns:minmax(90px,max-content) 1fr;gap:4px 12px;margin:8px 0 2px;align-items:baseline}
+  .words .w-line b{color:var(--muted);font-weight:600;font-size:.85rem}
+  .words .w-amt{font-weight:600}
+  .words .w-amt small{display:block;color:var(--muted);font-weight:400;font-size:.8rem}
+  .words .w-note{font-size:.78rem;color:var(--muted);margin-top:8px}
+  [lang=ur] .tr-text,.words[lang=ur]{unicode-bidi:plaintext}
+  #report .words{border:1px solid #d0d5dd;border-left:4px solid #0f4c81;padding:8px 10px;margin-top:8px;background:#fff;break-inside:avoid;page-break-inside:avoid}
+  #report .words h3{margin:0 0 4px;font-size:11px}
+  #report .words p,#report .words .w-amt{font-size:10px}
+  #report .words .w-note{font-size:8.5px}
+  #report .words .w-line{grid-template-columns:minmax(70px,max-content) 1fr;margin:4px 0 0}
+  #report .words .w-line b{font-size:9.5px}
+  #report .words .w-amt small{font-size:9.5px}
   header{background:var(--brand);color:#fff;padding:22px 16px}
   header h1{margin:0;font-size:1.35rem;font-weight:700}
   header p{margin:4px 0 0;opacity:.85;font-size:.9rem}
@@ -139,11 +158,13 @@
 <body>
 <header>
   <div class="head-row"><div>
-  <h1>Redevelopment Offer Calculator | <span style="font-weight:500">पुनर्विकास ऑफर कॅल्क्युलेटर</span></h1>
-  <p>Asmita Jyoti Co-operative Housing Society Ltd. — compare developer offers for your flat</p>
+  <h1 data-i18n="title">Redevelopment Offer Calculator</h1>
+  <p data-i18n="subtitle">Asmita Jyoti Co-operative Housing Society Ltd. — compare developer offers for your flat</p>
+  <div class="lang-pick"><label for="langSel">🌐 <span data-i18n="language">Language</span></label>
+    <select id="langSel" aria-label="Language"></select></div>
   </div>
-  <div class="updated">Offers last updated on | <span class="marathi-label" style="color:inherit;opacity:.85">शेवटचे अद्यतन</span>: <b id="lastUpdated">09-Oct-2026</b>
-    <div class="disclaimer">Figures are indicative; final terms as per Development Agreement.</div></div>
+  <div class="updated"><span data-i18n="last_updated">Offers last updated on</span>: <b id="lastUpdated">09-Oct-2026</b>
+    <div class="disclaimer" data-i18n="indicative">Figures are indicative; final terms as per Development Agreement.</div></div>
   </div>
 </header>
 
@@ -151,38 +172,39 @@
   <div class="card notice" id="error"></div>
 
   <section class="card">
-    <h2>Select your flat | <span class="marathi-label">आपली सदनिका निवडा</span></h2>
+    <h2 data-i18n="select_flat">Select your flat</h2>
     <div class="selectors">
       <div class="input-field-group">
-        <label for="buildingNum">Building Number | <span class="marathi-label">इमारत क्रमांक</span> <span style="color:#ff3333;">*</span></label>
+        <label for="buildingNum"><span data-i18n="building">Building Number</span> <span style="color:#ff3333;">*</span></label>
         <select id="buildingNum" required><option value="" disabled selected>Loading…</option></select>
       </div>
       <div class="input-field-group">
-        <label for="flatNum">Flat Number | <span class="marathi-label">सदनिका क्रमांक</span> <span style="color:#ff3333;">*</span></label>
+        <label for="flatNum"><span data-i18n="flat">Flat Number</span> <span style="color:#ff3333;">*</span></label>
         <select id="flatNum" required disabled><option value="" disabled selected>Choose building first</option></select>
       </div>
       <div class="input-field-group">
-        <label for="rentMonths">Rent period (months) | <span class="marathi-label">भाडे कालावधी (महिने)</span></label>
+        <label for="rentMonths" data-i18n="rent_period">Rent period (months)</label>
         <input type="number" id="rentMonths" min="1" max="120" step="1">
       </div>
     </div>
     <div class="selectors rent-q">
       <div class="input-field-group check-group">
         <label class="check"><input type="checkbox" id="isRented">
-          <span>I have given my flat / shop on rent<br><span class="marathi-label">मी माझी सदनिका / दुकान भाड्याने दिली आहे</span></span></label>
+          <span data-i18n="rented">I have given my flat / shop on rent</span></label>
       </div>
       <div class="input-field-group hidden" id="curRentGroup">
-        <label for="curRent">Current monthly rent you receive (₹) | <span class="marathi-label">सध्याचे मासिक भाडे (₹)</span></label>
+        <label for="curRent" data-i18n="cur_rent">Current monthly rent you receive (₹)</label>
         <input type="number" id="curRent" min="0" step="500" placeholder="e.g. 30000">
       </div>
     </div>
     <div class="selectors btn-row">
       <div></div><div></div>
       <div class="input-field-group">
-        <button type="button" class="btn" id="updateBtn" disabled>Submit | सबमिट करा</button>
-        <div class="hint hidden" id="updateHint">Selection changed – click Update to refresh results.</div>
+        <button type="button" class="btn" id="updateBtn" disabled>Submit</button>
+        <div class="hint hidden" id="updateHint" data-i18n="changed">Selection changed – click Update to refresh results.</div>
       </div>
     </div>
+    <div class="lang-note hidden" id="langNote" data-i18n="lang_auto"></div>
     <div class="flat-info hidden" id="flatInfo"></div>
     <div class="notice hidden" id="areaNotice"></div>
   </section>
@@ -190,52 +212,52 @@
   <div class="actions hidden" id="actions">
     <span class="print-stamp" id="printStamp"></span>
     <div class="action-btns">
-      <button type="button" class="btn-sec" id="printBtn">🖨 Print | प्रिंट</button>
-      <button type="button" class="btn-sec" id="pdfBtn">⬇ Export to PDF | PDF डाउनलोड</button>
+      <button type="button" class="btn-sec" id="printBtn">🖨 <span data-i18n="print">Print</span></button>
+      <button type="button" class="btn-sec" id="pdfBtn">⬇ <span data-i18n="pdf">Export to PDF</span></button>
     </div>
   </div>
 
   <section class="card hidden" id="memberCard">
-    <h2>Your offer comparison | <span class="marathi-label">आपल्या सदनिकेसाठी ऑफर तुलना</span> <a class="ref" href="#ref-2">#2</a></h2>
+    <h2><span data-i18n="your_comparison">Your offer comparison</span> <a class="ref" href="#ref-2">#2</a></h2>
     <div class="table-wrap"><table id="memberTable"></table></div>
-    <p class="legend" id="legend">Total cash benefit = rent + brokerage + relocation + corpus / hardship compensation (excludes refundable deposit and buyback).</p>
+    <p class="legend" id="legend" data-i18n="legend">Total cash benefit = rent + brokerage + relocation + corpus / hardship compensation (excludes refundable deposit and buyback).</p>
+    <div class="words hidden" id="wordsBox"></div>
   </section>
 
   <section class="card hidden" id="generalCard">
-    <h2>Other per-member offers | <span class="marathi-label">इतर सदस्य लाभ</span> <a class="ref" href="#ref-2">#2</a></h2>
+    <h2><span data-i18n="sec_other">Other per-member offers</span> <a class="ref" href="#ref-2">#2</a></h2>
     <div class="table-wrap"><table id="generalTable"></table></div>
   </section>
 
   <section class="card hidden" id="commercialCard">
-    <h2>Shops &amp; first-floor units | <span class="marathi-label">दुकाने व व्यावसायिक युनिट्स</span> <a class="ref" href="#ref-2">#2</a></h2>
+    <h2><span data-i18n="sec_commercial">Shops &amp; first-floor units</span> <a class="ref" href="#ref-2">#2</a></h2>
     <div class="table-wrap"><table id="commercialTable"></table></div>
   </section>
 
   <section class="card hidden" id="societyCard">
-    <h2>Society-level offers | <span class="marathi-label">संस्था स्तरावरील ऑफर</span> <a class="ref" href="#ref-2">#2</a></h2>
+    <h2><span data-i18n="sec_society">Society-level offers</span> <a class="ref" href="#ref-2">#2</a></h2>
     <div class="table-wrap"><table id="societyTable"></table></div>
   </section>
 
   <section class="card hidden" id="complianceCard">
-    <h2>Tender compliance &amp; clarifications | <span class="marathi-label">निविदा अटींचे पालन व स्पष्टीकरण</span> <a class="ref" href="#ref-12">#12</a></h2>
+    <h2><span data-i18n="sec_compliance">Tender compliance &amp; clarifications</span> <a class="ref" href="#ref-12">#12</a></h2>
     <p class="legend" style="margin-top:0">Each developer's final position (letters dated 15-Oct-2026) on points where its offer differs from, or did not address, the tender conditions. The tender requirement is shown under each topic.</p>
     <div class="table-wrap"><table id="complianceTable"></table></div>
   </section>
 
   <section class="card hidden" id="profileCard">
-    <h2>About the developers | <span class="marathi-label">विकासकांची माहिती</span></h2>
+    <h2 data-i18n="sec_profile">About the developers</h2>
     <div id="profileBody"></div>
     <p class="legend">Financial figures <a class="ref" href="#ref-3">#3</a> are as submitted by each developer in Proforma 'D' (tender), converted to ₹ crore. Profile details are compiled from public sources (rating agencies, company filings and press releases) as of Oct-2026 and should be verified independently.</p>
   </section>
 
   <section class="card disclaimer-card hidden" id="finalDisclaimer">
-    <h2>Disclaimer | <span class="marathi-label">अस्वीकरण</span></h2>
-    <p>The figures shown are indicative and have been calculated from the offers submitted by the developers and the existing carpet area records of the Society. Actual entitlements, areas, amounts and all other terms will be <b>as per the final Development Agreement (DA)</b> executed between the Society and the selected developer.</p>
-    <p class="marathi-label">येथे दर्शविलेले आकडे केवळ अंदाजे आहेत. प्रत्यक्ष क्षेत्रफळ, रक्कम व इतर सर्व अटी संस्था व निवडलेल्या विकासकामध्ये होणाऱ्या अंतिम विकास करारानुसार (Development Agreement) राहतील.</p>
+    <h2 data-i18n="sec_disclaimer">Disclaimer</h2>
+    <p data-i18n="disc_text">The figures shown are indicative and have been calculated from the offers submitted by the developers and the existing carpet area records of the Society. Actual entitlements, areas, amounts and all other terms will be as per the final Development Agreement (DA) executed between the Society and the selected developer.</p>
   </section>
 
   <section class="card hidden" id="refCard">
-    <h2>References / Sources | <span class="marathi-label">संदर्भ</span></h2>
+    <h2 data-i18n="sec_refs">References / Sources</h2>
     <ol class="ref-list" id="refList"></ol>
   </section>
 
@@ -244,11 +266,222 @@
 <div id="printHost"></div>
 
 <script>
+/* Indian-system amount in words (crore / lakh / thousand / hundred) for 12 languages.
+   numWords(amount, lang) -> e.g. "Rupees Thirty-Nine Lakh ... Only".  Rounded to the nearest rupee. */
+(function (g) {
+  'use strict';
+  const S = s => s.trim().split(/\s+/);
+
+  /* ---------- languages with a unique word for every number 1-99 ---------- */
+  const T99 = {
+    hi: S(`शून्य एक दो तीन चार पाँच छह सात आठ नौ दस ग्यारह बारह तेरह चौदह पंद्रह सोलह सत्रह अठारह उन्नीस बीस इक्कीस बाईस तेईस चौबीस पच्चीस छब्बीस सत्ताईस अट्ठाईस उनतीस
+      तीस इकतीस बत्तीस तैंतीस चौंतीस पैंतीस छत्तीस सैंतीस अड़तीस उनतालीस चालीस इकतालीस बयालीस तैंतालीस चवालीस पैंतालीस छियालीस सैंतालीस अड़तालीस उनचास
+      पचास इक्यावन बावन तिरपन चौवन पचपन छप्पन सत्तावन अट्ठावन उनसठ साठ इकसठ बासठ तिरसठ चौंसठ पैंसठ छियासठ सड़सठ अड़सठ उनहत्तर
+      सत्तर इकहत्तर बहत्तर तिहत्तर चौहत्तर पचहत्तर छिहत्तर सतहत्तर अठहत्तर उन्यासी अस्सी इक्यासी बयासी तिरासी चौरासी पचासी छियासी सत्तासी अट्ठासी नवासी
+      नब्बे इक्यानवे बानवे तिरानवे चौरानवे पंचानवे छियानवे सत्तानवे अट्ठानवे निन्यानवे`),
+    mr: S(`शून्य एक दोन तीन चार पाच सहा सात आठ नऊ दहा अकरा बारा तेरा चौदा पंधरा सोळा सतरा अठरा एकोणीस
+      वीस एकवीस बावीस तेवीस चोवीस पंचवीस सव्वीस सत्तावीस अठ्ठावीस एकोणतीस तीस एकतीस बत्तीस तेहेतीस चौतीस पस्तीस छत्तीस सदतीस अडतीस एकोणचाळीस
+      चाळीस एक्केचाळीस बेचाळीस त्रेचाळीस चव्वेचाळीस पंचेचाळीस सेहेचाळीस सत्तेचाळीस अठ्ठेचाळीस एकोणपन्नास
+      पन्नास एक्कावन्न बावन्न त्रेपन्न चोपन्न पंचावन्न छप्पन्न सत्तावन्न अठ्ठावन्न एकोणसाठ साठ एकसष्ट बासष्ट त्रेसष्ट चौसष्ट पासष्ट सहासष्ट सदुसष्ट अडुसष्ट एकोणसत्तर
+      सत्तर एकाहत्तर बाहत्तर त्र्याहत्तर चौऱ्याहत्तर पंचाहत्तर शहात्तर सत्याहत्तर अठ्ठ्याहत्तर एकोणऐंशी
+      ऐंशी एक्याऐंशी ब्याऐंशी त्र्याऐंशी चौऱ्याऐंशी पंच्याऐंशी शहाऐंशी सत्त्याऐंशी अठ्ठ्याऐंशी एकोणनव्वद
+      नव्वद एक्याण्णव ब्याण्णव त्र्याण्णव चौऱ्याण्णव पंचाण्णव शहाण्णव सत्त्याण्णव अठ्ठ्याण्णव नव्याण्णव`),
+    gu: S(`શૂન્ય એક બે ત્રણ ચાર પાંચ છ સાત આઠ નવ દસ અગિયાર બાર તેર ચૌદ પંદર સોળ સત્તર અઢાર ઓગણીસ
+      વીસ એકવીસ બાવીસ ત્રેવીસ ચોવીસ પચ્ચીસ છવ્વીસ સત્તાવીસ અઠ્ઠાવીસ ઓગણત્રીસ ત્રીસ એકત્રીસ બત્રીસ તેત્રીસ ચોત્રીસ પાંત્રીસ છત્રીસ સાડત્રીસ આડત્રીસ ઓગણચાલીસ
+      ચાલીસ એકતાલીસ બેતાલીસ ત્રેતાલીસ ચુંમાલીસ પિસ્તાલીસ છેતાલીસ સુડતાલીસ અડતાલીસ ઓગણપચાસ
+      પચાસ એકાવન બાવન ત્રેપન ચોપન પંચાવન છપ્પન સત્તાવન અઠ્ઠાવન ઓગણસાઠ સાઠ એકસઠ બાસઠ ત્રેસઠ ચોસઠ પાંસઠ છાસઠ સડસઠ અડસઠ ઓગણસિત્તેર
+      સિત્તેર એકોતેર બોતેર તોતેર ચુમોતેર પંચોતેર છોતેર સિત્યોતેર ઇઠ્યોતેર ઓગણએંસી
+      એંસી એક્યાસી બ્યાસી ત્યાસી ચોર્યાસી પંચાસી છ્યાસી સિત્યાસી ઇઠ્યાસી નેવ્યાસી
+      નેવું એકાણું બાણું ત્રાણું ચોરાણું પંચાણું છન્નું સત્તાણું અઠ્ઠાણું નવ્વાણું`),
+    bn: S(`শূন্য এক দুই তিন চার পাঁচ ছয় সাত আট নয় দশ এগারো বারো তেরো চোদ্দ পনেরো ষোলো সতেরো আঠারো উনিশ
+      কুড়ি একুশ বাইশ তেইশ চব্বিশ পঁচিশ ছাব্বিশ সাতাশ আঠাশ ঊনত্রিশ ত্রিশ একত্রিশ বত্রিশ তেত্রিশ চৌত্রিশ পঁয়ত্রিশ ছত্রিশ সাঁইত্রিশ আটত্রিশ ঊনচল্লিশ
+      চল্লিশ একচল্লিশ বিয়াল্লিশ তেতাল্লিশ চুয়াল্লিশ পঁয়তাল্লিশ ছেচল্লিশ সাতচল্লিশ আটচল্লিশ ঊনপঞ্চাশ
+      পঞ্চাশ একান্ন বাহান্ন তিপ্পান্ন চুয়ান্ন পঞ্চান্ন ছাপ্পান্ন সাতান্ন আটান্ন ঊনষাট ষাট একষট্টি বাষট্টি তেষট্টি চৌষট্টি পঁয়ষট্টি ছেষট্টি সাতষট্টি আটষট্টি ঊনসত্তর
+      সত্তর একাত্তর বাহাত্তর তিয়াত্তর চুয়াত্তর পঁচাত্তর ছিয়াত্তর সাতাত্তর আটাত্তর ঊনআশি
+      আশি একাশি বিরাশি তিরাশি চুরাশি পঁচাশি ছিয়াশি সাতাশি আটাশি ঊননব্বই
+      নব্বই একানব্বই বিরানব্বই তিরানব্বই চুরানব্বই পঁচানব্বই ছিয়ানব্বই সাতানব্বই আটানব্বই নিরানব্বই`),
+    pa: S(`ਸਿਫ਼ਰ ਇੱਕ ਦੋ ਤਿੰਨ ਚਾਰ ਪੰਜ ਛੇ ਸੱਤ ਅੱਠ ਨੌਂ ਦਸ ਗਿਆਰਾਂ ਬਾਰਾਂ ਤੇਰਾਂ ਚੌਦਾਂ ਪੰਦਰਾਂ ਸੋਲ਼ਾਂ ਸਤਾਰਾਂ ਅਠਾਰਾਂ ਉੱਨੀ
+      ਵੀਹ ਇੱਕੀ ਬਾਈ ਤੇਈ ਚੌਵੀ ਪੱਚੀ ਛੱਬੀ ਸਤਾਈ ਅਠਾਈ ਉਨੱਤੀ ਤੀਹ ਇਕੱਤੀ ਬੱਤੀ ਤੇਤੀ ਚੌਂਤੀ ਪੈਂਤੀ ਛੱਤੀ ਸੈਂਤੀ ਅਠੱਤੀ ਉਨਤਾਲੀ
+      ਚਾਲੀ ਇਕਤਾਲੀ ਬਤਾਲੀ ਤਰਤਾਲੀ ਚੁਤਾਲੀ ਪੰਜਤਾਲੀ ਛਿਆਲੀ ਸੰਤਾਲੀ ਅਠਤਾਲੀ ਉਨੰਜਾ
+      ਪੰਜਾਹ ਇਕਵੰਜਾ ਬਵੰਜਾ ਤਰਵੰਜਾ ਚਰਵੰਜਾ ਪਚਵੰਜਾ ਛਪੰਜਾ ਸਤਵੰਜਾ ਅਠਵੰਜਾ ਉਨਾਹਠ ਸੱਠ ਇਕਾਹਠ ਬਾਹਠ ਤਰੇਹਠ ਚੌਂਹਠ ਪੈਂਹਠ ਛਿਆਹਠ ਸਤਾਹਠ ਅਠਾਹਠ ਉਨੱਤਰ
+      ਸੱਤਰ ਇਕਹੱਤਰ ਬਹੱਤਰ ਤਹੱਤਰ ਚੌਹੱਤਰ ਪਚੱਤਰ ਛਿਹੱਤਰ ਸਤੱਤਰ ਅਠੱਤਰ ਉਨਾਸੀ
+      ਅੱਸੀ ਇਕਾਸੀ ਬਿਆਸੀ ਤਰਾਸੀ ਚੌਰਾਸੀ ਪਚਾਸੀ ਛਿਆਸੀ ਸਤਾਸੀ ਅਠਾਸੀ ਉਨਾਨਵੇਂ
+      ਨੱਬੇ ਇਕਾਨਵੇਂ ਬਿਆਨਵੇਂ ਤਰਾਨਵੇਂ ਚੁਰਾਨਵੇਂ ਪਚਾਨਵੇਂ ਛਿਆਨਵੇਂ ਸਤਾਨਵੇਂ ਅਠਾਨਵੇਂ ਨੜਿੰਨਵੇਂ`),
+    ur: S(`صفر ایک دو تین چار پانچ چھ سات آٹھ نو دس گیارہ بارہ تیرہ چودہ پندرہ سولہ سترہ اٹھارہ انیس
+      بیس اکیس بائیس تئیس چوبیس پچیس چھبیس ستائیس اٹھائیس انتیس تیس اکتیس بتیس تینتیس چونتیس پینتیس چھتیس سینتیس اڑتیس انتالیس
+      چالیس اکتالیس بیالیس تینتالیس چوالیس پینتالیس چھیالیس سینتالیس اڑتالیس انچاس
+      پچاس اکاون باون ترپن چون پچپن چھپن ستاون اٹھاون انسٹھ ساٹھ اکسٹھ باسٹھ تریسٹھ چونسٹھ پینسٹھ چھیاسٹھ سڑسٹھ اڑسٹھ انہتر
+      ستر اکہتر بہتر تہتر چوہتر پچھتر چھہتر ستتر اٹھتر اناسی
+      اسی اکیاسی بیاسی تراسی چوراسی پچاسی چھیاسی ستاسی اٹھاسی نواسی
+      نوے اکانوے بانوے ترانوے چورانوے پچانوے چھیانوے ستانوے اٹھانوے ننانوے`),
+    or: S(`ଶୂନ୍ ଏକ ଦୁଇ ତିନି ଚାରି ପାଞ୍ଚ ଛଅ ସାତ ଆଠ ନଅ ଦଶ ଏଗାର ବାର ତେର ଚଉଦ ପନ୍ଦର ଷୋହଳ ସତର ଅଠର ଉଣେଇଶି
+      କୋଡ଼ିଏ ଏକୋଇଶି ବାଇଶି ତେଇଶି ଚବିଶି ପଚିଶି ଛବିଶି ସତାଇଶି ଅଠାଇଶି ଅଣତିରିଶି ତିରିଶି ଏକତିରିଶି ବତିଶି ତେତିଶି ଚଉତିରିଶି ପଞ୍ଚତିରିଶି ଛତିଶି ସଇଁତିରିଶି ଅଠତିରିଶି ଅଣଚାଳିଶି
+      ଚାଳିଶି ଏକଚାଳିଶି ବୟାଳିଶି ତେୟାଳିଶି ଚଉରାଳିଶି ପଞ୍ଚଚାଳିଶି ଛୟାଳିଶି ସତଚାଳିଶି ଅଠଚାଳିଶି ଅଣଚାଶ
+      ପଚାଶ ଏକାବନ ବାଉନ ତେପନ ଚଉବନ ପଞ୍ଚାବନ ଛପନ ସତାବନ ଅଠାବନ ଅଣଷଠି ଷାଠିଏ ଏକଷଠି ବାଷଠି ତେଷଠି ଚଉଷଠି ପଞ୍ଚଷଠି ଛଅଷଠି ସତଷଠି ଅଠଷଠି ଅଣସ୍ତରି
+      ସତୁରି ଏକସ୍ତରି ବାସ୍ତରି ତେସ୍ତରି ଚଉସ୍ତରି ପଞ୍ଚସ୍ତରି ଛଅସ୍ତରି ସତସ୍ତରି ଅଠସ୍ତରି ଅଣାଅଶୀ
+      ଅଶୀ ଏକାଅଶୀ ବୟାଅଶୀ ତେୟାଅଶୀ ଚଉରାଅଶୀ ପଞ୍ଚାଅଶୀ ଛୟାଅଶୀ ସତାଅଶୀ ଅଠାଅଶୀ ଅଣାନବେ
+      ନବେ ଏକାନବେ ବୟାନବେ ତେୟାନବେ ଚଉରାନବେ ପଞ୍ଚାନବେ ଛୟାନବେ ସତାନବେ ଅଠାନବେ ଅନେଶତ`)
+  };
+  // hundreds word, thousand, lakh, crore, prefix, suffix
+  const NORTH = {
+    hi: { h: u => T99.hi[u] + ' सौ', th: 'हज़ार', lk: 'लाख', cr: 'करोड़', pre: 'रुपये ', suf: ' मात्र' },
+    mr: { h: (u, rest) => (u === 1 && !rest) ? 'शंभर' : ['', 'एकशे', 'दोनशे', 'तीनशे', 'चारशे', 'पाचशे', 'सहाशे', 'सातशे', 'आठशे', 'नऊशे'][u],
+          th: 'हजार', lk: 'लाख', cr: 'कोटी', pre: 'रुपये ', suf: ' फक्त' },
+    gu: { h: u => T99.gu[u] + ' સો', th: 'હજાર', lk: 'લાખ', cr: 'કરોડ', pre: 'રૂપિયા ', suf: ' પૂરા' },
+    bn: { h: u => T99.bn[u] + ' শত', th: 'হাজার', lk: 'লক্ষ', cr: 'কোটি', pre: '', suf: ' টাকা মাত্র' },
+    pa: { h: u => T99.pa[u] + ' ਸੌ', th: 'ਹਜ਼ਾਰ', lk: 'ਲੱਖ', cr: 'ਕਰੋੜ', pre: 'ਰੁਪਏ ', suf: ' ਮਾਤਰ' },
+    ur: { h: u => T99.ur[u] + ' سو', th: 'ہزار', lk: 'لاکھ', cr: 'کروڑ', pre: 'روپے ', suf: ' صرف' },
+    or: { h: u => T99.or[u] + ' ଶହ', th: 'ହଜାର', lk: 'ଲକ୍ଷ', cr: 'କୋଟି', pre: '', suf: ' ଟଙ୍କା ମାତ୍ର' }
+  };
+  function northCore(n, L) {
+    const C = NORTH[L], W = T99[L], p = [];
+    const cr = Math.floor(n / 1e7); n %= 1e7;
+    const lk = Math.floor(n / 1e5); n %= 1e5;
+    const th = Math.floor(n / 1e3); n %= 1e3;
+    const h = Math.floor(n / 100), r = n % 100;
+    if (cr) p.push(northCore(cr, L) + ' ' + C.cr);
+    if (lk) p.push(W[lk] + ' ' + C.lk);
+    if (th) p.push(W[th] + ' ' + C.th);
+    if (h) p.push(C.h(h, r));
+    if (r) p.push(W[r]);
+    return p.join(' ');
+  }
+
+  /* ---------- English (Indian system) ---------- */
+  const ONES = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  const TENS = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  const en2 = n => n < 20 ? ONES[n] : TENS[Math.floor(n / 10)] + (n % 10 ? '-' + ONES[n % 10] : '');
+  function enCore(n) {
+    const p = [];
+    const cr = Math.floor(n / 1e7); n %= 1e7;
+    const lk = Math.floor(n / 1e5); n %= 1e5;
+    const th = Math.floor(n / 1e3); n %= 1e3;
+    const h = Math.floor(n / 100), r = n % 100;
+    if (cr) p.push(enCore(cr) + ' Crore');
+    if (lk) p.push(en2(lk) + ' Lakh');
+    if (th) p.push(en2(th) + ' Thousand');
+    if (h) p.push(ONES[h] + ' Hundred');
+    if (r) p.push(en2(r));
+    return p.join(' ');
+  }
+
+  /* ---------- Dravidian languages (tens + units are composed) ---------- */
+  const DR = {
+    ta: {
+      u: ['', 'ஒன்று', 'இரண்டு', 'மூன்று', 'நான்கு', 'ஐந்து', 'ஆறு', 'ஏழு', 'எட்டு', 'ஒன்பது'],
+      teen: ['பத்து', 'பதினொன்று', 'பன்னிரண்டு', 'பதின்மூன்று', 'பதினான்கு', 'பதினைந்து', 'பதினாறு', 'பதினேழு', 'பதினெட்டு', 'பத்தொன்பது'],
+      tens: ['', '', 'இருபது', 'முப்பது', 'நாற்பது', 'ஐம்பது', 'அறுபது', 'எழுபது', 'எண்பது', 'தொண்ணூறு'],
+      tensC: ['', '', 'இருபத்து', 'முப்பத்து', 'நாற்பத்து', 'ஐம்பத்து', 'அறுபத்து', 'எழுபத்து', 'எண்பத்து', 'தொண்ணூற்று'],
+      hund: ['', 'நூறு', 'இருநூறு', 'முன்னூறு', 'நானூறு', 'ஐநூறு', 'அறுநூறு', 'எழுநூறு', 'எண்ணூறு', 'தொள்ளாயிரம்'],
+      hundC: ['', 'நூற்று', 'இருநூற்று', 'முன்னூற்று', 'நானூற்று', 'ஐநூற்று', 'அறுநூற்று', 'எழுநூற்று', 'எண்ணூற்று', 'தொள்ளாயிரத்து'],
+      one: 'ஒரு',
+      th: ['ஆயிரம்', 'ஆயிரத்து'], lk: ['லட்சம்', 'லட்சத்து'], cr: ['கோடி', 'கோடியே'],
+      oneThousand: ['ஆயிரம்', 'ஆயிரத்து'],
+      pre: 'ரூபாய் ', suf: ' மட்டும்'
+    },
+    te: {
+      u: ['', 'ఒకటి', 'రెండు', 'మూడు', 'నాలుగు', 'ఐదు', 'ఆరు', 'ఏడు', 'ఎనిమిది', 'తొమ్మిది'],
+      teen: ['పది', 'పదకొండు', 'పన్నెండు', 'పదమూడు', 'పద్నాలుగు', 'పదిహేను', 'పదహారు', 'పదిహేడు', 'పద్దెనిమిది', 'పందొమ్మిది'],
+      tens: ['', '', 'ఇరవై', 'ముప్పై', 'నలభై', 'యాభై', 'అరవై', 'డెబ్బై', 'ఎనభై', 'తొంభై'],
+      one: 'ఒక',
+      pre: '', suf: ' రూపాయలు మాత్రమే'
+    },
+    kn: {
+      u: ['', 'ಒಂದು', 'ಎರಡು', 'ಮೂರು', 'ನಾಲ್ಕು', 'ಐದು', 'ಆರು', 'ಏಳು', 'ಎಂಟು', 'ಒಂಬತ್ತು'],
+      teen: ['ಹತ್ತು', 'ಹನ್ನೊಂದು', 'ಹನ್ನೆರಡು', 'ಹದಿಮೂರು', 'ಹದಿನಾಲ್ಕು', 'ಹದಿನೈದು', 'ಹದಿನಾರು', 'ಹದಿನೇಳು', 'ಹದಿನೆಂಟು', 'ಹತ್ತೊಂಬತ್ತು'],
+      tens: ['', '', 'ಇಪ್ಪತ್ತು', 'ಮೂವತ್ತು', 'ನಲವತ್ತು', 'ಐವತ್ತು', 'ಅರವತ್ತು', 'ಎಪ್ಪತ್ತು', 'ಎಂಬತ್ತು', 'ತೊಂಬತ್ತು'],
+      hund: ['', 'ನೂರು', 'ಇನ್ನೂರು', 'ಮುನ್ನೂರು', 'ನಾನೂರು', 'ಐನೂರು', 'ಆರುನೂರು', 'ಏಳುನೂರು', 'ಎಂಟುನೂರು', 'ಒಂಬೈನೂರು'],
+      one: 'ಒಂದು',
+      pre: '', suf: ' ರೂಪಾಯಿಗಳು ಮಾತ್ರ'
+    },
+    ml: {
+      u: ['', 'ഒന്ന്', 'രണ്ട്', 'മൂന്ന്', 'നാല്', 'അഞ്ച്', 'ആറ്', 'ഏഴ്', 'എട്ട്', 'ഒൻപത്'],
+      teen: ['പത്ത്', 'പതിനൊന്ന്', 'പന്ത്രണ്ട്', 'പതിമൂന്ന്', 'പതിനാല്', 'പതിനഞ്ച്', 'പതിനാറ്', 'പതിനേഴ്', 'പതിനെട്ട്', 'പത്തൊൻപത്'],
+      tens: ['', '', 'ഇരുപത്', 'മുപ്പത്', 'നാൽപത്', 'അൻപത്', 'അറുപത്', 'എഴുപത്', 'എൺപത്', 'തൊണ്ണൂറ്'],
+      tensC: ['', '', 'ഇരുപത്തി', 'മുപ്പത്തി', 'നാൽപത്തി', 'അൻപത്തി', 'അറുപത്തി', 'എഴുപത്തി', 'എൺപത്തി', 'തൊണ്ണൂറ്റി'],
+      hund: ['', 'നൂറ്', 'ഇരുനൂറ്', 'മുന്നൂറ്', 'നാനൂറ്', 'അഞ്ഞൂറ്', 'അറുനൂറ്', 'എഴുനൂറ്', 'എണ്ണൂറ്', 'തൊള്ളായിരം'],
+      hundC: ['', 'നൂറ്റി', 'ഇരുനൂറ്റി', 'മുന്നൂറ്റി', 'നാനൂറ്റി', 'അഞ്ഞൂറ്റി', 'അറുനൂറ്റി', 'എഴുനൂറ്റി', 'എണ്ണൂറ്റി', 'തൊള്ളായിരത്തി'],
+      one: 'ഒരു',
+      pre: '', suf: ' രൂപ മാത്രം'
+    }
+  };
+  // Kannada: 21 = ಇಪ್ಪತ್ತ + ೊಂದು -> ಇಪ್ಪತ್ತೊಂದು ; 23 = ಇಪ್ಪತ್ತ + ಮೂರು -> ಇಪ್ಪತ್ತಮೂರು
+  const KN_V = { 'ಒ': 'ೊ', 'ಎ': 'ೆ', 'ಐ': 'ೈ', 'ಆ': 'ಾ', 'ಏ': 'ೇ' };
+  // Malayalam: 21 = ഇരുപത്തി + യൊന്ന് ; 22 = ഇരുപത്തി + രണ്ട്
+  const ML_V = { 'ഒ': 'യൊ', 'അ': 'യ', 'ആ': 'യാ', 'ഏ': 'യേ', 'എ': 'യെ' };
+  function dr2(n, L) {
+    const D = DR[L];
+    if (n < 10) return D.u[n];
+    if (n < 20) return D.teen[n - 10];
+    const t = Math.floor(n / 10), r = n % 10;
+    if (!r) return D.tens[t];
+    if (L === 'ta') return D.tensC[t] + ' ' + D.u[r];
+    if (L === 'te') return D.tens[t] + ' ' + D.u[r];
+    if (L === 'kn') {
+      const stem = D.tens[t].replace(/ು$/, ''), u = D.u[r], v = KN_V[u[0]];
+      return v ? stem + v + u.slice(1) : stem + u;
+    }
+    if (L === 'ml') {
+      const u = D.u[r], v = ML_V[u[0]];
+      return v ? D.tensC[t] + v + u.slice(1) : D.tensC[t] + u;
+    }
+  }
+  function drCore(n, L) {
+    const D = DR[L];
+    const cr = Math.floor(n / 1e7); n %= 1e7;
+    const lk = Math.floor(n / 1e5); n %= 1e5;
+    const th = Math.floor(n / 1e3); n %= 1e3;
+    const h = Math.floor(n / 100), r = n % 100;
+    const mult = m => m === 1 ? D.one : dr2(m, L);
+    const p = [];
+    const more = (...xs) => xs.some(Boolean);
+    if (L === 'ta') {
+      if (cr) p.push((cr > 99 ? drCore(cr, L) : mult(cr)) + ' ' + D.cr[more(lk, th, h, r) ? 1 : 0]);
+      if (lk) p.push(mult(lk) + ' ' + D.lk[more(th, h, r) ? 1 : 0]);
+      if (th) p.push((th === 1 ? '' : dr2(th, L) + ' ') + D.th[more(h, r) ? 1 : 0]);
+      if (h) p.push(r ? D.hundC[h] : D.hund[h]);
+      if (r) p.push(dr2(r, L));
+    } else if (L === 'te') {
+      const big = (m, sg, pl, plC, last) => m === 1 ? D.one + ' ' + sg : mult(m) + ' ' + (last ? pl : plC);
+      if (cr) p.push(cr > 99 ? drCore(cr, L) + ' కోట్లు' : big(cr, 'కోటి', 'కోట్లు', 'కోట్ల', !more(lk, th, h, r)));
+      if (lk) p.push(big(lk, 'లక్ష', 'లక్షలు', 'లక్షల', !more(th, h, r)));
+      if (th) p.push(th === 1 ? 'వెయ్యి' : mult(th) + ' ' + (more(h, r) ? 'వేల' : 'వేలు'));
+      if (h) p.push(h === 1 ? (r ? 'నూట' : 'వంద') : D.u[h] + ' ' + (r ? 'వందల' : 'వందలు'));
+      if (r) p.push(dr2(r, L));
+    } else if (L === 'kn') {
+      if (cr) p.push((cr > 99 ? drCore(cr, L) : mult(cr)) + ' ಕೋಟಿ');
+      if (lk) p.push(mult(lk) + ' ಲಕ್ಷ');
+      if (th) p.push(mult(th) + ' ಸಾವಿರ');
+      if (h) p.push(D.hund[h]);
+      if (r) p.push(dr2(r, L));
+    } else if (L === 'ml') {
+      if (cr) p.push((cr > 99 ? drCore(cr, L) : mult(cr)) + ' കോടി');
+      if (lk) p.push(mult(lk) + ' ' + (more(th, h, r) ? 'ലക്ഷത്തി' : 'ലക്ഷം'));
+      if (th) p.push((th === 1 ? '' : dr2(th, L) + ' ') + (more(h, r) ? 'ആയിരത്തി' : 'ആയിരം'));
+      if (h) p.push(r ? D.hundC[h] : D.hund[h]);
+      if (r) p.push(dr2(r, L));
+    }
+    return p.join(' ');
+  }
+
+  function numWords(amount, lang) {
+    let n = Math.round(Math.abs(Number(amount) || 0));
+    if (lang === 'en' || !lang) return n ? 'Rupees ' + enCore(n) + ' Only' : 'Rupees Zero Only';
+    if (NORTH[lang]) { const C = NORTH[lang]; return C.pre + (n ? northCore(n, lang) : T99[lang][0]) + C.suf; }
+    if (DR[lang]) { const D = DR[lang]; return D.pre + (n ? drCore(n, lang) : '0') + D.suf; }
+    return numWords(amount, 'en');
+  }
+  g.numWords = numWords;
+  g.NUMWORD_LANGS = ['en', 'hi', 'mr', 'gu', 'bn', 'pa', 'ur', 'or', 'ta', 'te', 'kn', 'ml'];
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>
 // Folder (virtual directory) name is case-sensitive: Offer-Calculator
 const VD_NAME = 'Offer-Calculator';
 // Works for /Offer-Calculator, /Offer-Calculator/ and /Offer-Calculator/index.html
 const DATA_DIR = (location.pathname.endsWith('/') || /\.[a-z]+$/i.test(location.pathname)) ? 'data/' : VD_NAME + '/data/';
-const FILES = ['flats','developers','offers_area','offers_general','settings','developer_profile','sources'];
+const FILES = ['flats','developers','offers_area','offers_general','settings','developer_profile','sources','i18n'];
+const OPTIONAL_FILES = ['i18n'];   // page still works (in English) if these are missing
 const BUILDING_ORDER = ['A1','A2','B1','C1','D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','E1','Shops/Units'];
 const DB = {};
 
@@ -271,7 +504,7 @@ function parseCSV(text){
 async function loadAll(){
   await Promise.all(FILES.map(async n=>{
     const res=await fetch(DATA_DIR+n+'.csv?v='+Date.now(),{cache:'no-store'});
-    if(!res.ok) throw new Error(n+'.csv: HTTP '+res.status);
+    if(!res.ok){ if(OPTIONAL_FILES.includes(n)){ DB[n]=[]; return; } throw new Error(n+'.csv: HTTP '+res.status); }
     DB[n]=parseCSV(await res.text());
   }));
 }
@@ -279,7 +512,38 @@ async function loadAll(){
 /* ---------- helpers ---------- */
 const num=v=>v===''||v==null||isNaN(+v)?null:+v;
 const inr=v=>v==null?'—':'₹ '+Math.round(v).toLocaleString('en-IN');
-const sqft=v=>v==null?'—':(+v).toLocaleString('en-IN',{maximumFractionDigits:1})+' sq ft';
+const sqft=v=>v==null?'—':(+v).toLocaleString('en-IN',{maximumFractionDigits:1})+' '+T('sqft');
+
+/* ---------- languages (data/i18n.csv = UI text, flats.csv "language" column = flat -> language code) ---------- */
+const LANGS=[['en','English'],['hi','हिन्दी (Hindi)'],['mr','मराठी (Marathi)'],['gu','ગુજરાતી (Gujarati)'],['bn','বাংলা (Bengali)'],
+  ['pa','ਪੰਜਾਬੀ (Punjabi)'],['ur','اردو (Urdu)'],['or','ଓଡ଼ିଆ (Odia)'],['ta','தமிழ் (Tamil)'],['te','తెలుగు (Telugu)'],['kn','ಕನ್ನಡ (Kannada)'],['ml','മലയാളം (Malayalam)']];
+const FONTS={hi:'Noto Sans Devanagari',mr:'Noto Sans Devanagari',gu:'Noto Sans Gujarati',bn:'Noto Sans Bengali',pa:'Noto Sans Gurmukhi',
+  ur:'Noto Naskh Arabic',or:'Noto Sans Oriya',ta:'Noto Sans Tamil',te:'Noto Sans Telugu',kn:'Noto Sans Kannada',ml:'Noto Sans Malayalam'};
+let LANG='en', manualLang=false, I18N={};
+function T(k,vars){ const r=I18N[k]; let s=(r&&(r[LANG]||r.en))||k;
+  if(vars) for(const [a,b] of Object.entries(vars)) s=s.split('{'+a+'}').join(b);
+  return s; }
+function loadFont(l){ const f=FONTS[l]; if(!f||document.getElementById('font-'+l)) return;
+  const ln=document.createElement('link'); ln.id='font-'+l; ln.rel='stylesheet';
+  ln.href='https://fonts.googleapis.com/css2?family='+f.replace(/ /g,'+')+':wght@400;600;700&display=swap'; document.head.appendChild(ln); }
+function flatLang(f){ const l=(f.language||'').trim(); return LANGS.some(x=>x[0]===l)?l:'en'; }   // 'language' column of flats.csv
+function applyLang(){
+  document.documentElement.lang=LANG;
+  document.body.style.setProperty('--lfont',FONTS[LANG]?'"'+FONTS[LANG]+'"':'"Noto Sans Devanagari"');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent=T(el.dataset.i18n); if(LANG==='ur') el.dir='auto'; else el.removeAttribute('dir'); });
+  $('updateBtn').textContent=T(shown?'update':'submit');
+  const bo=$('buildingNum').querySelector('option[value=""]'); if(bo) bo.textContent=T('choose');
+  const fo=$('flatNum').querySelector('option[value=""]'); if(fo) fo.textContent=T($('flatNum').disabled?'choose_bldg_first':'choose');
+  $('langSel').value=LANG;
+  $('footer').textContent=T('source',{date:setting('statement_date','')})+' '+T('indicative');
+  document.title=T('title')+' – Asmita Jyoti CHSL';
+}
+function setLang(l,manual){
+  if(!LANGS.some(x=>x[0]===l)) l='en';
+  LANG=l; if(manual){ manualLang=true; $('langNote').classList.add('hidden'); }
+  loadFont(l); applyLang();
+  if(shown) render(true);          // redraw the results already on screen in the new language
+}
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const flatSort=(a,b)=>{const na=parseInt(a.flat_no.replace(/\D/g,'')),nb=parseInt(b.flat_no.replace(/\D/g,''));
   const ta=a.flat_no[0],tb=b.flat_no[0]; return ta===tb?na-nb:ta.localeCompare(tb);};
@@ -342,16 +606,28 @@ const $=id=>document.getElementById(id);
 function initSelectors(){
   const present=[...new Set(DB.flats.map(f=>f.building))];
   const order=[...BUILDING_ORDER.filter(b=>present.includes(b)),...present.filter(b=>!BUILDING_ORDER.includes(b))];
-  $('buildingNum').innerHTML='<option value="" disabled selected>Choose</option>'+order.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('');
+  (DB.i18n||[]).forEach(r=>{ if(r.key) I18N[r.key]=r; });
+  $('langSel').innerHTML=LANGS.map(([c,n])=>`<option value="${c}">${esc(n)}</option>`).join('');
+  $('langSel').onchange=()=>setLang($('langSel').value,true);
+  $('buildingNum').innerHTML='<option value="" disabled selected>'+esc(T('choose'))+'</option>'+order.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('');
   $('rentMonths').value=setting('rent_months',48);
   $('buildingNum').onchange=()=>{
     const flats=DB.flats.filter(f=>f.building===$('buildingNum').value).sort(flatSort);
-    $('flatNum').innerHTML='<option value="" disabled selected>Choose</option>'+flats.map(f=>`<option value="${esc(f.flat_no)}">${esc(f.flat_no)}</option>`).join('');
+    $('flatNum').innerHTML='<option value="" disabled selected>'+esc(T('choose'))+'</option>'+flats.map(f=>`<option value="${esc(f.flat_no)}">${esc(f.flat_no)}</option>`).join('');
     $('flatNum').disabled=false;
     if(shown) markDirty(); else hideResults();
     $('updateBtn').disabled=true;
   };
-  $('flatNum').onchange=()=>{ $('updateBtn').disabled=false; if(shown) markDirty(); };
+  $('flatNum').onchange=()=>{
+    $('updateBtn').disabled=false; if(shown) markDirty();
+    // language follows the selected flat (from the owner's surname) unless the visitor picked one themselves
+    if(!manualLang){
+      const f=DB.flats.find(x=>x.building===$('buildingNum').value&&x.flat_no===$('flatNum').value);
+      const l=f?flatLang(f):'en';
+      $('langNote').classList.toggle('hidden',l==='en');
+      if(l!==LANG){ LANG=l; loadFont(l); applyLang(); }
+    }
+  };
   $('rentMonths').oninput=()=>{ if(shown) markDirty(); };
   $('isRented').onchange=()=>{ $('curRentGroup').classList.toggle('hidden',!$('isRented').checked); if(shown) markDirty(); };
   $('curRent').oninput=()=>{ if(shown) markDirty(); };
@@ -360,7 +636,7 @@ function initSelectors(){
   $('pdfBtn').onclick=exportPDF;
   window.addEventListener('beforeprint',()=>{ if(shown) buildReport(); });
   $('lastUpdated').textContent=setting('offers_last_updated','09-Oct-2026');
-  $('footer').textContent='Source: Comparative statement of offers (Deodhar Associates, PMC) dated '+setting('statement_date','')+'. Figures are indicative; final terms as per Development Agreement.';
+  applyLang();
 }
 let shown=false, rentOpen=false;
 function unitLabel(){ if(!CUR) return 'Offer'; return (CUR.building==='Shops/Units'?CUR.flat_no:CUR.building+'-'+CUR.flat_no).replace(/[^A-Za-z0-9-]+/g,'_'); }
@@ -383,27 +659,28 @@ function buildReport(){
   const sec=(title,html)=>html?`<div class="sec"><h2>${title}</h2>${html}</div>`:'';
   const gen=new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
   const sum=`<table class="sumtbl"><tr>
-      <td>Unit<br><b>${esc(L.unit||'')}</b></td><td>Type<br><b>${esc(L.type||'')}</b></td>
-      <td>Existing carpet area<br><b>${L.area==null?'Not available':sqft(L.area)}</b></td>
-      <td>Rent period<br><b>${L.months||''} months</b></td>
-      ${L.curRent>0?`<td>Current rent received<br><b>${inr(L.curRent)}/month</b></td>`:''}</tr></table>`;
+      <td>${esc(T('unit'))}<br><b>${esc(L.unit||'')}</b></td><td>${esc(T('type'))}<br><b>${esc(L.type?T('t_'+L.type):'')}</b></td>
+      <td>${esc(T('existing_area'))}<br><b>${L.area==null?esc(T('not_available')):sqft(L.area)}</b></td>
+      <td>${esc(T('rent_period_l'))}<br><b>${esc(T('months_n',{n:L.months||''}))}</b></td>
+      ${L.curRent>0?`<td>${esc(T('cur_rent_recv'))}<br><b>${inr(L.curRent)} ${esc(T('per_month'))}</b></td>`:''}</tr></table>`;
   const ref2=' <a class="ref" href="#ref-2">#2</a>';
   const profile=$('profileCard').classList.contains('hidden')?'':$('profileBody').innerHTML;
   const refs=(DB.sources||[]).map(r=>`<li><b>#${esc(r.ref_id)}</b> ${esc(r.title)}${r.note?` — ${esc(r.note)}`:''}${r.url?`<br><a href="${esc(r.url)}">${esc(r.url)}</a>`:''}</li>`).join('');
-  host.innerHTML=`<div id="report">
-    <div class="rh"><h1>Redevelopment Offer Comparison | पुनर्विकास ऑफर तुलना</h1>
+  const words=$('wordsBox').classList.contains('hidden')?'':`<div class="words" lang="${LANG}">${$('wordsBox').innerHTML}</div>`;
+  host.innerHTML=`<div id="report" lang="${LANG}">
+    <div class="rh"><h1>${esc(T('report_title'))}</h1>
       <div class="sub">Asmita Jyoti Co-operative Housing Society Ltd., Charkop Naka, Marve Road, Malad (W), Mumbai</div>
-      <div class="meta"><span>Offers last updated: <b>${esc(setting('offers_last_updated',''))}</b></span><span>Generated on: ${gen}</span></div>
-      <div class="meta"><span class="warn">Figures are indicative; final terms as per Development Agreement.</span></div></div>
-    ${sec('Your unit | आपली सदनिका',sum)}
-    ${sec('Offer comparison | ऑफर तुलना'+ref2, clone('memberTable')+`<p class="note">Total cash benefit = rent + brokerage + relocation + corpus / hardship compensation (excludes refundable deposit and buyback).</p>`)}
-    ${sec('Other per-member offers | इतर सदस्य लाभ'+ref2, clone('generalTable'))}
-    ${sec('Shops &amp; first-floor units | दुकाने व व्यावसायिक युनिट्स'+ref2, clone('commercialTable'))}
-    ${sec('Society-level offers | संस्था स्तरावरील ऑफर'+ref2, clone('societyTable'))}
-    ${sec('Tender compliance &amp; clarifications | निविदा अटींचे पालन <a class="ref" href="#ref-12">#12</a>', clone('complianceTable'))}
-    ${profile?`<div class="sec pb"><h2>About the developers | विकासकांची माहिती</h2>${profile}<p class="note">Financial figures <a class="ref" href="#ref-3">#3</a> as submitted in Proforma 'D', converted to ₹ crore. Profile details compiled from public sources as of Oct-2026; verify independently.</p></div>`:''}
-    ${!show('closing_disclaimer')?'':`<div class="sec"><h2>Disclaimer | अस्वीकरण</h2><div class="disc">${$('finalDisclaimer').querySelectorAll('p')[0].innerHTML?'<p>'+$('finalDisclaimer').querySelectorAll('p')[0].innerHTML+'</p><p>'+$('finalDisclaimer').querySelectorAll('p')[1].innerHTML+'</p>':''}</div></div>`}
-    ${refs&&show('references')?sec('References / Sources | संदर्भ',`<ol class="refs">${refs}</ol>`):''}
+      <div class="meta"><span>${esc(T('last_updated'))}: <b>${esc(setting('offers_last_updated',''))}</b></span><span>${esc(T('generated_on'))}: ${gen}</span></div>
+      <div class="meta"><span class="warn">${esc(T('indicative'))}</span></div></div>
+    ${sec(esc(T('your_unit')),sum)}
+    ${sec(esc(T('offer_comparison'))+ref2, clone('memberTable')+`<p class="note">${esc(T('legend'))}</p>`+words)}
+    ${sec(esc(T('sec_other'))+ref2, clone('generalTable'))}
+    ${sec(esc(T('sec_commercial'))+ref2, clone('commercialTable'))}
+    ${sec(esc(T('sec_society'))+ref2, clone('societyTable'))}
+    ${sec(esc(T('sec_compliance'))+' <a class="ref" href="#ref-12">#12</a>', clone('complianceTable'))}
+    ${profile?`<div class="sec pb"><h2>${esc(T('sec_profile'))}</h2>${profile}<p class="note">Financial figures <a class="ref" href="#ref-3">#3</a> as submitted in Proforma 'D', converted to ₹ crore. Profile details compiled from public sources as of Oct-2026; verify independently.</p></div>`:''}
+    ${!show('closing_disclaimer')?'':`<div class="sec"><h2>${esc(T('sec_disclaimer'))}</h2><div class="disc"><p>${esc(T('disc_text'))}</p></div></div>`}
+    ${refs&&show('references')?sec(esc(T('sec_refs')),`<ol class="refs">${refs}</ol>`):''}
   </div>`;
   return $('report');
 }
@@ -448,10 +725,11 @@ function paginate(el,W,H){
 function doPrint(){ buildReport(); setTimeout(()=>window.print(),50); }
 async function exportPDF(){
   const name='Offer_Comparison_'+unitLabel()+'.pdf';
-  const btn=$('pdfBtn'); btn.disabled=true; const old=btn.textContent; btn.textContent='Preparing PDF…';
+  const btn=$('pdfBtn'); btn.disabled=true; const old=btn.innerHTML; btn.textContent=T('preparing');
   const ok=await loadPdfLib();
   const el=buildReport();
-  if(!ok||typeof html2pdf==='undefined'){ const t=document.title; document.title=name.replace('.pdf',''); window.print(); document.title=t; btn.disabled=false; btn.textContent=old; return; }
+  try{ await document.fonts.ready; }catch(e){}
+  if(!ok||typeof html2pdf==='undefined'){ const t=document.title; document.title=name.replace('.pdf',''); window.print(); document.title=t; btn.disabled=false; btn.innerHTML=old; return; }
   const sx=window.scrollX, sy=window.scrollY;
   window.scrollTo(0,0);
   const MT=14, MS=18, MB=16;                        // page margins in mm: top, sides, bottom (footer sits in the bottom margin)
@@ -476,7 +754,7 @@ async function exportPDF(){
         pdf.text('Page '+i+' of '+n,pw-MS,ph-MB+9,{align:'right'});
       }
     }).save();
-  } finally { wrap.remove(); window.scrollTo(sx,sy); btn.disabled=false; btn.textContent=old; }
+  } finally { wrap.remove(); window.scrollTo(sx,sy); btn.disabled=false; btn.innerHTML=old; }
 }
 function toggleRent(){
   rentOpen=!rentOpen;
@@ -484,7 +762,7 @@ function toggleRent(){
   const t=document.querySelector('#memberTable .rent-toggle .tri'); if(t) t.textContent=rentOpen?'▾':'▸';
 }
 function markDirty(){ $('updateBtn').classList.add('dirty'); $('updateHint').classList.remove('hidden'); }
-function hideResults(){['flatInfo','areaNotice','memberCard','generalCard','commercialCard','societyCard','complianceCard','profileCard','actions','finalDisclaimer','refCard'].forEach(i=>$(i).classList.add('hidden'));}
+function hideResults(){['flatInfo','areaNotice','memberCard','wordsBox','generalCard','commercialCard','societyCard','complianceCard','profileCard','actions','finalDisclaimer','refCard'].forEach(i=>$(i).classList.add('hidden'));}
 
 function rowHTML(label,sub,vals,fmt,bestMode,cls){
   const nums=vals.map(v=>typeof v==='number'?v:null).filter(v=>v!=null);
@@ -495,30 +773,39 @@ function rowHTML(label,sub,vals,fmt,bestMode,cls){
 }
 function devHead(devs){return '<thead><tr><th></th>'+devs.map(d=>`<th class="dev">${esc(d.short_name)}<small>${esc(d.name)}</small></th>`).join('')+'</tr></thead>';}
 
-function render(){
-  const b=$('buildingNum').value,f=$('flatNum').value; if(!b||!f) return;
+/* render(true) redraws the results already on screen (e.g. after a language change) without picking up unsubmitted selector changes */
+let LASTIN=null;
+function render(redraw){
+  let b,f,months,curRent;
+  if(redraw===true&&LASTIN){ ({b,f,months,curRent}=LASTIN); }
+  else{
+    b=$('buildingNum').value; f=$('flatNum').value; if(!b||!f) return;
+    months=Math.max(1,parseInt($('rentMonths').value)||+setting('rent_months',48));
+    curRent=$('isRented').checked?(num($('curRent').value)||0):0;   // current monthly rent the member receives
+    LASTIN={b,f,months,curRent};
+    $('updateBtn').classList.remove('dirty'); $('updateHint').classList.add('hidden');
+  }
   const flat=DB.flats.find(x=>x.building===b&&x.flat_no===f); if(!flat) return;
-  CUR=flat; shown=true; $('updateBtn').textContent='Update | अद्यतनित करा'; $('updateBtn').classList.remove('dirty'); $('updateHint').classList.add('hidden');
+  CUR=flat; shown=true; $('updateBtn').textContent=T('update');
   const type=flat.unit_type, area=num(flat.existing_carpet_area_sqft);
-  const months=Math.max(1,parseInt($('rentMonths').value)||+setting('rent_months',48));
-  const curRent=$('isRented').checked?(num($('curRent').value)||0):0;   // current monthly rent the member receives
   const signed=v=>v==null?'—':`<span class="${v<0?'neg':''}">${v<0?'− ':'+ '}${inr(Math.abs(v))}</span>`;
   const devs=DB.developers;
+  const unit=(b==='Shops/Units'?f:b+'/'+f);
 
-  $('flatInfo').innerHTML=`<div class="pill">Unit <b>${esc(b==='Shops/Units'?f:b+'/'+f)}</b></div>
-    <div class="pill">Type <b>${esc(type)}</b></div>
-    <div class="pill">Existing carpet area <b>${area==null?'Not available':sqft(area)}</b></div>`;
-  LAST={unit:(b==='Shops/Units'?f:b+'/'+f),type,area,months,curRent};
+  $('flatInfo').innerHTML=`<div class="pill">${esc(T('unit'))} <b>${esc(unit)}</b></div>
+    <div class="pill">${esc(T('type'))} <b>${esc(T('t_'+type))}</b></div>
+    <div class="pill">${esc(T('existing_area'))} <b>${area==null?esc(T('not_available')):sqft(area)}</b></div>`;
+  LAST={unit,type,area,months,curRent};
   $('actions').classList.toggle('hidden',!show('print_pdf_buttons')); $('finalDisclaimer').classList.toggle('hidden',!show('closing_disclaimer'));
-  $('printStamp').textContent='Generated on '+new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})+' · Offers as of '+setting('offers_last_updated','');
+  $('printStamp').textContent=T('generated_on')+' '+new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})+' · '+T('offers_as_of')+' '+setting('offers_last_updated','');
   $('flatInfo').classList.remove('hidden');
 
   // general + society tables (always)
   renderGeneral(devs);
 
   if(area==null){
-    $('areaNotice').innerHTML='Area not available for this unit yet | <span class="marathi-label">या युनिटचे क्षेत्रफळ उपलब्ध नाही</span>. Showing rates offered for '+(type==='Shop'?'ground-floor shops':'first-floor commercial units')+'.';
-    $('areaNotice').classList.remove('hidden');
+    $('areaNotice').textContent=T('area_na')+' '+T(type==='Shop'?'rates_shop':'rates_unit');
+    $('areaNotice').classList.remove('hidden'); $('wordsBox').classList.add('hidden');
     renderRates(devs,type); return;
   }
   $('areaNotice').classList.add('hidden'); $('legend').classList.remove('hidden');
@@ -537,35 +824,53 @@ function render(){
     const total=[rent?.total,brokerage,relocation,hardship].reduce((s,v)=>s+(v||0),0);
     return {d,pct,fixed,newArea,addArea:newArea==null?null:newArea-area,rent,brokerage,relocation,hardship,deposit,buyback,parking,total};
   });
+  const e=k=>esc(T(k)), ev=(k,v)=>esc(T(k,v));
 
   let h=devHead(devs)+'<tbody>';
-  h+=rowHTML('Additional area %','on existing carpet area',calc.map(c=>(c.fixed!=null&&!(c.pct!=null&&Math.abs(Math.round(area*(1+c.pct/100))-c.fixed)<=1))?(c.addArea/area*100):c.pct),v=>(Math.round(v*10)/10)+' %');
-  h+=rowHTML('Additional area',null,calc.map(c=>c.addArea),sqft);
-  h+=rowHTML('New carpet area (RERA)','existing + additional',calc.map(c=>c.newArea),sqft,null,'highlight');
-  if(calc.some(c=>c.parking!=null)) h+=rowHTML('Free car parking',null,calc.map(c=>c.parking),v=>v+(v>1?' car parks':' car park'),null);
+  h+=rowHTML(e('add_area_pct'),e('on_existing'),calc.map(c=>(c.fixed!=null&&!(c.pct!=null&&Math.abs(Math.round(area*(1+c.pct/100))-c.fixed)<=1))?(c.addArea/area*100):c.pct),v=>(Math.round(v*10)/10)+' %');
+  h+=rowHTML(e('add_area'),null,calc.map(c=>c.addArea),sqft);
+  h+=rowHTML(e('new_area'),e('existing_plus'),calc.map(c=>c.newArea),sqft,null,'highlight');
+  if(calc.some(c=>c.parking!=null)) h+=rowHTML(e('parking'),null,calc.map(c=>c.parking),v=>v+' '+e('car_park'),null);
   // Rent – first month, expandable to year-wise rent
-  h+=`<tr class="rent-toggle" onclick="toggleRent()"><td class="row-head"><span class="tri">${rentOpen?'▾':'▸'}</span> Rent – first month<small>click to see year-wise rent | वर्षनिहाय भाडे</small></td>`+
+  h+=`<tr class="rent-toggle" onclick="toggleRent()"><td class="row-head"><span class="tri">${rentOpen?'▾':'▸'}</span> ${e('rent_first')}<small>${e('click_years')}</small></td>`+
      calc.map(c=>`<td>${c.rent?inr(c.rent.first):'—'}</td>`).join('')+'</tr>';
   for(let y=1;y<=Math.ceil(months/12);y++){
     const m=Math.min(12,months-(y-1)*12);
-    h+=`<tr class="rent-year${rentOpen?'':' hidden'}"><td class="row-head">Year ${y}<small>${m} month${m>1?'s':''}</small></td>`+calc.map(c=>{const yr=c.rent?.years[y-1];
-      return yr?`<td>${inr(yr.amount)}<small>₹${yr.rate.toFixed(2)}/sq ft · ${inr(yr.rate*area)}/month</small></td>`:'<td>—</td>';}).join('')+'</tr>';
+    h+=`<tr class="rent-year${rentOpen?'':' hidden'}"><td class="row-head">${e('year')} ${y}<small>${ev('months_n',{n:m})}</small></td>`+calc.map(c=>{const yr=c.rent?.years[y-1];
+      return yr?`<td>${inr(yr.amount)}<small>₹${yr.rate.toFixed(2)}/${e('sqft')} · ${inr(yr.rate*area)} ${e('per_month')}</small></td>`:'<td>—</td>';}).join('')+'</tr>';
   }
-  if(curRent>0) h+=rowHTML('Monthly rent advantage (year 1)',`vs your current rent ${inr(curRent)}/month`,calc.map(c=>c.rent?c.rent.first-curRent:null),signed,null,'adv');
-  h+=rowHTML(`Rent – total for ${months} months`,'incl. escalation',calc.map(c=>c.rent?c.rent.total:null),inr,'max');
-  if(curRent>0) h+=rowHTML(`Rent advantage – ${months} months`,`vs your current rent ${inr(curRent)} × ${months} = ${inr(curRent*months)}`,calc.map(c=>c.rent?c.rent.total-curRent*months:null),signed,null,'adv');
-  h+=rowHTML('Brokerage',null,calc.map(c=>c.brokerage),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'brokerage'))}</small>`,'max');
-  h+=rowHTML('Relocation (shifting)',null,calc.map(c=>c.relocation),inr,'max');
-  h+=rowHTML('Corpus / hardship compensation',null,calc.map(c=>c.hardship),inr,'max');
-  h=h.replace(/<\/tbody>$/,'');
-  h+=`<tr class="total"><td>Total cash benefit</td>`+calc.map(c=>`<td>${inr(c.total)}</td>`).join('')+'</tr>';
-  if(curRent>0) h+=rowHTML('Net gain over your current rent income',`total cash benefit − current rent for ${months} months (${inr(curRent*months)})`,calc.map(c=>c.total-curRent*months),signed,null,'adv');
-  h+=rowHTML('Refundable deposit','not added to total',calc.map(c=>c.deposit??'Not stated'),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'refundable_deposit'))}</small>`,null);
-  h+=rowHTML('Buyback value (optional)','if you sell existing unit to developer',calc.map(c=>c.buyback??'N.A.'),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'buyback'))}</small>`,null);
+  if(curRent>0) h+=rowHTML(e('adv_month'),ev('vs_rent',{amt:inr(curRent)}),calc.map(c=>c.rent?c.rent.first-curRent:null),signed,null,'adv');
+  h+=rowHTML(ev('rent_total',{n:months}),e('incl_esc'),calc.map(c=>c.rent?c.rent.total:null),inr,'max');
+  if(curRent>0) h+=rowHTML(ev('rent_adv',{n:months}),ev('vs_rent_total',{amt:inr(curRent),n:months,tot:inr(curRent*months)}),calc.map(c=>c.rent?c.rent.total-curRent*months:null),signed,null,'adv');
+  h+=rowHTML(e('brokerage'),null,calc.map(c=>c.brokerage),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'brokerage'))}</small>`,'max');
+  h+=rowHTML(e('relocation'),null,calc.map(c=>c.relocation),inr,'max');
+  h+=rowHTML(e('corpus'),null,calc.map(c=>c.hardship),inr,'max');
+  h+=`<tr class="total"><td>${e('total')}</td>`+calc.map(c=>`<td>${inr(c.total)}</td>`).join('')+'</tr>';
+  if(curRent>0) h+=rowHTML(e('net_gain'),ev('net_gain_sub',{n:months,amt:inr(curRent*months)}),calc.map(c=>c.total-curRent*months),signed,null,'adv');
+  h+=rowHTML(e('deposit'),e('not_added'),calc.map(c=>c.deposit??T('not_stated')),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'refundable_deposit'))}</small>`,null);
+  h+=rowHTML(e('buyback'),e('buyback_sub'),calc.map(c=>c.buyback??T('na')),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'buyback'))}</small>`,null);
   h+='</tbody>';
   $('memberTable').innerHTML=h;
+  renderWords(calc,curRent,months);
 
   $('memberCard').classList.remove('hidden');
+}
+
+/* Benefit in words, in the selected language only. Shows the range across developers WITHOUT naming any developer. */
+function renderWords(calc,curRent,months){
+  const box=$('wordsBox');
+  const tots=calc.map(c=>c.total).filter(v=>v>0);
+  if(!tots.length){ box.classList.add('hidden'); return; }
+  const amt=v=>(v<0?'− ':'')+inr(Math.abs(v)), wds=v=>(v<0?'− ':'')+numWords(Math.abs(v),LANG);
+  const line=(lab,v)=>`<div class="w-line"><b>${esc(lab)}</b><div class="w-amt">${amt(v)}<small>${esc(wds(v))}</small></div></div>`;
+  const range=(intro,vals)=>{ const lo=Math.min(...vals), hi=Math.max(...vals);
+    return Math.round(lo)===Math.round(hi) ? `<p>${esc(intro)}</p>`+line('',lo)
+         : `<p>${esc(intro)}</p>`+line(T('words_from'),lo)+line(T('words_to'),hi); };
+  let h=`<h3>${esc(T('words_title'))}</h3>`;
+  h+=range(T(new Set(tots.map(Math.round)).size>1?'words_intro':'words_single'),tots);
+  if(curRent>0) h+=range(T('words_net_intro'),calc.filter(c=>c.total>0).map(c=>c.total-curRent*months));
+  h+=`<p class="w-note">${esc(T('words_note'))}</p>`;
+  box.innerHTML=h; box.setAttribute('lang',LANG); box.classList.remove('hidden');
 }
 
 function renderRates(devs,type){
@@ -575,16 +880,17 @@ function renderRates(devs,type){
     const vs=variants(d.dev_id,type,'rent').filter(x=>x.applies_to);
     return vs.length?grouped(vs,v=>'₹'+v):null;};
   const brkTxt=d=>{const r=areaItems(d.dev_id,type,'brokerage');
-    if(r.length) return r[0].basis==='per_sqft_onetime'?'₹'+r[0].value+' per sq ft':(r.map(x=>x.note).join(' ')||'—');
+    if(r.length) return r[0].basis==='per_sqft_onetime'?'₹'+r[0].value+' '+T('per_sqft'):(r.map(x=>x.note).join(' ')||'—');
     const vs=variants(d.dev_id,type,'brokerage').filter(x=>x.applies_to);
-    return vs.length?grouped(vs,v=>'₹'+v+'/sq ft'):'—';};
+    return vs.length?grouped(vs,v=>'₹'+v+'/'+T('sqft')):'—';};
   let h=devHead(devs)+'<tbody>';
-  h+=rowHTML('Additional area %',null,devs.map(pctTxt),x=>x+' %');
-  h+=rowHTML('Rent – year 1','per sq ft per month',devs.map(rentTxt),inr);
-  h+=rowHTML('Rent escalation',null,devs.map(d=>{const p=areaVal(d.dev_id,type,'rent_escalation_pct');return p==null?'—':p+'% per year';}),x=>x);
-  h+=rowHTML('Brokerage',null,devs.map(brkTxt),x=>x);
-  h+=rowHTML('Corpus / hardship compensation','per sq ft',devs.map(d=>areaVal(d.dev_id,type,'hardship')),inr);
-  h+=rowHTML('Relocation (shifting)',null,devs.map(d=>amountFor(d.dev_id,type,'relocation',0,1)),inr);
+  const e=k=>esc(T(k));
+  h+=rowHTML(e('add_area_pct'),null,devs.map(pctTxt),x=>x+' %');
+  h+=rowHTML(e('rent_y1'),e('per_sqft_pm'),devs.map(rentTxt),inr);
+  h+=rowHTML(e('escalation'),null,devs.map(d=>{const p=areaVal(d.dev_id,type,'rent_escalation_pct');return p==null?'—':p+T('per_year');}),x=>x);
+  h+=rowHTML(e('brokerage'),null,devs.map(brkTxt),x=>x);
+  h+=rowHTML(e('corpus'),e('per_sqft'),devs.map(d=>areaVal(d.dev_id,type,'hardship')),inr);
+  h+=rowHTML(e('relocation'),null,devs.map(d=>amountFor(d.dev_id,type,'relocation',0,1)),inr);
   h+='</tbody>';
   $('memberTable').innerHTML=h; $('legend').classList.add('hidden');
   $('memberCard').classList.remove('hidden');
@@ -598,7 +904,7 @@ function renderReferences(){
 }
 function renderProfile(devs){
   const rows=DB.developer_profile||[]; if(!rows.length) return;
-  const titles={'Profile':'Company profile | कंपनी माहिती','Financials':'Financials (₹ crore) | आर्थिक माहिती (₹ कोटी)'};
+  const titles={'Profile':'Company profile','Financials':'Financials (₹ crore)'};
   let out='';
   for(const sec of [...new Set(rows.map(r=>r.section))]){
     const items=[...new Set(rows.filter(r=>r.section===sec).map(r=>r.item))];
