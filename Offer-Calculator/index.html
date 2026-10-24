@@ -17,6 +17,13 @@
   .lang-note{background:var(--brand-soft);color:var(--brand);border-radius:8px;padding:8px 12px;margin-top:12px;font-size:.85rem}
   .words{margin-top:16px;border:1px solid var(--line);border-left:4px solid var(--brand);border-radius:8px;padding:12px 14px;background:#fbfcfe}
   .words h3{margin:0 0 6px;font-size:.98rem;color:var(--brand)}
+  .words.savings{border-left-color:#1a7f3c;background:#f6fbf7}
+  .words.savings h3{color:#1a7f3c}
+  .words.savings .w-line{grid-template-columns:minmax(0,1fr) auto;max-width:640px}
+  .words.savings .w-amt{text-align:right}
+  .words .w-line b small{display:block;font-weight:400;font-size:.78rem;color:var(--muted)}
+  .words .w-tot{border-top:1px solid var(--line);padding-top:6px;margin-top:8px}
+  .words .w-tot b{color:var(--ink)}
   .words p{margin:6px 0;font-size:.9rem}
   .words .w-line{display:grid;grid-template-columns:minmax(90px,max-content) 1fr;gap:4px 12px;margin:8px 0 2px;align-items:baseline}
   .words .w-line b{color:var(--muted);font-weight:600;font-size:.85rem}
@@ -31,6 +38,7 @@
   #report .words .w-line{grid-template-columns:minmax(70px,max-content) 1fr;margin:4px 0 0}
   #report .words .w-line b{font-size:9.5px}
   #report .words .w-amt small{font-size:9.5px}
+  #report .words .w-line b small{font-size:8.5px}
   header{background:var(--brand);color:#fff;padding:22px 16px}
   header h1{margin:0;font-size:1.35rem;font-weight:700}
   header p{margin:4px 0 0;opacity:.85;font-size:.9rem}
@@ -223,6 +231,7 @@
     <h2><span data-i18n="your_comparison">Your offer comparison</span> <a class="ref" href="#ref-2">#2</a></h2>
     <div class="table-wrap"><table id="memberTable"></table></div>
     <p class="legend" id="legend" data-i18n="legend">Total cash benefit = rent + brokerage + relocation + corpus / hardship compensation (excludes refundable deposit and buyback).</p>
+    <div class="words savings hidden" id="savingsBox"></div>
     <div class="words hidden" id="wordsBox"></div>
   </section>
 
@@ -668,7 +677,7 @@ function buildReport(){
   const ref2=' <a class="ref" href="#ref-2">#2</a>';
   const profile=$('profileCard').classList.contains('hidden')?'':$('profileBody').innerHTML;
   const refs=(DB.sources||[]).map(r=>`<li><b>#${esc(r.ref_id)}</b> ${esc(r.title)}${r.note?` — ${esc(r.note)}`:''}${r.url?`<br><a href="${esc(r.url)}">${esc(r.url)}</a>`:''}</li>`).join('');
-  const words=$('wordsBox').classList.contains('hidden')?'':`<div class="words" lang="${LANG}">${$('wordsBox').innerHTML}</div>`;
+  const words=['savingsBox','wordsBox'].map(id=>$(id).classList.contains('hidden')?'':`<div class="${$(id).className}" lang="${LANG}">${$(id).innerHTML}</div>`).join('');
   host.innerHTML=`<div id="report" lang="${LANG}">
     <div class="rh"><h1>${esc(T('report_title'))}</h1>
       <div class="sub">Asmita Jyoti Co-operative Housing Society Ltd., Charkop Naka, Marve Road, Malad (W), Mumbai</div>
@@ -700,7 +709,7 @@ function paginate(el,W,H){
       before.parentNode.insertBefore(tr,before); }
     else { const d=document.createElement('div'); d.className='sp'; d.style.height=h+'px'; before.parentNode.insertBefore(d,before); } };
   let pageEnd=H;
-  const blocks=[...el.querySelectorAll('.rh, .sec, h2, h3, tr, .disc, li, p.note')];
+  const blocks=[...el.querySelectorAll('.rh, .sec, h2, h3:not(.words h3), .words, tr:not(.words tr), .disc, li, p.note')];
   for(const b of blocks){
     if(!b.isConnected||b.classList.contains('sp')) continue;
     let r=b.getBoundingClientRect(), t=r.top-top0(), bt=r.bottom-top0();
@@ -764,7 +773,7 @@ function toggleRent(){
   const t=document.querySelector('#memberTable .rent-toggle .tri'); if(t) t.textContent=rentOpen?'▾':'▸';
 }
 function markDirty(){ $('updateBtn').classList.add('dirty'); $('updateHint').classList.remove('hidden'); }
-function hideResults(){['flatInfo','areaNotice','memberCard','wordsBox','generalCard','commercialCard','societyCard','complianceCard','profileCard','actions','finalDisclaimer','refCard'].forEach(i=>$(i).classList.add('hidden'));}
+function hideResults(){['flatInfo','areaNotice','memberCard','wordsBox','savingsBox','generalCard','commercialCard','societyCard','complianceCard','profileCard','actions','finalDisclaimer','refCard'].forEach(i=>$(i).classList.add('hidden'));}
 
 function rowHTML(label,sub,vals,fmt,bestMode,cls){
   const nums=vals.map(v=>typeof v==='number'?v:null).filter(v=>v!=null);
@@ -807,7 +816,7 @@ function render(redraw){
 
   if(area==null){
     $('areaNotice').textContent=T('area_na')+' '+T(type==='Shop'?'rates_shop':'rates_unit');
-    $('areaNotice').classList.remove('hidden'); $('wordsBox').classList.add('hidden');
+    $('areaNotice').classList.remove('hidden'); $('wordsBox').classList.add('hidden'); $('savingsBox').classList.add('hidden');
     renderRates(devs,type); return;
   }
   $('areaNotice').classList.add('hidden'); $('legend').classList.remove('hidden');
@@ -826,7 +835,7 @@ function render(redraw){
     const deposit=amountFor(d.dev_id,type,'refundable_deposit',area,months);
     const buyback=perSqft(d.dev_id,type,'buyback',area);
     const parking=areaVal(d.dev_id,type,'free_parking');
-    const total=[rent?.total,brokerage,relocation,hardship,maintSave,taxSave].reduce((s,v)=>s+(v||0),0);
+    const total=[rent?.total,brokerage,relocation,hardship].reduce((s,v)=>s+(v||0),0);
     return {d,pct,fixed,newArea,addArea:newArea==null?null:newArea-area,rent,brokerage,relocation,hardship,deposit,buyback,parking,total};
   });
   const e=k=>esc(T(k)), ev=(k,v)=>esc(T(k,v));
@@ -850,17 +859,30 @@ function render(redraw){
   h+=rowHTML(e('brokerage'),null,calc.map(c=>c.brokerage),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'brokerage'))}</small>`,'max');
   h+=rowHTML(e('relocation'),null,calc.map(c=>c.relocation),inr,'max');
   h+=rowHTML(e('corpus'),null,calc.map(c=>c.hardship),inr,'max');
-  if(mMaint) h+=rowHTML(ev('maint_save',{n:months}),ev('save_sub',{amt:inr(mMaint),n:months}),calc.map(()=>maintSave),inr);
-  if(mTax) h+=rowHTML(ev('tax_save',{n:months}),ev('save_sub',{amt:inr(mTax),n:months}),calc.map(()=>taxSave),inr);
   h+=`<tr class="total"><td>${e('total')}</td>`+calc.map(c=>`<td>${inr(c.total)}</td>`).join('')+'</tr>';
   if(curRent>0) h+=rowHTML(e('net_gain'),ev('net_gain_sub',{n:months,amt:inr(curRent*months)}),calc.map(c=>c.total-curRent*months),signed,null,'adv');
   h+=rowHTML(e('deposit'),e('not_added'),calc.map(c=>c.deposit??T('not_stated')),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'refundable_deposit'))}</small>`,null);
   h+=rowHTML(e('buyback'),e('buyback_sub'),calc.map(c=>c.buyback??T('na')),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'buyback'))}</small>`,null);
   h+='</tbody>';
   $('memberTable').innerHTML=h;
+  renderSavings(mMaint,mTax,months);
   renderWords(calc,curRent,months);
 
   $('memberCard').classList.remove('hidden');
+}
+
+/* Savings that do not depend on the developer: society maintenance and property tax not payable during the rent period */
+function renderSavings(mMaint,mTax,months){
+  const box=$('savingsBox');
+  if(!(mMaint||mTax)){ box.classList.add('hidden'); return; }
+  const e=k=>esc(T(k));
+  const line=(lab,sub,v)=>`<div class="w-line"><b>${lab}<small>${sub}</small></b><div class="w-amt">${inr(v)}</div></div>`;
+  let h=`<h3>${e('savings_title')}</h3><p>${e('savings_note')}</p>`;
+  if(mMaint) h+=line(esc(T('maint_save',{n:months})),esc(T('save_sub',{amt:inr(mMaint),n:months})),mMaint*months);
+  if(mTax) h+=line(esc(T('tax_save',{n:months})),esc(T('save_sub',{amt:inr(mTax),n:months})),mTax*months);
+  const tot=(mMaint+mTax)*months;
+  h+=`<div class="w-line w-tot"><b>${e('savings_total')}</b><div class="w-amt">${inr(tot)}<small>${esc(numWords(tot,LANG))}</small></div></div>`;
+  box.innerHTML=h; box.setAttribute('lang',LANG); box.classList.remove('hidden');
 }
 
 /* Benefit in words, in the selected language only. Shows the range across developers WITHOUT naming any developer. */
