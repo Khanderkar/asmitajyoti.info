@@ -22,6 +22,9 @@
   .words.savings .w-line{grid-template-columns:minmax(0,1fr) auto;max-width:640px}
   .words.savings .w-amt{text-align:right}
   .words .w-line b small{display:block;font-weight:400;font-size:.78rem;color:var(--muted)}
+  .words .w-cols.two{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px}
+  .words .w-cols.two .w-col+.w-col{border-left:1px solid var(--line);padding-left:20px}
+  @media (max-width:720px){.words .w-cols.two{grid-template-columns:1fr}.words .w-cols.two .w-col+.w-col{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:6px}}
   .words .w-tot{border-top:1px solid var(--line);padding-top:6px;margin-top:8px}
   .words .w-tot b{color:var(--ink)}
   .words p{margin:6px 0;font-size:.9rem}
@@ -39,6 +42,8 @@
   #report .words .w-line b{font-size:9.5px}
   #report .words .w-amt small{font-size:9.5px}
   #report .words .w-line b small{font-size:8.5px}
+  #report .words .w-cols.two{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}
+  #report .words .w-cols.two .w-col+.w-col{border-left:1px solid #d0d5dd;padding-left:12px;border-top:0;padding-top:0}
   header{background:var(--brand);color:#fff;padding:22px 16px}
   header h1{margin:0;font-size:1.35rem;font-weight:700}
   header p{margin:4px 0 0;opacity:.85;font-size:.9rem}
@@ -101,7 +106,21 @@
   .actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:-4px 0 18px}
   .actions.hidden{display:none}
   .print-stamp{font-size:.8rem;color:var(--muted)}
-  .action-btns{display:flex;gap:10px;flex-wrap:wrap}
+  .action-btns{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .style-pick{display:flex;gap:4px;border:1px solid #cfd4dc;border-radius:8px;padding:3px;background:#fff}
+  .style-pick label{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted)}
+  .style-pick label:has(input:checked){background:var(--brand-soft);color:var(--brand)}
+  .style-pick input{accent-color:var(--brand);margin:0}
+  /* graphics report header */
+  #report .rh-g{position:relative;border-radius:8px;overflow:hidden;color:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #report .rh-g img{display:block;width:100%;height:auto}
+  #report .rh-g .txt{position:absolute;left:16px;top:14px;right:42%;text-shadow:0 1px 3px rgba(0,0,0,.35)}
+  #report .rh-g h1{font-size:17px;margin:0 0 4px;line-height:1.2}
+  #report .rh-g .sub{font-size:9.5px;opacity:.95}
+  #report .rh-g .unitbadge{display:inline-block;margin-top:8px;background:rgba(255,255,255,.92);color:#0f4c81;border-radius:6px;padding:4px 10px;font-weight:700;font-size:12px;text-shadow:none}
+  #report .rh-g .meta{position:absolute;left:16px;bottom:10px;font-size:8.5px;opacity:.95}
+  #report.g .sec{margin-top:0}
+  #report.g h2{margin:10px 0 5px}
   .btn-sec{padding:9px 16px;border:1px solid var(--brand);border-radius:8px;background:#fff;color:var(--brand);font:inherit;font-weight:600;cursor:pointer}
   .btn-sec:hover{background:var(--brand-soft)}
   .btn-sec:disabled{opacity:.6;cursor:wait}
@@ -157,7 +176,7 @@
   @media print{
     @page{size:A4;margin:14mm 18mm 16mm 18mm;@bottom-right{content:"Page " counter(page) " of " counter(pages);font-size:8pt;color:#666}@bottom-left{content:"Asmita Jyoti CHSL - Offer comparison";font-size:8pt;color:#666}}
     body{background:#fff!important}
-    body > *:not(#printHost){display:none!important}
+    body > *:not(#printHost):not(.measure){display:none!important}
     #printHost{display:block!important}
     #report{width:auto}
   }
@@ -222,6 +241,10 @@
   <div class="actions hidden" id="actions">
     <span class="print-stamp" id="printStamp"></span>
     <div class="action-btns">
+      <div class="style-pick" role="radiogroup" aria-label="Report style">
+        <label><input type="radio" name="rstyle" value="text" checked> <span data-i18n="mode_text">Text</span></label>
+        <label><input type="radio" name="rstyle" value="graphics"> <span data-i18n="mode_graphics">Graphics</span></label>
+      </div>
       <button type="button" class="btn-sec" id="printBtn">🖨 <span data-i18n="print">Print</span></button>
       <button type="button" class="btn-sec" id="pdfBtn">⬇ <span data-i18n="pdf">Export to PDF</span></button>
     </div>
@@ -645,7 +668,7 @@ function initSelectors(){
   $('updateBtn').onclick=render;
   $('printBtn').onclick=doPrint;
   $('pdfBtn').onclick=exportPDF;
-  window.addEventListener('beforeprint',()=>{ if(shown) buildReport(); });
+  window.addEventListener('beforeprint',()=>{ if(shown) prepPrint(); });
   $('lastUpdated').textContent=setting('offers_last_updated','09-Oct-2026');
   applyLang();
 }
@@ -658,12 +681,14 @@ function loadPdfLib(){
     sc.onload=()=>res(true); sc.onerror=()=>res(false); document.head.appendChild(sc);});
 }
 let LAST=null;
+const HEADER_IMG='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iMCAwIDEyMDAgMzQwIj4gPGRlZnM+IDxsaW5lYXJHcmFkaWVudCBpZD0ic2t5IiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOWNjN2VhIi8+PHN0b3Agb2Zmc2V0PSIuNiIgc3RvcC1jb2xvcj0iI2U2ZWVmMyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2ZiZThjOCIvPjwvbGluZWFyR3JhZGllbnQ+IDxyYWRpYWxHcmFkaWVudCBpZD0ic3VuIiBjeD0iLjUiIGN5PSIuNSIgcj0iLjUiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZjZkOCIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjZmZlNmE2IiBzdG9wLW9wYWNpdHk9Ii45Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZmZlNmE2IiBzdG9wLW9wYWNpdHk9IjAiLz48L3JhZGlhbEdyYWRpZW50PiA8bGluZWFyR3JhZGllbnQgaWQ9InR3IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMCI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZjFjNDhjIi8+PHN0b3Agb2Zmc2V0PSIuNTUiIHN0b3AtY29sb3I9IiNlN2FkNmMiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNjOThhNGMiLz48L2xpbmVhckdyYWRpZW50PiA8bGluZWFyR3JhZGllbnQgaWQ9InR3MiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2Y3ZTJjMiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2UwYmY5MyIvPjwvbGluZWFyR3JhZGllbnQ+IDxwYXR0ZXJuIGlkPSJ3aW4iIHdpZHRoPSIyMiIgaGVpZ2h0PSIyMCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHJlY3Qgd2lkdGg9IjIyIiBoZWlnaHQ9IjIwIiBmaWxsPSJub25lIi8+PHJlY3QgeD0iNCIgeT0iNSIgd2lkdGg9IjEzIiBoZWlnaHQ9IjEwIiByeD0iMS41IiBmaWxsPSIjNmY4ZmFlIiBvcGFjaXR5PSIuODUiLz48cmVjdCB4PSI0IiB5PSIxNSIgd2lkdGg9IjEzIiBoZWlnaHQ9IjIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii41NSIvPjwvcGF0dGVybj4gPHBhdHRlcm4gaWQ9IndpbjIiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxNiIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHJlY3QgeD0iNCIgeT0iNCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjgiIHJ4PSIxIiBmaWxsPSIjOGFhNmJmIiBvcGFjaXR5PSIuNiIvPjwvcGF0dGVybj4gPGxpbmVhckdyYWRpZW50IGlkPSJmYWRlIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMCI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMGY0YzgxIiBzdG9wLW9wYWNpdHk9Ii45MiIvPjxzdG9wIG9mZnNldD0iLjQyIiBzdG9wLWNvbG9yPSIjMGY0YzgxIiBzdG9wLW9wYWNpdHk9Ii41NSIvPjxzdG9wIG9mZnNldD0iLjYyIiBzdG9wLWNvbG9yPSIjMGY0YzgxIiBzdG9wLW9wYWNpdHk9IjAiLz48L2xpbmVhckdyYWRpZW50PiA8bGluZWFyR3JhZGllbnQgaWQ9Imdyb3VuZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzZmOWE0ZSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzNmNmIyZSIvPjwvbGluZWFyR3JhZGllbnQ+IDwvZGVmcz4gPHJlY3Qgd2lkdGg9IjEyMDAiIGhlaWdodD0iMzQwIiBmaWxsPSJ1cmwoI3NreSkiLz4gPGNpcmNsZSBjeD0iMTA0MCIgY3k9IjcwIiByPSIxMjAiIGZpbGw9InVybCgjc3VuKSIvPiA8ZyBvcGFjaXR5PSIuNTUiIGZpbGw9InVybCgjdHcyKSI+IDxyZWN0IHg9IjQzMCIgeT0iMTIwIiB3aWR0aD0iOTAiIGhlaWdodD0iMTkwIi8+PHJlY3QgeD0iOTgwIiB5PSIxMzUiIHdpZHRoPSI4NSIgaGVpZ2h0PSIxNzUiLz48cmVjdCB4PSIxMDkwIiB5PSIxNTAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIxNjAiLz4gPC9nPiA8ZyBvcGFjaXR5PSIuNTUiPjxyZWN0IHg9IjQzMCIgeT0iMTIwIiB3aWR0aD0iOTAiIGhlaWdodD0iMTkwIiBmaWxsPSJ1cmwoI3dpbjIpIi8+PHJlY3QgeD0iOTgwIiB5PSIxMzUiIHdpZHRoPSI4NSIgaGVpZ2h0PSIxNzUiIGZpbGw9InVybCgjd2luMikiLz48cmVjdCB4PSIxMDkwIiB5PSIxNTAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIxNjAiIGZpbGw9InVybCgjd2luMikiLz48L2c+IDxnPiA8cmVjdCB4PSI1NDAiIHk9IjQwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjI4MCIgZmlsbD0idXJsKCN0dykiLz48cmVjdCB4PSI1NDAiIHk9IjQwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjI4MCIgZmlsbD0idXJsKCN3aW4pIi8+PHJlY3QgeD0iNTMyIiB5PSIzMiIgd2lkdGg9IjE2NiIgaGVpZ2h0PSIxMiIgZmlsbD0iI2I5ODE0YSIvPiA8cmVjdCB4PSI3MDUiIHk9Ijg1IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjIzNSIgZmlsbD0idXJsKCN0dykiLz48cmVjdCB4PSI3MDUiIHk9Ijg1IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjIzNSIgZmlsbD0idXJsKCN3aW4pIi8+PHJlY3QgeD0iNjk5IiB5PSI3OCIgd2lkdGg9IjEzMiIgaGVpZ2h0PSIxMCIgZmlsbD0iI2I5ODE0YSIvPiA8cmVjdCB4PSI4NDAiIHk9IjYwIiB3aWR0aD0iMTMwIiBoZWlnaHQ9IjI2MCIgZmlsbD0idXJsKCN0dykiLz48cmVjdCB4PSI4NDAiIHk9IjYwIiB3aWR0aD0iMTMwIiBoZWlnaHQ9IjI2MCIgZmlsbD0idXJsKCN3aW4pIi8+PHJlY3QgeD0iODM0IiB5PSI1MiIgd2lkdGg9IjE0MiIgaGVpZ2h0PSIxMSIgZmlsbD0iI2I5ODE0YSIvPiA8cmVjdCB4PSI2OTAiIHk9IjE1MCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjE3MCIgZmlsbD0iI2M5OGE0YyIvPjxyZWN0IHg9IjgyNSIgeT0iMTcwIiB3aWR0aD0iMTUiIGhlaWdodD0iMTUwIiBmaWxsPSIjYzk4YTRjIi8+IDwvZz4gPHJlY3QgeT0iMjkyIiB3aWR0aD0iMTIwMCIgaGVpZ2h0PSI0OCIgZmlsbD0idXJsKCNncm91bmQpIi8+IDxnIGZpbGw9IiM0ZjdkMzkiPjxjaXJjbGUgY3g9IjQ3MCIgY3k9IjMwMCIgcj0iMzQiLz48Y2lyY2xlIGN4PSI1MjAiIGN5PSIyOTIiIHI9IjI4Ii8+PGNpcmNsZSBjeD0iNjAwIiBjeT0iMzA1IiByPSIzMCIvPjxjaXJjbGUgY3g9IjcwMCIgY3k9IjI5OCIgcj0iMzYiLz48Y2lyY2xlIGN4PSI3OTAiIGN5PSIzMDYiIHI9IjMwIi8+PGNpcmNsZSBjeD0iODgwIiBjeT0iMjk2IiByPSIzNCIvPjxjaXJjbGUgY3g9Ijk2MCIgY3k9IjMwNCIgcj0iMzAiLz48Y2lyY2xlIGN4PSIxMDUwIiBjeT0iMjk0IiByPSIzOCIvPjxjaXJjbGUgY3g9IjExNDAiIGN5PSIzMDIiIHI9IjMyIi8+PC9nPiA8ZyBmaWxsPSIjM2M2YTJjIj48Y2lyY2xlIGN4PSI0NDAiIGN5PSIzMTgiIHI9IjI2Ii8+PGNpcmNsZSBjeD0iNjUwIiBjeT0iMzIwIiByPSIyNCIvPjxjaXJjbGUgY3g9IjgzMCIgY3k9IjMyMiIgcj0iMjYiLz48Y2lyY2xlIGN4PSIxMDAwIiBjeT0iMzIwIiByPSIyNCIvPjxjaXJjbGUgY3g9IjExODAiIGN5PSIzMTgiIHI9IjI2Ii8+PC9nPiA8ZyBmaWxsPSIjMWQyZjQ1Ij4gPGNpcmNsZSBjeD0iNzYwIiBjeT0iMjQ2IiByPSIyNCIvPjxwYXRoIGQ9Ik03MTIgMzQwIEM3MTIgMjkyIDcyOCAyNzIgNzYwIDI3MiBDNzkyIDI3MiA4MDggMjkyIDgwOCAzNDAgWiIvPiA8Y2lyY2xlIGN4PSI4MzAiIGN5PSIyNTYiIHI9IjIxIi8+PHBhdGggZD0iTTc5MCAzNDAgQzc5MCAzMDAgODAzIDI4MiA4MzAgMjgyIEM4NTcgMjgyIDg3MCAzMDAgODcwIDM0MCBaIi8+PHBhdGggZD0iTTgxMiAyNTAgQzgwOCAyOTAgODE4IDMxMiA4MzIgMzE4IEw4NDggMzE4IEM4NTIgMjkyIDg1MiAyNjggODQ2IDI1MCBaIiBvcGFjaXR5PSIuOTUiLz4gPGNpcmNsZSBjeD0iODkwIiBjeT0iMjkyIiByPSIxNSIvPjxwYXRoIGQ9Ik04NjQgMzQwIEM4NjQgMzE2IDg3MyAzMDYgODkwIDMwNiBDOTA3IDMwNiA5MTYgMzE2IDkxNiAzNDAgWiIvPiA8L2c+IDxyZWN0IHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjM0MCIgZmlsbD0idXJsKCNmYWRlKSIvPiA8L3N2Zz4=';
+const reportStyle=()=>(document.querySelector('input[name=rstyle]:checked')||{}).value||'text';
 /* Build a clean, A4-ready report from the current results */
 function buildReport(){
-  const host=$('printHost'); const L=LAST||{};
+  const host=$('printHost'); const L=LAST||{}; const G=reportStyle()==='graphics';
   const clone=id=>{const el=$(id); if(!el||el.closest('.hidden')) return '';
     const t=el.cloneNode(true); t.removeAttribute('id');
-    t.querySelectorAll('tr.rent-year').forEach(r=>r.classList.remove('hidden'));
+    t.querySelectorAll('tr.rent-year').forEach(r=>{ if(G) r.remove(); else r.classList.remove('hidden'); });   // graphics: keep to one page
     t.querySelectorAll('.tri,tr.rent-toggle small').forEach(x=>x.remove());
     t.querySelectorAll('[onclick]').forEach(x=>x.removeAttribute('onclick'));
     return t.outerHTML;};
@@ -678,11 +703,18 @@ function buildReport(){
   const profile=$('profileCard').classList.contains('hidden')?'':$('profileBody').innerHTML;
   const refs=(DB.sources||[]).map(r=>`<li><b>#${esc(r.ref_id)}</b> ${esc(r.title)}${r.note?` — ${esc(r.note)}`:''}${r.url?`<br><a href="${esc(r.url)}">${esc(r.url)}</a>`:''}</li>`).join('');
   const words=['savingsBox','wordsBox'].map(id=>$(id).classList.contains('hidden')?'':`<div class="${$(id).className}" lang="${LANG}">${$(id).innerHTML}</div>`).join('');
-  host.innerHTML=`<div id="report" lang="${LANG}">
-    <div class="rh"><h1>${esc(T('report_title'))}</h1>
+  const img=setting('graphics_header_image','').trim();
+  const head=G?`<div class="rh-g"><img src="${img?esc(DATA_DIR.replace(/data\/$/,'')+img):HEADER_IMG}" alt="">
+      <div class="txt"><h1>${esc(T('report_title'))}</h1>
+        <div class="sub">Asmita Jyoti Co-operative Housing Society Ltd., Charkop Naka, Marve Road, Malad (W), Mumbai</div>
+        <div class="unitbadge">${esc(T('unit'))} ${esc(L.unit||'')}</div></div>
+      <div class="meta">${esc(T('last_updated'))}: <b>${esc(setting('offers_last_updated',''))}</b> · ${esc(T('generated_on'))}: ${gen} · ${esc(T('indicative'))}</div></div>`
+    :`<div class="rh"><h1>${esc(T('report_title'))}</h1>
       <div class="sub">Asmita Jyoti Co-operative Housing Society Ltd., Charkop Naka, Marve Road, Malad (W), Mumbai</div>
       <div class="meta"><span>${esc(T('last_updated'))}: <b>${esc(setting('offers_last_updated',''))}</b></span><span>${esc(T('generated_on'))}: ${gen}</span></div>
-      <div class="meta"><span class="warn">${esc(T('indicative'))}</span></div></div>
+      <div class="meta"><span class="warn">${esc(T('indicative'))}</span></div></div>`;
+  host.innerHTML=`<div id="report" class="${G?'g':''}" lang="${LANG}">
+    ${head}
     ${sec(esc(T('your_unit')),sum)}
     ${sec(esc(T('offer_comparison'))+ref2, clone('memberTable')+`<p class="note">${esc(T('legend'))}</p>`+words)}
     ${sec(esc(T('sec_other'))+ref2, clone('generalTable'))}
@@ -733,7 +765,26 @@ function paginate(el,W,H){
   }
   return wrap;
 }
-function doPrint(){ buildReport(); setTimeout(()=>window.print(),50); }
+/* Graphics style: shrink the report so that it fits on ONE A4 page. Returns the layout width to use. */
+function measure(el,w){ const wrap=document.createElement('div'); wrap.className='measure'; el.style.width=w+'px';
+  wrap.style.cssText=`position:absolute;left:0;top:0;width:${w}px;visibility:hidden;z-index:-1;pointer-events:none`;
+  document.body.appendChild(wrap); wrap.appendChild(el); const h=el.getBoundingClientRect().height; return {wrap,h}; }
+function fitWidth(el,W,H){
+  let w=W, m=measure(el,w);
+  while(m.h*W/w>H && w<W*2.6){ m.wrap.remove(); w=Math.round(w*1.06); m=measure(el,w); }   // wider layout = smaller when scaled to the page
+  return {wrap:m.wrap,w};
+}
+function prepPrint(){
+  const el=buildReport();
+  if(reportStyle()==='graphics'){
+    const W=Math.floor((210-36)/25.4*96), H=Math.floor((297-30)/25.4*96)-10;  // printable box at the @page margins
+    const {wrap}=measure(el,W); const h=el.getBoundingClientRect().height; wrap.remove(); $('printHost').appendChild(el);
+    const lim=H*(matchMedia('print').matches?1:0.8);   // measured on screen: print fonts run a little taller, keep a margin
+    if(h>lim) el.style.zoom=(lim/h).toFixed(3);                              // shrink to one page
+  }
+  return el;
+}
+function doPrint(){ prepPrint(); setTimeout(()=>window.print(),50); }
 async function exportPDF(){
   const name='Offer_Comparison_'+unitLabel()+'.pdf';
   const btn=$('pdfBtn'); btn.disabled=true; const old=btn.innerHTML; btn.textContent=T('preparing');
@@ -746,7 +797,19 @@ async function exportPDF(){
   const MT=14, MS=18, MB=16;                        // page margins in mm: top, sides, bottom (footer sits in the bottom margin)
   const cw=210-2*MS, ch=297-MT-MB;
   const W=Math.floor(cw/25.4*96), H=Math.floor(W*2*ch/cw)/2;   // A4 content box in CSS px (same rounding as html2pdf at scale 2)
-  const wrap=paginate(el,W,H);
+  const G=reportStyle()==='graphics';
+  let wrap;
+  let target=el;
+  if(G){ // one page: lay the report out wider, then scale it down (CSS transform) into an A4-sized box
+    await Promise.all([...el.querySelectorAll('img')].map(i=>i.decode().catch(()=>{})));
+    const f=fitWidth(el,W,H), sc=W/f.w, h=el.getBoundingClientRect().height;
+    wrap=f.wrap; wrap.style.width=W+'px';
+    const box=document.createElement('div'); box.style.cssText=`width:${W}px;height:${Math.ceil(h*sc)+2}px;overflow:hidden;background:#fff`;
+    wrap.appendChild(box); box.appendChild(el);
+    el.style.width=f.w+'px'; el.style.transformOrigin='0 0'; el.style.transform=`scale(${sc})`;
+    target=box;
+  }
+  else wrap=paginate(el,W,H);
   try{
     await html2pdf().set({
       margin:[MT,MS,MB,MS], filename:name,
@@ -754,7 +817,7 @@ async function exportPDF(){
       html2canvas:{scale:2,useCORS:true,scrollX:0,scrollY:0,backgroundColor:'#ffffff'},
       jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, enableLinks:true,
       pagebreak:{mode:[]}
-    }).from(el).toPdf().get('pdf').then(pdf=>{
+    }).from(target).toPdf().get('pdf').then(pdf=>{
       // footer on every page: unit on the left, "Page X of Y" on the right
       const n=pdf.internal.getNumberOfPages(), pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
       const left='Asmita Jyoti CHSL - Offer comparison - '+(LAST&&LAST.unit?LAST.unit:'');
@@ -896,8 +959,9 @@ function renderWords(calc,curRent,months){
     return Math.round(lo)===Math.round(hi) ? `<p>${esc(intro)}</p>`+line('',lo)
          : `<p>${esc(intro)}</p>`+line(T('words_from'),lo)+line(T('words_to'),hi); };
   let h=`<h3>${esc(T('words_title'))}</h3>`;
-  h+=range(T(new Set(tots.map(Math.round)).size>1?'words_intro':'words_single'),tots);
-  if(curRent>0) h+=range(T('words_net_intro'),calc.filter(c=>c.total>0).map(c=>c.total-curRent*months));
+  const cols=[range(T(new Set(tots.map(Math.round)).size>1?'words_intro':'words_single'),tots)];
+  if(curRent>0) cols.push(range(T('words_net_intro'),calc.filter(c=>c.total>0).map(c=>c.total-curRent*months)));
+  h+=`<div class="w-cols${cols.length>1?' two':''}">`+cols.map(c=>`<div class="w-col">${c}</div>`).join('')+'</div>';   // rented: total and net gain side by side
   h+=`<p class="w-note">${esc(T('words_note'))}</p>`;
   box.innerHTML=h; box.setAttribute('lang',LANG); box.classList.remove('hidden');
 }
