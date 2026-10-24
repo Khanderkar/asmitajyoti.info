@@ -10,4 +10,4 @@ show_developer_profile,0,Section switch: About the developers (profile & financi
 show_closing_disclaimer,0,Section switch: Disclaimer box at the end (header disclaimer line always shows)
 show_references,0,Section switch: References list at the end and the #1 #2 source markers
 show_print_pdf_buttons,1,Print and Export to PDF buttons above the results
-graphics_header_image,,Optional picture for the Graphics print / PDF header (e.g. img/header.jpg in this folder). Blank = built-in illustration
+graphics_header_image,img/header.jpg,Optional picture for the Graphics print / PDF header (e.g. img/header.jpg in this folder). Blank = built-in illustration
