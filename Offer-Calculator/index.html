@@ -154,7 +154,9 @@
   #report h2{font-size:12px;margin:14px 0 6px;padding-bottom:3px;border-bottom:2px solid #0f4c81;color:#0f4c81;break-after:avoid;page-break-after:avoid}
   #report h3{font-size:11px;margin:10px 0 5px;color:#0f4c81;break-after:avoid;page-break-after:avoid}
   #report table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed;margin:0}
-  #report th,#report td{padding:4px 5px;border:1px solid #d0d5dd;font-size:9.5px;vertical-align:top;word-wrap:break-word;overflow-wrap:anywhere;text-align:right}
+  #report th,#report td{padding:4px 5px;border:1px solid #d0d5dd;font-size:9.5px;vertical-align:top;word-wrap:break-word;overflow-wrap:anywhere;word-break:break-word;text-align:right}
+  #report{max-width:100%;overflow-wrap:anywhere}
+  #report table{max-width:100%}
   #report th:first-child,#report td:first-child{text-align:left;width:27%}
   #report td.text{text-align:left}
   #report thead th{background:#eef2f7;color:#1c2230;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -738,10 +740,21 @@ function buildReport(){
 }
 /* Lay the report out at A4 content width and insert spacers so that no row, heading or block is cut
    across a page, headings stay with their tables, and continued tables repeat their header row. */
+/* Some browsers / fonts (e.g. Windows fonts for Indian scripts) draw text wider; if a table would then be wider than
+   the page, reduce that table's font size until it fits, so nothing is cut off at the right edge. */
+function fitTables(el){
+  const box=el.getBoundingClientRect(); if(!box.width) return;
+  el.querySelectorAll('table').forEach(t=>{
+    const cells=[...t.querySelectorAll('th,td')]; if(!cells.length) return;
+    let fs=parseFloat(getComputedStyle(cells[0]).fontSize)||9.5, guard=0;
+    const too=()=>t.scrollWidth>t.getBoundingClientRect().width+1 || t.getBoundingClientRect().right>box.right+1 || el.scrollWidth>el.clientWidth+1;
+    while(too() && fs>6 && guard++<16){ fs-=0.5; cells.forEach(c=>{ c.style.fontSize=fs+'px'; c.querySelectorAll('small').forEach(x=>x.style.fontSize=Math.max(5.5,fs-1.5)+'px'); }); }
+  });
+}
 function paginate(el,W,H){
   const wrap=document.createElement('div');
   wrap.style.cssText=`position:absolute;left:0;top:0;width:${W}px;visibility:hidden;z-index:-1;pointer-events:none`;
-  document.body.appendChild(wrap); wrap.appendChild(el);
+  document.body.appendChild(wrap); wrap.appendChild(el); fitTables(el);
   const top0=()=>el.getBoundingClientRect().top;
   const isHead=n=>n&&/^H[23]$/.test(n.tagName);
   const spacer=(before,h)=>{ if(h<=0) return;
@@ -789,6 +802,7 @@ function fitWidth(el,W,H){
 }
 function prepPrint(){
   const el=buildReport();
+  { const W=Math.floor((210-2*PM)/25.4*96); const m=measure(el,W); fitTables(el); m.wrap.remove(); el.style.width=''; $('printHost').appendChild(el); }
   if(reportStyle()==='graphics'){
     const W=Math.floor((210-2*PM)/25.4*96), H=Math.floor((297-2*PM)/25.4*96)-10;  // printable box at the @page margins
     const {wrap}=measure(el,W); const h=el.getBoundingClientRect().height; wrap.remove(); el.style.width=''; $('printHost').appendChild(el);
@@ -840,7 +854,7 @@ async function onePageBox(){
   try{ await document.fonts.ready; }catch(e){}
   const MT=PM, MS=PM, MB=PM, cw=210-2*MS, ch=297-MT-MB;
   const W=Math.floor(cw/25.4*96), H=Math.floor(W*2*ch/cw)/2;
-  const f=fitWidth(el,W,H), sc=W/f.w, h=el.getBoundingClientRect().height;
+  const f=fitWidth(el,W,H); fitTables(el); const sc=W/f.w, h=el.getBoundingClientRect().height;
   const wrap=f.wrap; wrap.style.width=W+'px';
   const box=document.createElement('div'); box.style.cssText=`width:${W}px;height:${Math.ceil(h*sc)+2}px;overflow:hidden;background:#fff`;
   wrap.appendChild(box); box.appendChild(el);
