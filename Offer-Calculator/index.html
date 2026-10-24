@@ -1020,7 +1020,7 @@ function renderWords(calc,curRent,months,sav){   // sav = maintenance + property
   const line=(lab,v)=>`<div class="w-line"><b>${esc(lab)}</b><div class="w-amt">${amt(v)}<small>${esc(wds(v))}</small></div></div>`;
   const intro=curRent>0?T(sav?'words_net_intro_s':'words_net_intro'):T(sav?'words_intro_s':'words_intro');
   let h=`<h3>${esc(T('words_title'))}</h3><p>${esc(intro)}</p>`;
-  h+=Math.round(lo)===Math.round(hi)?line('',lo):line(T('words_from'),lo)+line(T('words_to'),hi);
+  h+=Math.round(lo)===Math.round(hi)?line('',lo):line(T('words_to'),hi)+line(T('words_from'),lo);   // maximum first, then minimum
   if(curRent>0) h+=`<p class="w-ded">${esc(T('words_rent_ded',{amt:inr(curRent),n:months,tot:inr(curRent*months)}))}</p>`;
   h+=`<p class="w-note">${sav?esc(T('words_incl',{amt:inr(sav)}))+' ':''}${esc(T('words_note'))}</p>`;
   box.innerHTML=h; box.setAttribute('lang',LANG); box.classList.remove('hidden');
