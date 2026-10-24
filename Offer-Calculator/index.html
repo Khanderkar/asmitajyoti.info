@@ -210,6 +210,32 @@
     #printHost{display:block!important}
     #report{width:auto}
   }
+  /* All views (screen, Text and Graphics print / PDF): grey text -> black, normal black text -> bold,
+     totals extra bold; blue / green / white text unchanged */
+  #report{color:#000}
+  #report th,#report td,#report thead th,#report thead th.dev{color:#000;font-weight:700}
+  #report td small,#report th small,#report td.muted,#report .muted,#report .row-head small,#report tr.highlight td small{color:#000;font-weight:400}
+  #report tr.highlight td{font-weight:800}
+  #report tr.total td{color:#000;font-weight:900}
+  #report .legend,#report .note{color:#000}
+  #report .words p{color:#000;font-weight:700}
+  #report .words .w-amt{color:#000;font-weight:800}
+  #report .words .w-line b,#report .words .w-tot b{color:#000;font-weight:600}
+  #report .words.savings .w-tot b,#report .words.savings .w-tot .w-amt{color:#000;font-weight:900}
+  #report .words .w-line b small,#report .words .w-amt small,#report .words .w-note{color:#000;font-weight:400}
+  .card th,.card td,.card thead th,.card thead th.dev{color:#000;font-weight:700}
+  .card td small,.card th small,.card td.muted,.card .muted,.card .row-head small,.card tr.highlight td small{color:#000;font-weight:400}
+  .card tr.highlight td{font-weight:800}
+  .card tr.total td{color:#000;font-weight:900}
+  .card .legend,.card .note{color:#000}
+  .card .words p{color:#000;font-weight:700}
+  .card .words .w-amt{color:#000;font-weight:800}
+  .card .words .w-line b,.card .words .w-tot b{color:#000;font-weight:600}
+  .card .words.savings .w-tot b,.card .words.savings .w-tot .w-amt{color:#000;font-weight:900}
+  .card .words .w-line b small,.card .words .w-amt small,.card .words .w-note{color:#000;font-weight:400}
+  .card tr.total td,.card .words.savings .w-tot b,.card .words.savings .w-tot .w-amt{font-size:1.08rem}
+  #report.t tr.total td,#report.t .words.savings .w-tot b,#report.t .words.savings .w-tot .w-amt{font-size:11px}
+  #report.g tr.total td,#report.g .words.savings .w-tot b,#report.g .words.savings .w-tot .w-amt{font-size:13px}
 </style>
 </head>
 <body>
