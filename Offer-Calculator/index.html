@@ -19,7 +19,9 @@
   .words h3{margin:0 0 6px;font-size:.98rem;color:var(--brand)}
   .words.savings{border-left-color:#1a7f3c;background:#f6fbf7}
   .words.savings h3{color:#1a7f3c}
-  .words.savings .w-line{grid-template-columns:minmax(0,1fr) auto;max-width:640px}
+  .words.savings .w-line{grid-template-columns:80% 20%;gap:4px 0}
+  .words.savings .w-amt{padding-left:12px}
+  @media (max-width:600px){.words.savings .w-line{grid-template-columns:62% 38%}}
   .words.savings .w-amt{text-align:right}
   .words .w-line b small{display:block;font-weight:400;font-size:.78rem;color:var(--muted)}
   .words .w-cols.two{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px}
@@ -1001,21 +1003,23 @@ function renderSavings(mMaint,mTax,months){
 }
 
 /* Benefit in words, in the selected language only. Shows the range across developers WITHOUT naming any developer. */
-function renderWords(calc,curRent,months,sav){   // sav = maintenance + property tax saving, added to both ranges
+function renderWords(calc,curRent,months,sav){   // sav = maintenance + property tax saving
+  /* Same figures as the printed letters: benefit = total cash benefit + savings, minus current rent for the rent period
+     when the flat is rented. Upper / lower amounts come from the developers set in settings.csv
+     (words_high_dev / words_low_dev, letters used RAMKY / MAHINDRA); developer names are never shown. */
   sav=sav||0;
   const box=$('wordsBox');
-  const tots=calc.map(c=>c.total).filter(v=>v>0);
-  if(!tots.length){ box.classList.add('hidden'); return; }
+  const ok=calc.filter(c=>c.total>0);
+  if(!ok.length){ box.classList.add('hidden'); return; }
+  const val=c=>c.total+sav-(curRent>0?curRent*months:0);
+  const pick=(key,fn)=>{ const id=String(setting(key,'')).trim().toUpperCase(); const c=ok.find(x=>String(x.d.dev_id).toUpperCase()===id); return c?val(c):fn(...ok.map(val)); };
+  let hi=pick('words_high_dev',Math.max), lo=pick('words_low_dev',Math.min);
+  if(lo>hi) [lo,hi]=[hi,lo];
   const amt=v=>(v<0?'− ':'')+inr(Math.abs(v)), wds=v=>(v<0?'− ':'')+numWords(Math.abs(v),LANG);
   const line=(lab,v)=>`<div class="w-line"><b>${esc(lab)}</b><div class="w-amt">${amt(v)}<small>${esc(wds(v))}</small></div></div>`;
-  const range=(intro,vals)=>{ const lo=Math.min(...vals), hi=Math.max(...vals);
-    return Math.round(lo)===Math.round(hi) ? `<p>${esc(intro)}</p>`+line('',lo)
-         : `<p>${esc(intro)}</p>`+line(T('words_from'),lo)+line(T('words_to'),hi); };
-  let h=`<h3>${esc(T('words_title'))}</h3>`;
-  const multi=new Set(tots.map(Math.round)).size>1;
-  const cols=[range(T(sav?(multi?'words_intro_s':'words_single'):(multi?'words_intro':'words_single')),tots.map(v=>v+sav))];
-  if(curRent>0) cols.push(range(T(sav?'words_net_intro_s':'words_net_intro'),calc.filter(c=>c.total>0).map(c=>c.total-curRent*months+sav)));
-  h+=`<div class="w-cols${cols.length>1?' two':''}">`+cols.map(c=>`<div class="w-col">${c}</div>`).join('')+'</div>';   // rented: total and net gain side by side
+  const intro=curRent>0?T(sav?'words_net_intro_s':'words_net_intro'):T(sav?'words_intro_s':'words_intro');
+  let h=`<h3>${esc(T('words_title'))}</h3><p>${esc(intro)}</p>`;
+  h+=Math.round(lo)===Math.round(hi)?line('',lo):line(T('words_from'),lo)+line(T('words_to'),hi);
   h+=`<p class="w-note">${sav?esc(T('words_incl',{amt:inr(sav)}))+' ':''}${esc(T('words_note'))}</p>`;
   box.innerHTML=h; box.setAttribute('lang',LANG); box.classList.remove('hidden');
 }
