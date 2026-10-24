@@ -34,6 +34,7 @@
   .words .w-line b{color:var(--muted);font-weight:600;font-size:.85rem}
   .words .w-amt{font-weight:600}
   .words .w-amt small{display:block;color:var(--muted);font-weight:400;font-size:.8rem}
+  .words .w-ded{font-size:.85rem;font-weight:600;color:#9a6200;background:#fff6e5;border-radius:6px;padding:5px 9px;margin:8px 0 0}
   .words .w-note{font-size:.78rem;color:var(--muted);margin-top:8px}
   [lang=ur] .tr-text,.words[lang=ur]{unicode-bidi:plaintext}
   #report .words{border:1px solid #d0d5dd;border-left:4px solid #0f4c81;padding:8px 10px;margin-top:8px;background:#fff;break-inside:avoid;page-break-inside:avoid}
@@ -1020,6 +1021,7 @@ function renderWords(calc,curRent,months,sav){   // sav = maintenance + property
   const intro=curRent>0?T(sav?'words_net_intro_s':'words_net_intro'):T(sav?'words_intro_s':'words_intro');
   let h=`<h3>${esc(T('words_title'))}</h3><p>${esc(intro)}</p>`;
   h+=Math.round(lo)===Math.round(hi)?line('',lo):line(T('words_from'),lo)+line(T('words_to'),hi);
+  if(curRent>0) h+=`<p class="w-ded">${esc(T('words_rent_ded',{amt:inr(curRent),n:months,tot:inr(curRent*months)}))}</p>`;
   h+=`<p class="w-note">${sav?esc(T('words_incl',{amt:inr(sav)}))+' ':''}${esc(T('words_note'))}</p>`;
   box.innerHTML=h; box.setAttribute('lang',LANG); box.classList.remove('hidden');
 }
