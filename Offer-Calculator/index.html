@@ -123,6 +123,7 @@
   #report .rh-g .unitbadge{display:inline-block;margin-top:8px;background:rgba(255,255,255,.92);color:#0f4c81;border-radius:6px;padding:4px 10px;font-weight:700;font-size:12px;text-shadow:none}
   #report .rh-g .meta{position:absolute;left:16px;bottom:10px;font-size:8.5px;opacity:.95}
   #report.g .sec{margin-top:0}
+  #report.t{padding:0 6mm;box-sizing:border-box}   /* Text style: extra space at left and right (on top of the page margin) */
   #report.g h2{margin:10px 0 5px}
   .btn-sec{padding:9px 16px;border:1px solid var(--brand);border-radius:8px;background:#fff;color:var(--brand);font:inherit;font-weight:600;cursor:pointer}
   .btn-sec:hover{background:var(--brand-soft)}
@@ -718,7 +719,7 @@ function buildReport(){
       <div class="sub">Asmita Jyoti Co-operative Housing Society Ltd., Charkop Naka, Marve Road, Malad (W), Mumbai</div>
       <div class="meta"><span>${esc(T('last_updated'))}: <b>${esc(setting('offers_last_updated',''))}</b></span><span>${esc(T('generated_on'))}: ${gen}</span></div>
       <div class="meta"><span class="warn">${esc(T('indicative'))}</span></div></div>`;
-  host.innerHTML=`<div id="report" class="${G?'g':''}" lang="${LANG}">
+  host.innerHTML=`<div id="report" class="${G?'g':'t'}" lang="${LANG}">
     ${head}
     ${sec(esc(T('your_unit')),sum)}
     ${sec(esc(T('offer_comparison'))+ref2, clone('memberTable')+`<p class="note">${esc(T('legend'))}</p>`+words)}
