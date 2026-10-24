@@ -671,7 +671,8 @@ function initSelectors(){
   $('updateBtn').onclick=render;
   $('printBtn').onclick=doPrint;
   $('pdfBtn').onclick=exportPDF;
-  window.addEventListener('beforeprint',()=>{ if(shown && !PRINT_IMG) prepPrint(); });
+  window.addEventListener('beforeprint',()=>{ if(!shown || PRINT_IMG) return; if(!(reportStyle()==='graphics' && usePrintImage())) prepPrint(); });
+  document.querySelectorAll('input[name=rstyle]').forEach(r=>r.addEventListener('change',schedulePrintImage));
   $('lastUpdated').textContent=setting('offers_last_updated','09-Oct-2026');
   applyLang();
 }
@@ -786,23 +787,44 @@ function prepPrint(){
   const el=buildReport();
   if(reportStyle()==='graphics'){
     const W=Math.floor((210-2*PM)/25.4*96), H=Math.floor((297-2*PM)/25.4*96)-10;  // printable box at the @page margins
-    const {wrap}=measure(el,W); const h=el.getBoundingClientRect().height; wrap.remove(); $('printHost').appendChild(el);
+    const {wrap}=measure(el,W); const h=el.getBoundingClientRect().height; wrap.remove(); el.style.width=''; $('printHost').appendChild(el);
     const lim=H*(matchMedia('print').matches?1:0.8);   // measured on screen: print fonts run a little taller, keep a margin
     if(h>lim) el.style.zoom=(lim/h).toFixed(3);                              // shrink to one page
   }
   return el;
 }
+/* Graphics print: the one-page layout (same as the PDF) is rendered to an image in the background, so both the
+   Print button and Ctrl+P give a clean, full-page preview. */
+let PRINT_CACHE=null, PRINT_KEY='', PRINT_BUSY=null, prepTimer=null;
+const printKey=()=>JSON.stringify([LASTIN,LANG,reportStyle(),$('printStamp').textContent.slice(0,0)]);
+async function preparePrintImage(){
+  if(!shown||reportStyle()!=='graphics') return null;
+  const key=printKey(); if(PRINT_CACHE&&PRINT_KEY===key) return PRINT_CACHE;
+  if(PRINT_BUSY) return PRINT_BUSY;
+  PRINT_BUSY=(async()=>{
+    try{
+      const ok=await loadPdfLib(); if(!ok||typeof html2pdf==='undefined') return null;
+      const {target,wrap}=await onePageBox();
+      const canvas=await html2pdf().set({html2canvas:{scale:3,useCORS:true,backgroundColor:'#ffffff'}}).from(target).toCanvas().get('canvas');
+      wrap.remove();
+      PRINT_CACHE=canvas.toDataURL('image/png'); PRINT_KEY=key; return PRINT_CACHE;
+    }catch(e){ return null; } finally{ PRINT_BUSY=null; }
+  })();
+  return PRINT_BUSY;
+}
+function schedulePrintImage(){ clearTimeout(prepTimer); PRINT_CACHE=null; if(reportStyle()==='graphics') prepTimer=setTimeout(preparePrintImage,400); }
+function usePrintImage(){   // put the cached one-page image into the print area (synchronous, for Ctrl+P)
+  if(!PRINT_CACHE||PRINT_KEY!==printKey()) return false;
+  $('printHost').innerHTML=`<img id="printImg" src="${PRINT_CACHE}" alt="" style="display:block;width:100%;height:auto;max-height:${297-2*PM-1}mm;object-fit:contain;margin:0 auto">`;
+  return true;
+}
 async function doPrint(){
   if(reportStyle()!=='graphics'){ prepPrint(); setTimeout(()=>window.print(),50); return; }
-  // Graphics: render exactly the one-page layout used for the PDF and print it as one full-width A4 image
   const btn=$('printBtn'); btn.disabled=true;
   try{
-    const ok=await loadPdfLib(); if(!ok||typeof html2pdf==='undefined'){ prepPrint(); setTimeout(()=>window.print(),50); return; }
-    const {target,wrap}=await onePageBox();
-    const canvas=await html2pdf().set({html2canvas:{scale:3,useCORS:true,backgroundColor:'#ffffff'}}).from(target).toCanvas().get('canvas');
-    wrap.remove();
-    $('printHost').innerHTML=`<img id="printImg" src="${canvas.toDataURL('image/png')}" style="display:block;width:100%;height:auto;max-height:${297-2*PM-1}mm;object-fit:contain">`;
-    PRINT_IMG=true; await $('printImg').decode().catch(()=>{});
+    await preparePrintImage();
+    if(usePrintImage()){ PRINT_IMG=true; await $('printImg').decode().catch(()=>{}); }
+    else prepPrint();
     setTimeout(()=>{ window.print(); PRINT_IMG=false; },50);
   } finally { btn.disabled=false; }
 }
@@ -908,7 +930,7 @@ function render(redraw){
   if(area==null){
     $('areaNotice').textContent=T('area_na')+' '+T(type==='Shop'?'rates_shop':'rates_unit');
     $('areaNotice').classList.remove('hidden'); $('wordsBox').classList.add('hidden'); $('savingsBox').classList.add('hidden');
-    renderRates(devs,type); return;
+    renderRates(devs,type); schedulePrintImage(); return;
   }
   $('areaNotice').classList.add('hidden'); $('legend').classList.remove('hidden');
 
@@ -960,6 +982,7 @@ function render(redraw){
   renderWords(calc,curRent,months,(mMaint+mTax)*months);
 
   $('memberCard').classList.remove('hidden');
+  schedulePrintImage();
 }
 
 /* Savings that do not depend on the developer: society maintenance and property tax not payable during the rent period */
