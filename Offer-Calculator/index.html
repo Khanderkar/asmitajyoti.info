@@ -90,6 +90,18 @@
   .updated b{font-weight:700}
   .disclaimer{font-size:.75rem;color:#fff;font-weight:600;margin-top:3px;white-space:normal;animation:blink 1.2s step-end infinite}
   @keyframes blink{50%{opacity:0}}
+  .rotate-tip{display:none;align-items:center;gap:12px;margin:0 0 14px;padding:12px 14px;border:2px solid #d92d20;border-radius:10px;
+    background:#fef3f2;color:#d92d20;font-weight:800;font-size:1rem;line-height:1.35;animation:tipblink 1.1s ease-in-out infinite}
+  .rotate-tip .rot-ico{flex:none}
+  .rotate-tip .rot-phone{transform-origin:32px 28px;animation:rotphone 2.2s ease-in-out infinite}
+  @keyframes tipblink{50%{background:#d92d20;color:#fff}}
+  @keyframes rotphone{0%,25%{transform:rotate(0)}50%,80%{transform:rotate(-90deg)}100%{transform:rotate(0)}}
+  @media (max-width:760px) and (orientation:portrait){ body.has-results .rotate-tip{display:flex} }
+  @media (prefers-reduced-motion:reduce){ .rotate-tip,.rotate-tip .rot-phone{animation:none} }
+  @media print{ .rotate-tip{display:none!important} }
+  .words.savings .w-line.w-tot{grid-template-columns:1fr auto} .words.savings .w-tot .w-amt{white-space:nowrap} .words.savings .w-tot .w-amt small{white-space:normal}
+  /* phones held sideways: let the 3-developer table fit the screen width */
+  @media (orientation:landscape) and (max-height:500px){ #memberCard table{min-width:0} #memberCard th,#memberCard td{padding:8px 7px;font-size:.92rem} }
   @media (prefers-reduced-motion:reduce){.disclaimer{animation:none}}
   .btn{margin-top:10px;width:100%;padding:10px 12px;border:0;border-radius:8px;background:var(--brand);color:#fff;font:inherit;font-weight:600;cursor:pointer}
   .btn:disabled{background:#c4ccd6;cursor:not-allowed}
@@ -328,6 +340,16 @@
     </div>
   </div>
 
+  <!-- Mobile, portrait: ask to turn the phone so all 3 developers fit side by side (shown only after Submit) -->
+  <div class="rotate-tip" role="status">
+    <svg class="rot-ico" viewBox="0 0 64 64" width="46" height="46" aria-hidden="true">
+      <g class="rot-phone"><rect x="22" y="10" width="20" height="36" rx="3.5" fill="none" stroke="currentColor" stroke-width="3.5"/>
+        <circle cx="32" cy="40.5" r="2" fill="currentColor"/></g>
+      <path d="M50 22a20 20 0 0 1-6 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      <path d="M41 43l3.5 4.2L49 44" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span data-i18n="rotate_msg">Turn your phone sideways (landscape) to see all 3 developers side by side.</span>
+  </div>
   <section class="card hidden" id="memberCard">
     <h2><span data-i18n="your_comparison">Your offer comparison</span> <a class="ref" href="#ref-2">#2</a></h2>
     <div class="table-wrap"><table id="memberTable"></table></div>
@@ -746,15 +768,36 @@ function initSelectors(){
   $('rentMonths').oninput=()=>{ if(shown) markDirty(); };
   $('isRented').onchange=()=>{ $('curRentGroup').classList.toggle('hidden',!$('isRented').checked); if(shown) markDirty(); };
   $('curRent').oninput=()=>{ if(shown) markDirty(); };
-  $('updateBtn').onclick=render;
+  $('updateBtn').onclick=()=>{ render(); if(shown) calcLog('view'); };
   $('printBtn').onclick=doPrint;
-  $('pdfBtn').onclick=exportPDF;
-  window.addEventListener('beforeprint',()=>{ if(!shown || PRINT_IMG) return; if(!(reportStyle()==='graphics' && usePrintImage())) prepPrint(); });
+  $('pdfBtn').onclick=()=>{ calcLog('pdf'); exportPDF(); };
+  window.addEventListener('beforeprint',()=>{ if(shown) calcLog('print'); if(!shown || PRINT_IMG) return; if(!(reportStyle()==='graphics' && usePrintImage())) prepPrint(); });
   document.querySelectorAll('input[name=rstyle]').forEach(r=>r.addEventListener('change',schedulePrintImage));
   $('lastUpdated').textContent=setting('offers_last_updated','09-Oct-2026');
   applyLang();
+  calcLog('open');
 }
 let shown=false, rentOpen=false;
+/* ---- Usage log (for the committee's admin page). Records only: event, building / flat viewed, language, Text/Graphics,
+   whether "rented" was ticked (not the amount), device type and an anonymous per-browser visitor id. No names / contacts.
+   Sent to Firebase (collection calculator_access) by the module script at the end of the page; skipped on localhost. */
+const LOG_ON=!/^(localhost|127\.|0\.0\.0\.0|$)/.test(location.hostname);
+const rid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+let VISITOR=''; try{ VISITOR=localStorage.getItem('ajcVisitor')||''; if(!VISITOR){ VISITOR=rid(); localStorage.setItem('ajcVisitor',VISITOR); } }catch(e){ VISITOR=rid(); }
+const SESSION=rid();
+function calcLog(event){
+  if(!LOG_ON) return;
+  try{
+    const ua=navigator.userAgent||'';
+    const p={event, visitor:VISITOR, session:SESSION,
+      building:(LASTIN&&LASTIN.b)||'', flat:(LASTIN&&LASTIN.f)||'', unit:(LAST&&LAST.unit)||'',
+      lang:LANG||'', style:reportStyle(), rented:!!(LASTIN&&LASTIN.curRent>0),
+      device:(/Mobi|Android|iPhone|iPad/i.test(ua)?'mobile':'desktop'), ua:ua.slice(0,250),
+      screen:`${screen.width}x${screen.height}`, ref:(document.referrer||'').slice(0,200),
+      page:location.pathname.slice(0,100), clientTime:new Date().toISOString()};
+    if(window._calcSend) window._calcSend(p); else (window._calcQ=window._calcQ||[]).push(p);
+  }catch(e){}
+}
 function unitLabel(){ if(!CUR) return 'Offer'; return (CUR.building==='Shops/Units'?CUR.flat_no:CUR.building+'-'+CUR.flat_no).replace(/[^A-Za-z0-9-]+/g,'_'); }
 function loadPdfLib(){
   if(typeof html2pdf!=='undefined') return Promise.resolve(true);
@@ -1011,7 +1054,7 @@ function render(redraw){
     $('updateBtn').classList.remove('dirty'); $('updateHint').classList.add('hidden');
   }
   const flat=DB.flats.find(x=>x.building===b&&x.flat_no===f); if(!flat) return;
-  CUR=flat; shown=true; $('updateBtn').textContent=T('update');
+  CUR=flat; shown=true; document.body.classList.add('has-results'); $('updateBtn').textContent=T('update');
   const type=flat.unit_type, area=num(flat.existing_carpet_area_sqft);
   const signed=v=>v==null?'—':`<span class="${v<0?'neg':''}">${v<0?'− ':'+ '}${inr(Math.abs(v))}</span>`;
   const devs=DB.developers;
@@ -1196,6 +1239,26 @@ loadAll().then(initSelectors).catch(e=>{
   $('error').style.display='block';
   $('error').innerHTML='Could not load data files ('+esc(e.message)+'). This page must be opened from a web server (e.g. GitHub Pages), not by double-clicking the file.';
 });
+</script>
+<!-- Usage log -> Firebase Firestore (same project as the meeting page). Failures are ignored; the calculator works without it. -->
+<script type="module">
+  if(!/^(localhost|127\.|0\.0\.0\.0|$)/.test(location.hostname)){
+    try{
+      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
+      const { getFirestore, collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+      const app = initializeApp({
+        apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
+        authDomain: "asmitajyoti-sgbm.firebaseapp.com",
+        projectId: "asmitajyoti-sgbm",
+        storageBucket: "asmitajyoti-sgbm.firebasestorage.app",
+        messagingSenderId: "85179629629",
+        appId: "1:85179629629:web:81718858a1d21aba752a54"
+      }, "calc-log");
+      const db = getFirestore(app);
+      window._calcSend = p => addDoc(collection(db, "calculator_access"), { ...p, ts: serverTimestamp() }).catch(() => {});
+      (window._calcQ || []).splice(0).forEach(window._calcSend);
+    }catch(e){ /* logging unavailable */ }
+  }
 </script>
 </body>
 </html>
