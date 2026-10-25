@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asmita Jyoti - Online Meeting Data</title>
+    <title>Asmita Jyoti - Admin</title>
     <style>
         body { font-family: Arial, sans-serif; background: #f4f6f9; color: #333; margin: 0; padding: 20px; }
-        .admin-header { background: #003366; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        .admin-header { background: #003366; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); gap: 12px; flex-wrap: wrap; }
         .header-left-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .meeting-dropdown-selector { padding: 10px 15px; font-size: 1rem; font-weight: bold; border-radius: 4px; border: 2px solid #ffcc00; background: #fff; color: #003366; cursor: pointer; outline: none; }
 
@@ -15,9 +15,10 @@
         .unique-badge { background: #00cc66; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .flat-badge { background: #0099ff; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .face-badge { background: #8e44ad; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .print-badge { background: #e67e22; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
         .login-box { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
-        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; box-sizing: border-box; }
         .login-box button { background: #003366; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 1rem; margin-top: 10px; }
         .dashboard { display: none; }
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
@@ -26,6 +27,28 @@
         tr:hover { background: #f9f9f9; }
         .logout-btn { background: #ff3333; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         #recaptcha-container { margin: 15px 0; display: flex; justify-content: center; }
+
+        /* --- TABS --- */
+        .tabs { display: flex; gap: 6px; margin: -10px 0 20px; flex-wrap: wrap; }
+        .tab-btn { background: #e9eef5; color: #003366; border: 2px solid #003366; padding: 10px 18px; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; }
+        .tab-btn.active { background: #003366; color: #fff; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* --- CALCULATOR TAB --- */
+        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 15px; background: #fff; padding: 12px 15px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .toolbar select, .toolbar input { padding: 9px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; }
+        .toolbar label { font-weight: bold; font-size: 0.9rem; color: #003366; }
+        .tool-btn { background: #003366; color: #fff; border: none; padding: 9px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+        .tool-btn.yellow { background: #ffcc00; color: #000; }
+        .tool-btn.red { background: #b42318; }
+        .tool-btn:disabled { opacity: 0.5; cursor: wait; }
+        .spacer { flex: 1; }
+        .ev { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; color: #fff; }
+        .ev-open { background: #7f8c8d; } .ev-view { background: #0099ff; } .ev-print { background: #e67e22; } .ev-pdf { background: #8e44ad; }
+        .vid { font-family: monospace; font-size: 0.85rem; color: #555; }
+        .hint-text { font-size: 0.85rem; color: #666; margin: -5px 0 12px; }
+        .secure-box { background: #fff8e6; border: 1px solid #f5b94a; border-left: 5px solid #f5b94a; border-radius: 6px; padding: 12px 15px; margin-bottom: 15px; font-size: 0.9rem; }
 
         /* --- FACE ID COLUMN --- */
         .view-photo-btn { display: inline-flex; align-items: center; gap: 8px; background: #003366; color: #fff; border: none; padding: 4px 12px 4px 4px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.85rem; white-space: nowrap; }
@@ -48,6 +71,8 @@
         .btn-nav { background: #e9eef5; color: #003366; }
         .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
         .btn-download { background: #ffcc00; color: #000; }
+
+        @media (max-width: 760px) { body { padding: 10px; } th, td { padding: 8px; font-size: 0.85rem; } .table-scroll { overflow-x: auto; } }
     </style>
 </head>
 <body>
@@ -69,48 +94,118 @@
     </div>
 </div>
 
-<!-- DATA VIEW PANEL DASHBOARD -->
+<!-- DASHBOARD -->
 <div class="dashboard" id="dashboardContainer">
+
     <div class="admin-header">
-        <div class="header-left-group">
-            <h2 style="margin:0;">Online meeting data</h2>
-
-            <!-- FILTER DROP-DOWN SELECTOR -->
-            <select class="meeting-dropdown-selector" id="meetingFilter" onchange="filterTableByMeeting()">
-                <option value="" disabled selected>Loading Meetings...</option>
-            </select>
-
-            <!-- LIVE RECORD TOTAL COUNTER BADGE -->
-            <span class="count-badge" id="meetingCountLabel">Total: 0</span>
-
-            <!-- LIVE UNIQUE RECORD COUNTER BADGE -->
-            <span class="unique-badge" id="meetingUniqueCountLabel">Unique: 0</span>
-
-            <!-- LIVE UNIQUE BUILDING/FLAT COUNTER BADGE -->
-            <span class="flat-badge" id="meetingUniqueFlatLabel">Unique Flats: 0</span>
-
-            <!-- NEW: FACE ID ATTACHED COUNTER BADGE -->
-            <span class="face-badge" id="meetingFaceLabel">Face ID: 0</span>
-        </div>
+        <h2 style="margin:0;">Asmita Jyoti – Admin</h2>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
 
-    <table id="reportsTable">
-        <thead>
-            <tr>
-                <th>Submission Timestamp</th>
-                <th>Meeting Code</th>
-                <th>Full Name</th>
-                <th>Building / Flat</th>
-                <th>Registered Mobile</th>
-                <th>Registered Email</th>
-                <th>Face ID</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            <!-- Loaded dynamically from database collection -->
-        </tbody>
-    </table>
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="meetingTab">Online meeting data</button>
+        <button class="tab-btn" data-tab="calcTab">Offer calculator access</button>
+    </div>
+
+    <!-- ===== TAB 1: ONLINE MEETING DATA (unchanged) ===== -->
+    <div class="tab-panel active" id="meetingTab">
+        <div class="admin-header" style="background:#00509e;">
+            <div class="header-left-group">
+                <h2 style="margin:0;">Online meeting data</h2>
+
+                <!-- FILTER DROP-DOWN SELECTOR -->
+                <select class="meeting-dropdown-selector" id="meetingFilter" onchange="filterTableByMeeting()">
+                    <option value="" disabled selected>Loading Meetings...</option>
+                </select>
+
+                <span class="count-badge" id="meetingCountLabel">Total: 0</span>
+                <span class="unique-badge" id="meetingUniqueCountLabel">Unique: 0</span>
+                <span class="flat-badge" id="meetingUniqueFlatLabel">Unique Flats: 0</span>
+                <span class="face-badge" id="meetingFaceLabel">Face ID: 0</span>
+            </div>
+        </div>
+
+        <div class="table-scroll">
+        <table id="reportsTable">
+            <thead>
+                <tr>
+                    <th>Submission Timestamp</th>
+                    <th>Meeting Code</th>
+                    <th>Full Name</th>
+                    <th>Building / Flat</th>
+                    <th>Registered Mobile</th>
+                    <th>Registered Email</th>
+                    <th>Face ID</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+        </div>
+    </div>
+
+    <!-- ===== TAB 2: OFFER CALCULATOR ACCESS ===== -->
+    <div class="tab-panel" id="calcTab">
+        <div class="admin-header" style="background:#00509e;">
+            <div class="header-left-group">
+                <h2 style="margin:0;">Offer calculator access</h2>
+                <span class="count-badge" id="cEvents">Events: 0</span>
+                <span class="unique-badge" id="cVisitors">Visitors: 0</span>
+                <span class="flat-badge" id="cFlats">Flats viewed: 0</span>
+                <span class="print-badge" id="cPrints">Prints: 0</span>
+                <span class="face-badge" id="cPdfs">PDFs: 0</span>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <label for="cPeriod">Period</label>
+            <select id="cPeriod">
+                <option value="all">All time</option>
+                <option value="today">Today</option>
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+            </select>
+            <label for="cEvent">Event</label>
+            <select id="cEvent">
+                <option value="">All events</option>
+                <option value="open">Page opened</option>
+                <option value="view">Flat viewed</option>
+                <option value="print">Printed</option>
+                <option value="pdf">PDF exported</option>
+            </select>
+            <label for="cSearch">Flat</label>
+            <input id="cSearch" placeholder="e.g. D7/21 or D7" size="14">
+            <span class="spacer"></span>
+            <button class="tool-btn" id="cRefresh">Refresh</button>
+            <button class="tool-btn yellow" id="cExportLog">Export log (CSV)</button>
+        </div>
+
+        <div class="secure-box">
+            <b>Member data (decrypted)</b> – downloads <i>flats.csv</i> with member name, rent, permanent address, mobile and email in readable form.
+            The key is read from the protected admin record of your mobile number. Keep the downloaded file private and never upload it to GitHub.
+            <div style="margin-top:10px;"><button class="tool-btn red" id="cExportFlats">Export decrypted flats.csv</button> <span id="cExportStatus" style="margin-left:8px;font-weight:bold;"></span></div>
+        </div>
+
+        <p class="hint-text">Members are not asked to sign in, so each browser gets an anonymous visitor ID. "Flat viewed" = the member pressed Submit / Update for that flat.
+            "Rented" shows only whether the rent box was ticked – the amount is never recorded.</p>
+
+        <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>Time (IST)</th>
+                    <th>Event</th>
+                    <th>Building / Flat</th>
+                    <th>Language</th>
+                    <th>Style</th>
+                    <th>Rented</th>
+                    <th>Device</th>
+                    <th>Visitor ID</th>
+                </tr>
+            </thead>
+            <tbody id="cBody"><tr><td colspan="8">Open this tab to load the log.</td></tr></tbody>
+        </table>
+        </div>
+    </div>
 </div>
 
 <!-- FACE PHOTO POPUP -->
@@ -133,7 +228,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, collection, query, orderBy, getDocs, limit, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
@@ -144,6 +239,12 @@
     appId: "1:85179629629:web:81718858a1d21aba752a54",
     measurementId: "G-D107TNSPL1"
   };
+
+  // ---- Offer calculator settings ----
+  const FLATS_CSV_URL = "/Offer-Calculator/data/flats.csv";   // encrypted member file on the website
+  const ENC_SALT_B64 = "uxvtoV8bzv+Oi4BvERzJxw==";            // PBKDF2 salt used when flats.csv was encrypted (not secret)
+  const ENC_ITERATIONS = 600000;                             // PBKDF2-SHA256 iterations
+  const CALC_LOG_LIMIT = 20000;                              // newest N log entries loaded
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -179,6 +280,8 @@
           document.getElementById('authContainer').style.display = 'none';
           document.getElementById('dashboardContainer').style.display = 'block';
           fetchMasterData();
+          calcLoaded = false;
+          if (document.getElementById('calcTab').classList.contains('active')) fetchCalcLog();
       } else {
           document.getElementById('authContainer').style.display = 'block';
           document.getElementById('dashboardContainer').style.display = 'none';
@@ -229,9 +332,21 @@
 
   document.getElementById('logoutBtn').addEventListener('click', () => {
       closePhoto();
+      calcRecords = []; calcLoaded = false;
+      document.getElementById('cBody').innerHTML = '<tr><td colspan="8">Open this tab to load the log.</td></tr>';
       signOut(auth);
   });
 
+  // ---- TABS ----
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === btn.dataset.tab));
+      if (btn.dataset.tab === 'calcTab' && !calcLoaded) fetchCalcLog();
+  }));
+
+  // =====================================================================
+  //  TAB 1 – ONLINE MEETING DATA (same logic as before)
+  // =====================================================================
   async function fetchMasterData() {
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = `<tr><td colspan="${COLS}">Fetching database logs...</td></tr>`;
@@ -252,13 +367,13 @@
 
           const uniqueMeetingCodes = new Set();
 
-          querySnapshot.forEach((doc) => {
-              const data = doc.data();
+          querySnapshot.forEach((d) => {
+              const data = d.data();
               const dateObj = data.timestamp ? data.timestamp.toDate() : new Date();
               const formattedTime = dateObj.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
               const record = {
-                  id: doc.id,
+                  id: d.id,
                   meetingCode: data.meetingCode || 'N/A',
                   timestamp: formattedTime,
                   name: data.name || '',
@@ -306,21 +421,16 @@
       const filtered = allMasterRecords.filter(r => r.meetingCode === filterCode);
       photoRecords = filtered.filter(r => r.facePhoto);
 
-      // --- CALCULATE UNIQUE SUBMISSIONS & UNIQUE FLATS ---
       const uniqueSubmissionsSet = new Set();
       const uniqueFlatsSet = new Set();
 
       filtered.forEach(r => {
-          // 1. Full deduplication key (all 4 values match exactly)
           const normalizedRowKey = `${r.name.trim().toLowerCase()}|${r.flatInfo.trim().toLowerCase()}|${r.mobile.trim().toLowerCase()}|${r.email.trim().toLowerCase()}`;
           uniqueSubmissionsSet.add(normalizedRowKey);
-
-          // 2. Flat deduplication key (only isolates the building & flat number combo)
           const normalizedFlatKey = r.flatInfo.trim().toLowerCase();
           uniqueFlatsSet.add(normalizedFlatKey);
       });
 
-      // DYNAMICALLY UPDATE ALL COUNTER BADGES
       document.getElementById('meetingCountLabel').innerText = `Total: ${filtered.length}`;
       document.getElementById('meetingUniqueCountLabel').innerText = `Unique: ${uniqueSubmissionsSet.size}`;
       document.getElementById('meetingUniqueFlatLabel').innerText = `Unique Flats: ${uniqueFlatsSet.size}`;
@@ -397,6 +507,183 @@
       if (e.key === 'Escape') closePhoto();
       if (e.key === 'ArrowLeft' && photoIndex > 0) showPhotoAt(photoIndex - 1);
       if (e.key === 'ArrowRight' && photoIndex < photoRecords.length - 1) showPhotoAt(photoIndex + 1);
+  });
+
+  // =====================================================================
+  //  TAB 2 – OFFER CALCULATOR ACCESS
+  // =====================================================================
+  const LANG_NAMES = { en:'English', hi:'Hindi', mr:'Marathi', gu:'Gujarati', bn:'Bengali', pa:'Punjabi', ur:'Urdu',
+                       or:'Odia', ta:'Tamil', te:'Telugu', kn:'Kannada', ml:'Malayalam' };
+  const EVENT_NAMES = { open:'Page opened', view:'Flat viewed', print:'Printed', pdf:'PDF exported' };
+  let calcRecords = [];
+  let calcFiltered = [];
+  let calcLoaded = false;
+
+  async function fetchCalcLog() {
+      const tbody = document.getElementById('cBody');
+      tbody.innerHTML = '<tr><td colspan="8">Fetching calculator log...</td></tr>';
+      try {
+          const q = query(collection(db, "calculator_access"), orderBy("ts", "desc"), limit(CALC_LOG_LIMIT));
+          const snap = await getDocs(q);
+          calcRecords = [];
+          snap.forEach(d => {
+              const x = d.data();
+              const t = x.ts ? x.ts.toDate() : (x.clientTime ? new Date(x.clientTime) : null);
+              calcRecords.push({
+                  date: t,
+                  time: t ? t.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : '',
+                  event: x.event || '',
+                  building: x.building || '',
+                  flat: x.flat || '',
+                  unit: x.unit || (x.building ? `${x.building}/${x.flat}` : ''),
+                  lang: x.lang || '',
+                  style: x.style || '',
+                  rented: !!x.rented,
+                  device: x.device || '',
+                  visitor: x.visitor || '',
+                  session: x.session || '',
+                  screen: x.screen || '',
+                  ref: x.ref || '',
+                  ua: x.ua || ''
+              });
+          });
+          calcLoaded = true;
+          renderCalc();
+      } catch (error) {
+          console.error(error);
+          tbody.innerHTML = '<tr><td colspan="8" style="color:red;">Access Denied: Rules validation parameter error (check the calculator_access rule).</td></tr>';
+      }
+  }
+
+  function renderCalc() {
+      const period = document.getElementById('cPeriod').value;
+      const ev = document.getElementById('cEvent').value;
+      const term = document.getElementById('cSearch').value.trim().toLowerCase().replace(/[-\s]+/g, '/');
+
+      let since = null;
+      if (period === 'today') { since = new Date(); since.setHours(0, 0, 0, 0); }
+      else if (period !== 'all') { since = new Date(Date.now() - (+period) * 86400000); }
+
+      calcFiltered = calcRecords.filter(r =>
+          (!since || (r.date && r.date >= since)) &&
+          (!ev || r.event === ev) &&
+          (!term || r.unit.toLowerCase().replace(/[-\s]+/g, '/').includes(term)));
+
+      const inPeriod = calcRecords.filter(r => !since || (r.date && r.date >= since));
+      document.getElementById('cEvents').innerText = `Events: ${calcFiltered.length}`;
+      document.getElementById('cVisitors').innerText = `Visitors: ${new Set(inPeriod.map(r => r.visitor).filter(Boolean)).size}`;
+      document.getElementById('cFlats').innerText = `Flats viewed: ${new Set(inPeriod.filter(r => r.event === 'view' && r.unit).map(r => r.unit)).size}`;
+      document.getElementById('cPrints').innerText = `Prints: ${inPeriod.filter(r => r.event === 'print').length}`;
+      document.getElementById('cPdfs').innerText = `PDFs: ${inPeriod.filter(r => r.event === 'pdf').length}`;
+
+      const tbody = document.getElementById('cBody');
+      if (!calcFiltered.length) { tbody.innerHTML = '<tr><td colspan="8">No calculator activity for this selection.</td></tr>'; return; }
+      tbody.innerHTML = calcFiltered.slice(0, 2000).map(r => `<tr>
+          <td>${esc(r.time)}</td>
+          <td><span class="ev ev-${esc(r.event)}">${esc(EVENT_NAMES[r.event] || r.event)}</span></td>
+          <td><strong>${esc(r.unit || '—')}</strong></td>
+          <td>${esc(LANG_NAMES[r.lang] || r.lang)}</td>
+          <td>${esc(r.style === 'graphics' ? 'Graphics' : r.style === 'text' ? 'Text' : r.style)}</td>
+          <td>${r.rented ? 'Yes' : ''}</td>
+          <td>${esc(r.device)}</td>
+          <td class="vid" title="${esc(r.visitor)}">${esc(r.visitor.slice(0, 8))}</td>
+      </tr>`).join('') + (calcFiltered.length > 2000 ? `<tr><td colspan="8">Showing the newest 2,000 of ${calcFiltered.length} – use Export log (CSV) for all.</td></tr>` : '');
+  }
+
+  ['cPeriod', 'cEvent'].forEach(id => document.getElementById(id).addEventListener('change', renderCalc));
+  document.getElementById('cSearch').addEventListener('input', renderCalc);
+  document.getElementById('cRefresh').addEventListener('click', fetchCalcLog);
+
+  // ---- CSV helpers ----
+  function csvCell(v) { v = String(v ?? ''); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  function downloadCsv(name, rows) {
+      const text = '﻿' + rows.map(r => r.map(csvCell).join(',')).join('\r\n');   // BOM so Excel shows Indian scripts correctly
+      const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
+      const a = document.createElement('a'); a.href = url; a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+  const today = () => new Date().toISOString().slice(0, 10);
+
+  document.getElementById('cExportLog').addEventListener('click', () => {
+      if (!calcFiltered.length) { alert('Nothing to export for this selection.'); return; }
+      downloadCsv(`Offer_Calculator_Access_${today()}.csv`, [
+          ['time_ist', 'event', 'building', 'flat', 'unit', 'language', 'style', 'rented_ticked', 'device', 'visitor_id', 'session_id', 'screen', 'referrer', 'user_agent'],
+          ...calcFiltered.map(r => [r.time, EVENT_NAMES[r.event] || r.event, r.building, r.flat, r.unit, LANG_NAMES[r.lang] || r.lang, r.style,
+                                    r.rented ? 'Yes' : 'No', r.device, r.visitor, r.session, r.screen, r.ref, r.ua])]);
+  });
+
+  // ---- Decrypted flats.csv export ----
+  // flats.csv cells: "ENC1:" + base64(12-byte IV | AES-256-GCM ciphertext | 16-byte tag), plaintext padded with spaces.
+  // Key = PBKDF2-SHA256(password, salt, 600000 iterations). The password is stored in Firestore: admins/<your mobile> → field "password".
+  function parseCsv(text) {
+      const rows = []; let row = [], cell = '', q = false;
+      text = text.replace(/^﻿/, '');
+      for (let i = 0; i < text.length; i++) {
+          const c = text[i];
+          if (q) {
+              if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; }
+              else cell += c;
+          } else if (c === '"') q = true;
+          else if (c === ',') { row.push(cell); cell = ''; }
+          else if (c === '\n' || c === '\r') {
+              if (c === '\r' && text[i + 1] === '\n') i++;
+              row.push(cell); cell = ''; rows.push(row); row = [];
+          } else cell += c;
+      }
+      if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+      return rows.filter(r => r.length > 1 || r[0] !== '');
+  }
+  const b64ToBytes = b => Uint8Array.from(atob(b), c => c.charCodeAt(0));
+
+  async function deriveKey(password, saltB64, iterations) {
+      const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+      return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64ToBytes(saltB64), iterations, hash: 'SHA-256' },
+                                     base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+  }
+
+  async function decryptCell(key, cell) {
+      if (!cell.startsWith('ENC1:')) return cell;
+      const raw = b64ToBytes(cell.slice(5));
+      const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: raw.slice(0, 12) }, key, raw.slice(12));
+      return new TextDecoder().decode(pt).replace(/ +$/, '');
+  }
+
+  async function decryptFlatsCsv(csvText, password, saltB64, iterations) {
+      const key = await deriveKey(password, saltB64, iterations);
+      const rows = parseCsv(csvText);
+      let n = 0;
+      for (let r = 1; r < rows.length; r++)
+          for (let c = 0; c < rows[r].length; c++)
+              if (rows[r][c].startsWith('ENC1:')) { rows[r][c] = await decryptCell(key, rows[r][c]); n++; }
+      return { rows, cells: n };
+  }
+  window._decryptFlatsCsv = decryptFlatsCsv;   // (used for testing)
+
+  document.getElementById('cExportFlats').addEventListener('click', async () => {
+      const btn = document.getElementById('cExportFlats'), st = document.getElementById('cExportStatus');
+      const user = auth.currentUser;
+      if (!user || !user.phoneNumber) { alert('Please sign in again.'); return; }
+      btn.disabled = true; st.style.color = '#003366'; st.textContent = 'Reading key…';
+      try {
+          const snap = await getDoc(doc(db, 'admins', user.phoneNumber));
+          const sec = snap.exists() ? snap.data() : null;
+          if (!sec || !sec.password) throw new Error(`No decryption password found for ${user.phoneNumber} (Firestore: admins/${user.phoneNumber} → password).`);
+          st.textContent = 'Downloading flats.csv…';
+          const res = await fetch(FLATS_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' });
+          if (!res.ok) throw new Error('Could not download flats.csv (' + res.status + ').');
+          const text = await res.text();
+          st.textContent = 'Decrypting…';
+          const { rows, cells } = await decryptFlatsCsv(text, sec.password, sec.salt || ENC_SALT_B64, +(sec.iterations || ENC_ITERATIONS));
+          downloadCsv(`flats_DECRYPTED_${today()}.csv`, rows);
+          st.style.color = '#1a7f3c'; st.textContent = `Done – ${rows.length - 1} units, ${cells} cells decrypted.`;
+      } catch (e) {
+          console.error(e);
+          st.style.color = '#b42318';
+          st.textContent = (e && e.name === 'OperationError') ? 'Wrong password – the stored password does not match flats.csv.'
+                         : (e && e.code === 'permission-denied') ? 'Access denied by Firestore rules for the admins record.'
+                         : (e.message || 'Export failed.');
+      } finally { btn.disabled = false; }
   });
 </script>
 </body>
