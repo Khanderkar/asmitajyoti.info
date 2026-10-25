@@ -228,7 +228,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, collection, query, orderBy, getDocs, limit, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, collection, query, orderBy, getDocs, limit, startAfter, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
@@ -244,7 +244,8 @@
   const FLATS_CSV_URL = "/Offer-Calculator/data/flats.csv";   // encrypted member file on the website
   const ENC_SALT_B64 = "uxvtoV8bzv+Oi4BvERzJxw==";            // PBKDF2 salt used when flats.csv was encrypted (not secret)
   const ENC_ITERATIONS = 600000;                             // PBKDF2-SHA256 iterations
-  const CALC_LOG_LIMIT = 20000;                              // newest N log entries loaded
+  const CALC_LOG_LIMIT = 50000;                              // newest N log entries loaded (read in batches)
+  const CALC_PAGE = 5000;                                    // Firestore allows max 10,000 per query
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -523,10 +524,20 @@
       const tbody = document.getElementById('cBody');
       tbody.innerHTML = '<tr><td colspan="8">Fetching calculator log...</td></tr>';
       try {
-          const q = query(collection(db, "calculator_access"), orderBy("ts", "desc"), limit(CALC_LOG_LIMIT));
-          const snap = await getDocs(q);
           calcRecords = [];
-          snap.forEach(d => {
+          const docs = [];
+          let last = null;
+          while (docs.length < CALC_LOG_LIMIT) {
+              const parts = [collection(db, "calculator_access"), orderBy("ts", "desc")];
+              if (last) parts.push(startAfter(last));
+              parts.push(limit(Math.min(CALC_PAGE, CALC_LOG_LIMIT - docs.length)));
+              const page = await getDocs(query(...parts));
+              page.forEach(d => docs.push(d));
+              if (page.size < CALC_PAGE) break;
+              last = page.docs[page.docs.length - 1];
+              tbody.innerHTML = `<tr><td colspan="8">Fetching calculator log... ${docs.length} entries</td></tr>`;
+          }
+          docs.forEach(d => {
               const x = d.data();
               const t = x.ts ? x.ts.toDate() : (x.clientTime ? new Date(x.clientTime) : null);
               calcRecords.push({
