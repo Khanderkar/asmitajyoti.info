@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asmita Jyoti CHSL – Redevelopment Offer Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#fff; --ink:#1c2230; --muted:#667085; --line:#e4e7ec;
+    --brand:#0f4c81; --brand-soft:#e8f0f8; --best:#e7f6ec; --best-ink:#1a7f3c; --warn:#fff6e5; --warn-ink:#9a6200;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,var(--lfont,"Noto Sans Devanagari"),"Noto Sans Devanagari",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45}
+  .lang-group{grid-column:3}
+  @media (max-width:720px){.lang-group{grid-column:auto}}
+  .lang-note{background:var(--brand-soft);color:var(--brand);border-radius:8px;padding:8px 12px;margin-top:12px;font-size:.85rem}
+  .words{margin-top:16px;border:1px solid var(--line);border-left:4px solid var(--brand);border-radius:8px;padding:12px 14px;background:#fbfcfe}
+  .words h3{margin:0 0 6px;font-size:.98rem;color:var(--brand)}
+  .words.savings{border-left-color:#1a7f3c;background:#f6fbf7}
+  .words.savings h3{color:#1a7f3c}
+  .words.savings .w-line{grid-template-columns:80% 20%;gap:4px 0}
+  .words.savings .w-amt{padding-left:12px}
+  @media (max-width:600px){.words.savings .w-line{grid-template-columns:62% 38%}}
+  .words.savings .w-amt{text-align:right}
+  .words .w-line b small{display:block;font-weight:400;font-size:.78rem;color:var(--muted)}
+  .words .w-cols.two{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px}
+  .words .w-cols.two .w-col+.w-col{border-left:1px solid var(--line);padding-left:20px}
+  @media (max-width:720px){.words .w-cols.two{grid-template-columns:1fr}.words .w-cols.two .w-col+.w-col{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:6px}}
+  .words .w-tot{border-top:1px solid var(--line);padding-top:6px;margin-top:8px}
+  .words .w-tot b{color:var(--ink)}
+  .words p{margin:6px 0;font-size:.9rem}
+  .words .w-line{display:grid;grid-template-columns:minmax(90px,max-content) 1fr;gap:4px 12px;margin:8px 0 2px;align-items:baseline}
+  .words .w-line b{color:var(--muted);font-weight:600;font-size:.85rem}
+  .words .w-amt{font-weight:600}
+  .words .w-amt small{display:block;color:var(--muted);font-weight:400;font-size:.8rem}
+  .words .w-ded{font-size:.85rem;font-weight:600;color:#9a6200;background:#fff6e5;border-radius:6px;padding:5px 9px;margin:8px 0 0}
+  .words .w-note{font-size:.78rem;color:var(--muted);margin-top:8px}
+  [lang=ur] .tr-text,.words[lang=ur]{unicode-bidi:plaintext}
+  #report .words{border:1px solid #d0d5dd;border-left:4px solid #0f4c81;padding:8px 10px;margin-top:8px;background:#fff;break-inside:avoid;page-break-inside:avoid}
+  #report .words h3{margin:0 0 4px;font-size:11px}
+  #report .words p,#report .words .w-amt{font-size:10px}
+  #report .words .w-note{font-size:8.5px}
+  #report .words .w-line{grid-template-columns:minmax(70px,max-content) 1fr;margin:4px 0 0}
+  #report .words .w-line b{font-size:9.5px}
+  #report .words .w-amt small{font-size:9.5px}
+  #report .words .w-line b small{font-size:8.5px}
+  #report .words .w-cols.two{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}
+  #report .words .w-cols.two .w-col+.w-col{border-left:1px solid #d0d5dd;padding-left:12px;border-top:0;padding-top:0}
+  header{background:var(--brand);color:#fff;padding:22px 16px}
+  header h1{margin:0;font-size:1.35rem;font-weight:700}
+  header p{margin:4px 0 0;opacity:.85;font-size:.9rem}
+  main{max-width:1100px;margin:0 auto;padding:20px 16px 48px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:18px}
+  .card h2{margin:0 0 12px;font-size:1.05rem}
+  .marathi-label{font-family:"Noto Sans Devanagari",sans-serif;color:var(--muted);font-weight:400}
+  .selectors{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media (max-width:720px){.selectors{grid-template-columns:1fr}}
+  .input-field-group label{display:block;font-weight:600;margin-bottom:6px;font-size:.92rem}
+  select,input[type=number]{width:100%;padding:10px 12px;border:1px solid #cfd4dc;border-radius:8px;font:inherit;background:#fff}
+  select:focus,input:focus{outline:2px solid var(--brand);outline-offset:1px}
+  .flat-info{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+  .pill{background:var(--brand-soft);color:var(--brand);border-radius:8px;padding:8px 12px;font-size:.9rem}
+  .pill b{font-size:1.05rem}
+  .notice{background:var(--warn);color:var(--warn-ink);border-radius:8px;padding:10px 12px;margin-top:12px;font-size:.9rem}
+  .table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:620px}
+  th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+  th:first-child,td:first-child{text-align:left;width:30%}
+  thead th{background:#fafbfc;font-size:.85rem;color:var(--muted);font-weight:600}
+  thead th.dev{color:var(--ink);font-size:.95rem}
+  tr.rent-toggle{cursor:pointer}
+  tr.rent-toggle:hover td{background:#fafbfc}
+  .tri{display:inline-block;width:14px;color:var(--brand);font-size:.85rem}
+  tr.rent-year td{background:#f9fafb;font-size:.9rem}
+  tr.rent-year td:first-child{padding-left:30px}
+  .rent-q{margin-top:16px}
+  .check-group{display:flex;align-items:flex-end}
+  label.check{display:flex;gap:10px;align-items:center;cursor:pointer;font-weight:600;font-size:.92rem;margin:0;padding:8px 12px;border:1px solid #cfd4dc;border-radius:8px;background:#fff;width:100%;min-height:44px}
+  label.check input{width:20px;height:20px;accent-color:var(--brand);flex:none;cursor:pointer}
+  .btn-row{margin-top:4px}
+  @media (max-width:720px){.btn-row>div:empty{display:none}}
+  td .neg{color:#b42318}
+  tr.adv td{background:#fff8e6;font-weight:700}
+  h3.sub{font-size:.95rem;margin:18px 0 8px;color:var(--brand)}
+  h3.sub:first-child{margin-top:0}
+  tr.highlight td{background:var(--brand-soft);color:var(--brand);font-weight:700;font-size:1.02rem}
+  .head-row{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  .updated{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:.85rem;white-space:nowrap}
+  .updated b{font-weight:700}
+  .disclaimer{font-size:.75rem;color:#fff;font-weight:600;margin-top:3px;white-space:normal;animation:blink 1.2s step-end infinite}
+  @keyframes blink{50%{opacity:0}}
+  @media (prefers-reduced-motion:reduce){.disclaimer{animation:none}}
+  .btn{margin-top:10px;width:100%;padding:10px 12px;border:0;border-radius:8px;background:var(--brand);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+  .btn:disabled{background:#c4ccd6;cursor:not-allowed}
+  .btn.dirty{box-shadow:0 0 0 3px #f5b94a}
+  .hint{font-size:.8rem;color:var(--warn-ink);margin-top:6px}
+  tr.total td{font-weight:700;border-top:2px solid var(--ink)}
+  td small,th small{display:block;color:var(--muted);font-weight:400;font-size:.78rem}
+  td.text{text-align:left;font-size:.88rem}
+  .muted{color:var(--muted)}
+  .row-head small{display:block;color:var(--muted);font-size:.78rem;font-weight:400}
+  details summary{cursor:pointer;font-weight:600;margin:6px 0}
+  .legend{font-size:.82rem;color:var(--muted);margin-top:10px}
+  #error{display:none}
+  .hidden{display:none}
+  footer{font-size:.8rem;color:var(--muted);text-align:center;margin-top:20px}
+  @media (max-width:600px){header h1{font-size:1.15rem} th,td{padding:8px} }
+  .actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:-4px 0 18px}
+  .actions.hidden{display:none}
+  .print-stamp{font-size:.8rem;color:var(--muted)}
+  .action-btns{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .style-pick{display:flex;gap:4px;border:1px solid #cfd4dc;border-radius:8px;padding:3px;background:#fff}
+  .style-pick label{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted)}
+  .style-pick label:has(input:checked){background:var(--brand-soft);color:var(--brand)}
+  .style-pick input{accent-color:var(--brand);margin:0}
+  /* graphics report header */
+  #report .rh-g{position:relative;border-radius:8px;overflow:hidden;color:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #report .rh-g img{display:block;width:100%;height:auto}
+  #report .rh-g .ov{position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,45,80,.82) 0%,rgba(10,45,80,.55) 38%,rgba(10,45,80,0) 62%),linear-gradient(0deg,rgba(10,45,80,.65) 0%,rgba(10,45,80,0) 30%)}
+  #report .rh-g .txt,#report .rh-g .meta{z-index:1}
+  #report .rh-g .meta{background:none}
+  #report .rh-g .txt{position:absolute;left:16px;top:14px;right:42%;text-shadow:0 1px 3px rgba(0,0,0,.35)}
+  #report .rh-g h1{font-size:17px;margin:0 0 4px;line-height:1.2}
+  #report .rh-g .sub{font-size:9.5px;opacity:.95}
+  #report .rh-g .unitbadge{display:inline-block;margin-top:8px;background:rgba(255,255,255,.92);color:#0f4c81;border-radius:6px;padding:4px 10px;font-weight:700;font-size:12px;text-shadow:none}
+  #report .rh-g .meta{position:absolute;left:16px;bottom:10px;font-size:10px;font-weight:600;text-align:left;opacity:.95;text-shadow:0 1px 3px rgba(0,0,0,.45)}
+  #report.g .sec{margin-top:0}
+  #report.t{padding:0 6mm;box-sizing:border-box}   /* Text style: extra space at left and right (on top of the page margin) */
+  #report.g h2{margin:10px 0 5px}
+  .hash{font-weight:800;color:#000;font-size:1.05em}
+  #report.g .rentnote{font-size:10.5px}
+  #report .rh-g .sub{white-space:nowrap}
+  .btn-sec{padding:9px 16px;border:1px solid var(--brand);border-radius:8px;background:#fff;color:var(--brand);font:inherit;font-weight:600;cursor:pointer}
+  .btn-sec:hover{background:var(--brand-soft)}
+  .btn-sec:disabled{opacity:.6;cursor:wait}
+  .disclaimer-card{border-left:4px solid #f5b94a}
+  .disclaimer-card p{margin:6px 0;font-size:.9rem}
+  .print-only{display:none}
+  body.no-refs a.ref,body.no-refs .refs{display:none!important}
+  a.ref{font-size:.72rem;font-weight:600;color:var(--brand);text-decoration:none;background:var(--brand-soft);padding:0 4px;border-radius:4px;white-space:nowrap}
+  a.ref:hover{text-decoration:underline}
+  h2 a.ref{vertical-align:middle}
+  .refs{display:inline-block;margin-left:2px}
+  .ref-list{list-style:none;padding:0;margin:0;font-size:.85rem}
+  .ref-list li{padding:7px 0;border-bottom:1px solid var(--line);word-break:break-all}
+  .ref-list li:target{background:#fff8e6}
+  .ref-list a{color:var(--brand)}
+  /* ---- print-ready report (used for Print and Export to PDF) ---- */
+  #printHost{display:none}
+  #report{width:100%;background:#fff;color:#1c2230;font-family:Inter,"Noto Sans Devanagari",Arial,sans-serif;font-size:10.5px;line-height:1.35}
+  #report .rh{background:#0f4c81;color:#fff;padding:12px 14px;border-radius:6px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #report .rh h1{font-size:15px;margin:0 0 2px}
+  #report .rh .sub{font-size:10px;opacity:.9}
+  #report .rh .meta{display:flex;justify-content:space-between;gap:10px;margin-top:6px;font-size:9.5px}
+  #report .rh .warn{font-weight:700}
+  #report h2{font-size:12px;margin:14px 0 6px;padding-bottom:3px;border-bottom:2px solid #0f4c81;color:#0f4c81;break-after:avoid;page-break-after:avoid}
+  #report h3{font-size:11px;margin:10px 0 5px;color:#0f4c81;break-after:avoid;page-break-after:avoid}
+  #report table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed;margin:0}
+  #report th,#report td{padding:4px 5px;border:1px solid #d0d5dd;font-size:9.5px;vertical-align:top;word-wrap:break-word;overflow-wrap:anywhere;word-break:break-word;text-align:right}
+  #report{max-width:100%;overflow-wrap:anywhere}
+  #report table{max-width:100%}
+  #report th:first-child,#report td:first-child{text-align:left;width:27%}
+  #report td.text{text-align:left}
+  #report thead th{background:#eef2f7;color:#1c2230;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #report thead th small,#report tr.rep th small{display:none}
+  #report tr.rep th{background:#eef2f7;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #report td small{display:block;font-size:8px;color:#667085;font-weight:400}
+  #report tr{break-inside:avoid;page-break-inside:avoid}
+  #report thead{display:table-header-group}
+  #report tr.highlight td{background:#e8f0f8;color:#0f4c81;font-weight:700;font-size:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #report tr.adv td{background:#fff8e6;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #report tr.total td{font-weight:700;border-top:2px solid #1c2230}
+  #report tr.rent-year td{background:#f9fafb;font-size:9px}
+  #report tr.rent-year td:first-child{padding-left:14px}
+  #report .neg{color:#b42318}
+  #report a.ref{font-size:8px;padding:0 3px;background:#e8f0f8;color:#0f4c81;text-decoration:none;border-radius:3px}
+  #report .sumtbl td{text-align:left;font-size:10px}
+  #report .sumtbl td b{font-size:10.5px}
+  #report .note{font-size:9px;color:#667085;margin:4px 0 0}
+  #report .disc{border:1px solid #f5b94a;border-left:4px solid #f5b94a;padding:8px 10px;border-radius:4px;margin-top:6px;break-inside:avoid;page-break-inside:avoid}
+  #report .disc p{margin:3px 0}
+  #report ol.refs{list-style:none;padding:0;margin:0}
+  #report ol.refs li{padding:3px 0;border-bottom:1px solid #eee;font-size:9px;word-break:break-all;break-inside:avoid}
+  #report ol.refs a{color:#0f4c81}
+  #report .sec{break-inside:auto}
+  #report .pb{break-before:page;page-break-before:always}
+  @media print{
+    @page{size:A4;margin:12.7mm;@bottom-right{content:"Page " counter(page) " of " counter(pages);font-size:8pt;color:#666}@bottom-left{content:"Asmita Jyoti CHSL - Offer comparison";font-size:8pt;color:#666}}
+    body{background:#fff!important}
+    body > *:not(#printHost):not(.measure){display:none!important}
+    #printHost{display:block!important}
+    #report{width:auto}
+  }
+  /* All views (screen, Text and Graphics print / PDF): grey text -> black, normal black text -> bold,
+     totals extra bold; blue / green / white text unchanged */
+  #report{color:#000}
+  #report th,#report td,#report thead th,#report thead th.dev{color:#000;font-weight:700}
+  #report td small,#report th small,#report td.muted,#report .muted,#report .row-head small,#report tr.highlight td small{color:#000;font-weight:400}
+  #report tr.highlight td{font-weight:800}
+  #report tr.total td{color:#000;font-weight:900}
+  #report .legend,#report .note{color:#000}
+  #report .words p{color:#000;font-weight:700}
+  #report .words .w-amt{color:#000;font-weight:800}
+  #report .words .w-line b,#report .words .w-tot b{color:#000;font-weight:600}
+  #report .words.savings .w-tot b,#report .words.savings .w-tot .w-amt{color:#000;font-weight:900}
+  #report .words .w-line b small,#report .words .w-amt small,#report .words .w-note{color:#000;font-weight:400}
+  .card th,.card td,.card thead th,.card thead th.dev{color:#000;font-weight:700}
+  .card td small,.card th small,.card td.muted,.card .muted,.card .row-head small,.card tr.highlight td small{color:#000;font-weight:400}
+  .card tr.highlight td{font-weight:800}
+  .card tr.total td{color:#000;font-weight:900}
+  .card .legend,.card .note{color:#000}
+  .card .words p{color:#000;font-weight:700}
+  .card .words .w-amt{color:#000;font-weight:800}
+  .card .words .w-line b,.card .words .w-tot b{color:#000;font-weight:600}
+  .card .words.savings .w-tot b,.card .words.savings .w-tot .w-amt{color:#000;font-weight:900}
+  .card .words .w-line b small,.card .words .w-amt small,.card .words .w-note{color:#000;font-weight:400}
+  .card tr.total td,.card .words.savings .w-tot b,.card .words.savings .w-tot .w-amt{font-size:1.08rem}
+  #report.t tr.total td,#report.t .words.savings .w-tot b,#report.t .words.savings .w-tot .w-amt{font-size:11px}
+  #report.g tr.total td,#report.g .words.savings .w-tot b,#report.g .words.savings .w-tot .w-amt{font-size:13px}
+  /* ===== Graphics style (one printed A4 page handed to members): large, black, easy-to-read text =====
+     The whole page is scaled to fit A4, so the sizes below are relative; less vertical space = bigger print. */
+  #report.g{font-size:13px;line-height:1.3}
+  #report.g h2{font-size:15px;margin:8px 0 4px}
+  #report.g th,#report.g td{font-size:13.5px;padding:3px 7px;line-height:1.25}
+  #report.g td small,#report.g th small{font-size:11px;line-height:1.2}
+  #report.g tr.highlight td{font-size:13.5px}
+  #report.g tr.total td{font-size:14.5px}
+  #report.g .note,#report.g .rentnote{font-size:11px;margin:4px 0}
+  #report.g .facts{margin:8px 0 0}
+  #report.g .facts .sumtbl td{font-size:11px;padding:4px 8px}
+  #report.g .facts .sumtbl td b{font-size:14px}
+  #report.g .words{padding:6px 12px;margin-top:6px}
+  #report.g .words h3{font-size:14.5px;margin:0 0 3px}
+  #report.g .words p{font-size:12.5px;margin:2px 0}
+  #report.g .words .w-line{margin:4px 0 0}
+  #report.g .words .w-line b{font-size:12.5px}
+  #report.g .words .w-amt{font-size:14px}
+  #report.g .words .w-amt small{font-size:11.5px}
+  #report.g .words .w-line b small{font-size:10.5px}
+  #report.g .words .w-note{display:none}
+  #report.g .words.savings .w-tot b,#report.g .words.savings .w-tot .w-amt{font-size:14.5px}
+  #report.g .words.savings,#report.g .words:not(.savings){display:grid;grid-template-columns:1fr 1fr;column-gap:30px}
+  #report.g .words>h3,#report.g .words>p,#report.g .words>.w-tot{grid-column:1/-1}
+  #report.g .rh-g img{height:150px;object-fit:cover;object-position:center 45%}
+  #report.g .rh-g .txt{right:45%}
+  #report.g .rh-g h1{font-size:21px}
+  #report.g .rh-g .sub{font-size:11.5px}
+  #report.g .rh-g .unitbadge{font-size:19px;padding:3px 14px;margin-top:8px}
+  #report.g .rh-g .meta{font-size:11px}
+  #report.g .rentnote{font-size:13px;line-height:1.35;margin:5px 0 2px}
+  #report.g .rentnote .nl{display:block;white-space:nowrap;overflow:hidden}
+  #report.g .rentnote br{display:none}
+  #report.g .facts .sumtbl td.unitcell{vertical-align:middle}
+  #report.g .facts .sumtbl td.unitcell b{font-size:17px}
+  #report.g .words.savings .w-line{grid-template-columns:1fr auto;gap:2px 10px}
+  #report.g .words .w-amt{white-space:normal}
+  #report.g .words.savings .w-line>.w-amt{white-space:nowrap}
+  #report.g .words.savings .w-tot>.w-amt{white-space:normal}
+  #report.g .sec th:first-child,#report.g .sec td:first-child{width:31%}
+</style>
+</head>
+<body>
+<header>
+  <div class="head-row"><div>
+  <h1 data-i18n="title">Redevelopment Offer Calculator</h1>
+  <p data-i18n="subtitle">Asmita Jyoti Co-operative Housing Society Ltd. — compare developer offers for your flat</p>
+  </div>
+  <div class="updated"><span data-i18n="last_updated">Offers last updated on</span>: <b id="lastUpdated">09-Oct-2026</b>
+    <div class="disclaimer" data-i18n="indicative">Figures are indicative; final terms as per Development Agreement.</div></div>
+  </div>
+</header>
+
+<main>
+  <div class="card notice" id="error"></div>
+
+  <section class="card">
+    <h2 data-i18n="select_flat">Select your flat</h2>
+    <div class="selectors">
+      <div class="input-field-group">
+        <label for="buildingNum"><span data-i18n="building">Building Number</span> <span style="color:#ff3333;">*</span></label>
+        <select id="buildingNum" required><option value="" disabled selected>Loading…</option></select>
+      </div>
+      <div class="input-field-group">
+        <label for="flatNum"><span data-i18n="flat">Flat Number</span> <span style="color:#ff3333;">*</span></label>
+        <select id="flatNum" required disabled><option value="" disabled selected>Choose building first</option></select>
+      </div>
+      <div class="input-field-group">
+        <label for="rentMonths" data-i18n="rent_period">Rent period (months)</label>
+        <input type="number" id="rentMonths" min="1" max="120" step="1">
+      </div>
+    </div>
+    <div class="selectors rent-q">
+      <div class="input-field-group check-group">
+        <label class="check"><input type="checkbox" id="isRented">
+          <span data-i18n="rented">I have given my flat / shop on rent</span></label>
+      </div>
+      <div class="input-field-group hidden" id="curRentGroup">
+        <label for="curRent" data-i18n="cur_rent">Current monthly rent you receive (₹)</label>
+        <input type="number" id="curRent" min="0" step="500" placeholder="e.g. 30000">
+      </div>
+      <div class="input-field-group lang-group">
+        <label for="langSel">🌐 <span data-i18n="language">Language</span></label>
+        <select id="langSel" aria-label="Language"></select>
+      </div>
+    </div>
+    <div class="selectors btn-row">
+      <div></div><div></div>
+      <div class="input-field-group">
+        <button type="button" class="btn" id="updateBtn" disabled>Submit</button>
+        <div class="hint hidden" id="updateHint" data-i18n="changed">Selection changed – click Update to refresh results.</div>
+      </div>
+    </div>
+    <div class="lang-note hidden" id="langNote" data-i18n="lang_auto"></div>
+    <div class="flat-info hidden" id="flatInfo"></div>
+    <div class="notice hidden" id="areaNotice"></div>
+  </section>
+
+  <div class="actions hidden" id="actions">
+    <span class="print-stamp" id="printStamp"></span>
+    <div class="action-btns">
+      <div class="style-pick" role="radiogroup" aria-label="Report style">
+        <label><input type="radio" name="rstyle" value="text" checked> <span data-i18n="mode_text">Text</span></label>
+        <label><input type="radio" name="rstyle" value="graphics"> <span data-i18n="mode_graphics">Graphics</span></label>
+      </div>
+      <button type="button" class="btn-sec" id="printBtn">🖨 <span data-i18n="print">Print</span></button>
+      <button type="button" class="btn-sec" id="pdfBtn">⬇ <span data-i18n="pdf">Export to PDF</span></button>
+    </div>
+  </div>
+
+  <section class="card hidden" id="memberCard">
+    <h2><span data-i18n="your_comparison">Your offer comparison</span> <a class="ref" href="#ref-2">#2</a></h2>
+    <div class="table-wrap"><table id="memberTable"></table></div>
+    <p class="legend" id="legend" data-i18n="legend">Total cash benefit = rent + brokerage + relocation + corpus / hardship compensation (excludes refundable deposit and buyback).</p>
+    <p class="legend" id="rentNote" style="font-weight:800;color:#000"><span id="rentNoteTxt"># All three developers have confirmed in writing that rent will be paid until possession of the new home.<br>The 48-month period is used only for calculation and does not limit the rent payment period.</span></p>
+    <div class="words savings hidden" id="savingsBox"></div>
+    <div class="words hidden" id="wordsBox"></div>
+  </section>
+
+  <section class="card hidden" id="generalCard">
+    <h2><span data-i18n="sec_other">Other per-member offers</span> <a class="ref" href="#ref-2">#2</a></h2>
+    <div class="table-wrap"><table id="generalTable"></table></div>
+  </section>
+
+  <section class="card hidden" id="commercialCard">
+    <h2><span data-i18n="sec_commercial">Shops &amp; first-floor units</span> <a class="ref" href="#ref-2">#2</a></h2>
+    <div class="table-wrap"><table id="commercialTable"></table></div>
+  </section>
+
+  <section class="card hidden" id="societyCard">
+    <h2><span data-i18n="sec_society">Society-level offers</span> <a class="ref" href="#ref-2">#2</a></h2>
+    <div class="table-wrap"><table id="societyTable"></table></div>
+  </section>
+
+  <section class="card hidden" id="complianceCard">
+    <h2><span data-i18n="sec_compliance">Tender compliance &amp; clarifications</span> <a class="ref" href="#ref-12">#12</a></h2>
+    <p class="legend" style="margin-top:0">Each developer's final position (letters dated 15-Oct-2026) on points where its offer differs from, or did not address, the tender conditions. The tender requirement is shown under each topic.</p>
+    <div class="table-wrap"><table id="complianceTable"></table></div>
+  </section>
+
+  <section class="card hidden" id="profileCard">
+    <h2 data-i18n="sec_profile">About the developers</h2>
+    <div id="profileBody"></div>
+    <p class="legend">Financial figures <a class="ref" href="#ref-3">#3</a> are as submitted by each developer in Proforma 'D' (tender), converted to ₹ crore. Profile details are compiled from public sources (rating agencies, company filings and press releases) as of Oct-2026 and should be verified independently.</p>
+  </section>
+
+  <section class="card disclaimer-card hidden" id="finalDisclaimer">
+    <h2 data-i18n="sec_disclaimer">Disclaimer</h2>
+    <p data-i18n="disc_text">The figures shown are indicative and have been calculated from the offers submitted by the developers and the existing carpet area records of the Society. Actual entitlements, areas, amounts and all other terms will be as per the final Development Agreement (DA) executed between the Society and the selected developer.</p>
+  </section>
+
+  <section class="card hidden" id="refCard">
+    <h2 data-i18n="sec_refs">References / Sources</h2>
+    <ol class="ref-list" id="refList"></ol>
+  </section>
+
+  <footer id="footer"></footer>
+</main>
+<div id="printHost"></div>
+
+<script>
+/* Indian-system amount in words (crore / lakh / thousand / hundred) for 12 languages.
+   numWords(amount, lang) -> e.g. "Rupees Thirty-Nine Lakh ... Only".  Rounded to the nearest rupee. */
+(function (g) {
+  'use strict';
+  const S = s => s.trim().split(/\s+/);
+
+  /* ---------- languages with a unique word for every number 1-99 ---------- */
+  const T99 = {
+    hi: S(`शून्य एक दो तीन चार पाँच छह सात आठ नौ दस ग्यारह बारह तेरह चौदह पंद्रह सोलह सत्रह अठारह उन्नीस बीस इक्कीस बाईस तेईस चौबीस पच्चीस छब्बीस सत्ताईस अट्ठाईस उनतीस
+      तीस इकतीस बत्तीस तैंतीस चौंतीस पैंतीस छत्तीस सैंतीस अड़तीस उनतालीस चालीस इकतालीस बयालीस तैंतालीस चवालीस पैंतालीस छियालीस सैंतालीस अड़तालीस उनचास
+      पचास इक्यावन बावन तिरपन चौवन पचपन छप्पन सत्तावन अट्ठावन उनसठ साठ इकसठ बासठ तिरसठ चौंसठ पैंसठ छियासठ सड़सठ अड़सठ उनहत्तर
+      सत्तर इकहत्तर बहत्तर तिहत्तर चौहत्तर पचहत्तर छिहत्तर सतहत्तर अठहत्तर उन्यासी अस्सी इक्यासी बयासी तिरासी चौरासी पचासी छियासी सत्तासी अट्ठासी नवासी
+      नब्बे इक्यानवे बानवे तिरानवे चौरानवे पंचानवे छियानवे सत्तानवे अट्ठानवे निन्यानवे`),
+    mr: S(`शून्य एक दोन तीन चार पाच सहा सात आठ नऊ दहा अकरा बारा तेरा चौदा पंधरा सोळा सतरा अठरा एकोणीस
+      वीस एकवीस बावीस तेवीस चोवीस पंचवीस सव्वीस सत्तावीस अठ्ठावीस एकोणतीस तीस एकतीस बत्तीस तेहेतीस चौतीस पस्तीस छत्तीस सदतीस अडतीस एकोणचाळीस
+      चाळीस एक्केचाळीस बेचाळीस त्रेचाळीस चव्वेचाळीस पंचेचाळीस सेहेचाळीस सत्तेचाळीस अठ्ठेचाळीस एकोणपन्नास
+      पन्नास एक्कावन्न बावन्न त्रेपन्न चोपन्न पंचावन्न छप्पन्न सत्तावन्न अठ्ठावन्न एकोणसाठ साठ एकसष्ट बासष्ट त्रेसष्ट चौसष्ट पासष्ट सहासष्ट सदुसष्ट अडुसष्ट एकोणसत्तर
+      सत्तर एकाहत्तर बाहत्तर त्र्याहत्तर चौऱ्याहत्तर पंचाहत्तर शहात्तर सत्याहत्तर अठ्ठ्याहत्तर एकोणऐंशी
+      ऐंशी एक्याऐंशी ब्याऐंशी त्र्याऐंशी चौऱ्याऐंशी पंच्याऐंशी शहाऐंशी सत्त्याऐंशी अठ्ठ्याऐंशी एकोणनव्वद
+      नव्वद एक्याण्णव ब्याण्णव त्र्याण्णव चौऱ्याण्णव पंचाण्णव शहाण्णव सत्त्याण्णव अठ्ठ्याण्णव नव्याण्णव`),
+    gu: S(`શૂન્ય એક બે ત્રણ ચાર પાંચ છ સાત આઠ નવ દસ અગિયાર બાર તેર ચૌદ પંદર સોળ સત્તર અઢાર ઓગણીસ
+      વીસ એકવીસ બાવીસ ત્રેવીસ ચોવીસ પચ્ચીસ છવ્વીસ સત્તાવીસ અઠ્ઠાવીસ ઓગણત્રીસ ત્રીસ એકત્રીસ બત્રીસ તેત્રીસ ચોત્રીસ પાંત્રીસ છત્રીસ સાડત્રીસ આડત્રીસ ઓગણચાલીસ
+      ચાલીસ એકતાલીસ બેતાલીસ ત્રેતાલીસ ચુંમાલીસ પિસ્તાલીસ છેતાલીસ સુડતાલીસ અડતાલીસ ઓગણપચાસ
+      પચાસ એકાવન બાવન ત્રેપન ચોપન પંચાવન છપ્પન સત્તાવન અઠ્ઠાવન ઓગણસાઠ સાઠ એકસઠ બાસઠ ત્રેસઠ ચોસઠ પાંસઠ છાસઠ સડસઠ અડસઠ ઓગણસિત્તેર
+      સિત્તેર એકોતેર બોતેર તોતેર ચુમોતેર પંચોતેર છોતેર સિત્યોતેર ઇઠ્યોતેર ઓગણએંસી
+      એંસી એક્યાસી બ્યાસી ત્યાસી ચોર્યાસી પંચાસી છ્યાસી સિત્યાસી ઇઠ્યાસી નેવ્યાસી
+      નેવું એકાણું બાણું ત્રાણું ચોરાણું પંચાણું છન્નું સત્તાણું અઠ્ઠાણું નવ્વાણું`),
+    bn: S(`শূন্য এক দুই তিন চার পাঁচ ছয় সাত আট নয় দশ এগারো বারো তেরো চোদ্দ পনেরো ষোলো সতেরো আঠারো উনিশ
+      কুড়ি একুশ বাইশ তেইশ চব্বিশ পঁচিশ ছাব্বিশ সাতাশ আঠাশ ঊনত্রিশ ত্রিশ একত্রিশ বত্রিশ তেত্রিশ চৌত্রিশ পঁয়ত্রিশ ছত্রিশ সাঁইত্রিশ আটত্রিশ ঊনচল্লিশ
+      চল্লিশ একচল্লিশ বিয়াল্লিশ তেতাল্লিশ চুয়াল্লিশ পঁয়তাল্লিশ ছেচল্লিশ সাতচল্লিশ আটচল্লিশ ঊনপঞ্চাশ
+      পঞ্চাশ একান্ন বাহান্ন তিপ্পান্ন চুয়ান্ন পঞ্চান্ন ছাপ্পান্ন সাতান্ন আটান্ন ঊনষাট ষাট একষট্টি বাষট্টি তেষট্টি চৌষট্টি পঁয়ষট্টি ছেষট্টি সাতষট্টি আটষট্টি ঊনসত্তর
+      সত্তর একাত্তর বাহাত্তর তিয়াত্তর চুয়াত্তর পঁচাত্তর ছিয়াত্তর সাতাত্তর আটাত্তর ঊনআশি
+      আশি একাশি বিরাশি তিরাশি চুরাশি পঁচাশি ছিয়াশি সাতাশি আটাশি ঊননব্বই
+      নব্বই একানব্বই বিরানব্বই তিরানব্বই চুরানব্বই পঁচানব্বই ছিয়ানব্বই সাতানব্বই আটানব্বই নিরানব্বই`),
+    pa: S(`ਸਿਫ਼ਰ ਇੱਕ ਦੋ ਤਿੰਨ ਚਾਰ ਪੰਜ ਛੇ ਸੱਤ ਅੱਠ ਨੌਂ ਦਸ ਗਿਆਰਾਂ ਬਾਰਾਂ ਤੇਰਾਂ ਚੌਦਾਂ ਪੰਦਰਾਂ ਸੋਲ਼ਾਂ ਸਤਾਰਾਂ ਅਠਾਰਾਂ ਉੱਨੀ
+      ਵੀਹ ਇੱਕੀ ਬਾਈ ਤੇਈ ਚੌਵੀ ਪੱਚੀ ਛੱਬੀ ਸਤਾਈ ਅਠਾਈ ਉਨੱਤੀ ਤੀਹ ਇਕੱਤੀ ਬੱਤੀ ਤੇਤੀ ਚੌਂਤੀ ਪੈਂਤੀ ਛੱਤੀ ਸੈਂਤੀ ਅਠੱਤੀ ਉਨਤਾਲੀ
+      ਚਾਲੀ ਇਕਤਾਲੀ ਬਤਾਲੀ ਤਰਤਾਲੀ ਚੁਤਾਲੀ ਪੰਜਤਾਲੀ ਛਿਆਲੀ ਸੰਤਾਲੀ ਅਠਤਾਲੀ ਉਨੰਜਾ
+      ਪੰਜਾਹ ਇਕਵੰਜਾ ਬਵੰਜਾ ਤਰਵੰਜਾ ਚਰਵੰਜਾ ਪਚਵੰਜਾ ਛਪੰਜਾ ਸਤਵੰਜਾ ਅਠਵੰਜਾ ਉਨਾਹਠ ਸੱਠ ਇਕਾਹਠ ਬਾਹਠ ਤਰੇਹਠ ਚੌਂਹਠ ਪੈਂਹਠ ਛਿਆਹਠ ਸਤਾਹਠ ਅਠਾਹਠ ਉਨੱਤਰ
+      ਸੱਤਰ ਇਕਹੱਤਰ ਬਹੱਤਰ ਤਹੱਤਰ ਚੌਹੱਤਰ ਪਚੱਤਰ ਛਿਹੱਤਰ ਸਤੱਤਰ ਅਠੱਤਰ ਉਨਾਸੀ
+      ਅੱਸੀ ਇਕਾਸੀ ਬਿਆਸੀ ਤਰਾਸੀ ਚੌਰਾਸੀ ਪਚਾਸੀ ਛਿਆਸੀ ਸਤਾਸੀ ਅਠਾਸੀ ਉਨਾਨਵੇਂ
+      ਨੱਬੇ ਇਕਾਨਵੇਂ ਬਿਆਨਵੇਂ ਤਰਾਨਵੇਂ ਚੁਰਾਨਵੇਂ ਪਚਾਨਵੇਂ ਛਿਆਨਵੇਂ ਸਤਾਨਵੇਂ ਅਠਾਨਵੇਂ ਨੜਿੰਨਵੇਂ`),
+    ur: S(`صفر ایک دو تین چار پانچ چھ سات آٹھ نو دس گیارہ بارہ تیرہ چودہ پندرہ سولہ سترہ اٹھارہ انیس
+      بیس اکیس بائیس تئیس چوبیس پچیس چھبیس ستائیس اٹھائیس انتیس تیس اکتیس بتیس تینتیس چونتیس پینتیس چھتیس سینتیس اڑتیس انتالیس
+      چالیس اکتالیس بیالیس تینتالیس چوالیس پینتالیس چھیالیس سینتالیس اڑتالیس انچاس
+      پچاس اکاون باون ترپن چون پچپن چھپن ستاون اٹھاون انسٹھ ساٹھ اکسٹھ باسٹھ تریسٹھ چونسٹھ پینسٹھ چھیاسٹھ سڑسٹھ اڑسٹھ انہتر
+      ستر اکہتر بہتر تہتر چوہتر پچھتر چھہتر ستتر اٹھتر اناسی
+      اسی اکیاسی بیاسی تراسی چوراسی پچاسی چھیاسی ستاسی اٹھاسی نواسی
+      نوے اکانوے بانوے ترانوے چورانوے پچانوے چھیانوے ستانوے اٹھانوے ننانوے`),
+    or: S(`ଶୂନ୍ ଏକ ଦୁଇ ତିନି ଚାରି ପାଞ୍ଚ ଛଅ ସାତ ଆଠ ନଅ ଦଶ ଏଗାର ବାର ତେର ଚଉଦ ପନ୍ଦର ଷୋହଳ ସତର ଅଠର ଉଣେଇଶି
+      କୋଡ଼ିଏ ଏକୋଇଶି ବାଇଶି ତେଇଶି ଚବିଶି ପଚିଶି ଛବିଶି ସତାଇଶି ଅଠାଇଶି ଅଣତିରିଶି ତିରିଶି ଏକତିରିଶି ବତିଶି ତେତିଶି ଚଉତିରିଶି ପଞ୍ଚତିରିଶି ଛତିଶି ସଇଁତିରିଶି ଅଠତିରିଶି ଅଣଚାଳିଶି
+      ଚାଳିଶି ଏକଚାଳିଶି ବୟାଳିଶି ତେୟାଳିଶି ଚଉରାଳିଶି ପଞ୍ଚଚାଳିଶି ଛୟାଳିଶି ସତଚାଳିଶି ଅଠଚାଳିଶି ଅଣଚାଶ
+      ପଚାଶ ଏକାବନ ବାଉନ ତେପନ ଚଉବନ ପଞ୍ଚାବନ ଛପନ ସତାବନ ଅଠାବନ ଅଣଷଠି ଷାଠିଏ ଏକଷଠି ବାଷଠି ତେଷଠି ଚଉଷଠି ପଞ୍ଚଷଠି ଛଅଷଠି ସତଷଠି ଅଠଷଠି ଅଣସ୍ତରି
+      ସତୁରି ଏକସ୍ତରି ବାସ୍ତରି ତେସ୍ତରି ଚଉସ୍ତରି ପଞ୍ଚସ୍ତରି ଛଅସ୍ତରି ସତସ୍ତରି ଅଠସ୍ତରି ଅଣାଅଶୀ
+      ଅଶୀ ଏକାଅଶୀ ବୟାଅଶୀ ତେୟାଅଶୀ ଚଉରାଅଶୀ ପଞ୍ଚାଅଶୀ ଛୟାଅଶୀ ସତାଅଶୀ ଅଠାଅଶୀ ଅଣାନବେ
+      ନବେ ଏକାନବେ ବୟାନବେ ତେୟାନବେ ଚଉରାନବେ ପଞ୍ଚାନବେ ଛୟାନବେ ସତାନବେ ଅଠାନବେ ଅନେଶତ`)
+  };
+  // hundreds word, thousand, lakh, crore, prefix, suffix
+  const NORTH = {
+    hi: { h: u => T99.hi[u] + ' सौ', th: 'हज़ार', lk: 'लाख', cr: 'करोड़', pre: 'रुपये ', suf: ' मात्र' },
+    mr: { h: (u, rest) => (u === 1 && !rest) ? 'शंभर' : ['', 'एकशे', 'दोनशे', 'तीनशे', 'चारशे', 'पाचशे', 'सहाशे', 'सातशे', 'आठशे', 'नऊशे'][u],
+          th: 'हजार', lk: 'लाख', cr: 'कोटी', pre: 'रुपये ', suf: ' फक्त' },
+    gu: { h: u => T99.gu[u] + ' સો', th: 'હજાર', lk: 'લાખ', cr: 'કરોડ', pre: 'રૂપિયા ', suf: ' પૂરા' },
+    bn: { h: u => T99.bn[u] + ' শত', th: 'হাজার', lk: 'লক্ষ', cr: 'কোটি', pre: '', suf: ' টাকা মাত্র' },
+    pa: { h: u => T99.pa[u] + ' ਸੌ', th: 'ਹਜ਼ਾਰ', lk: 'ਲੱਖ', cr: 'ਕਰੋੜ', pre: 'ਰੁਪਏ ', suf: ' ਮਾਤਰ' },
+    ur: { h: u => T99.ur[u] + ' سو', th: 'ہزار', lk: 'لاکھ', cr: 'کروڑ', pre: 'روپے ', suf: ' صرف' },
+    or: { h: u => T99.or[u] + ' ଶହ', th: 'ହଜାର', lk: 'ଲକ୍ଷ', cr: 'କୋଟି', pre: '', suf: ' ଟଙ୍କା ମାତ୍ର' }
+  };
+  function northCore(n, L) {
+    const C = NORTH[L], W = T99[L], p = [];
+    const cr = Math.floor(n / 1e7); n %= 1e7;
+    const lk = Math.floor(n / 1e5); n %= 1e5;
+    const th = Math.floor(n / 1e3); n %= 1e3;
+    const h = Math.floor(n / 100), r = n % 100;
+    if (cr) p.push(northCore(cr, L) + ' ' + C.cr);
+    if (lk) p.push(W[lk] + ' ' + C.lk);
+    if (th) p.push(W[th] + ' ' + C.th);
+    if (h) p.push(C.h(h, r));
+    if (r) p.push(W[r]);
+    return p.join(' ');
+  }
+
+  /* ---------- English (Indian system) ---------- */
+  const ONES = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  const TENS = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  const en2 = n => n < 20 ? ONES[n] : TENS[Math.floor(n / 10)] + (n % 10 ? '-' + ONES[n % 10] : '');
+  function enCore(n) {
+    const p = [];
+    const cr = Math.floor(n / 1e7); n %= 1e7;
+    const lk = Math.floor(n / 1e5); n %= 1e5;
+    const th = Math.floor(n / 1e3); n %= 1e3;
+    const h = Math.floor(n / 100), r = n % 100;
+    if (cr) p.push(enCore(cr) + ' Crore');
+    if (lk) p.push(en2(lk) + ' Lakh');
+    if (th) p.push(en2(th) + ' Thousand');
+    if (h) p.push(ONES[h] + ' Hundred');
+    if (r) p.push(en2(r));
+    return p.join(' ');
+  }
+
+  /* ---------- Dravidian languages (tens + units are composed) ---------- */
+  const DR = {
+    ta: {
+      u: ['', 'ஒன்று', 'இரண்டு', 'மூன்று', 'நான்கு', 'ஐந்து', 'ஆறு', 'ஏழு', 'எட்டு', 'ஒன்பது'],
+      teen: ['பத்து', 'பதினொன்று', 'பன்னிரண்டு', 'பதின்மூன்று', 'பதினான்கு', 'பதினைந்து', 'பதினாறு', 'பதினேழு', 'பதினெட்டு', 'பத்தொன்பது'],
+      tens: ['', '', 'இருபது', 'முப்பது', 'நாற்பது', 'ஐம்பது', 'அறுபது', 'எழுபது', 'எண்பது', 'தொண்ணூறு'],
+      tensC: ['', '', 'இருபத்து', 'முப்பத்து', 'நாற்பத்து', 'ஐம்பத்து', 'அறுபத்து', 'எழுபத்து', 'எண்பத்து', 'தொண்ணூற்று'],
+      hund: ['', 'நூறு', 'இருநூறு', 'முன்னூறு', 'நானூறு', 'ஐநூறு', 'அறுநூறு', 'எழுநூறு', 'எண்ணூறு', 'தொள்ளாயிரம்'],
+      hundC: ['', 'நூற்று', 'இருநூற்று', 'முன்னூற்று', 'நானூற்று', 'ஐநூற்று', 'அறுநூற்று', 'எழுநூற்று', 'எண்ணூற்று', 'தொள்ளாயிரத்து'],
+      one: 'ஒரு',
+      th: ['ஆயிரம்', 'ஆயிரத்து'], lk: ['லட்சம்', 'லட்சத்து'], cr: ['கோடி', 'கோடியே'],
+      oneThousand: ['ஆயிரம்', 'ஆயிரத்து'],
+      pre: 'ரூபாய் ', suf: ' மட்டும்'
+    },
+    te: {
+      u: ['', 'ఒకటి', 'రెండు', 'మూడు', 'నాలుగు', 'ఐదు', 'ఆరు', 'ఏడు', 'ఎనిమిది', 'తొమ్మిది'],
+      teen: ['పది', 'పదకొండు', 'పన్నెండు', 'పదమూడు', 'పద్నాలుగు', 'పదిహేను', 'పదహారు', 'పదిహేడు', 'పద్దెనిమిది', 'పందొమ్మిది'],
+      tens: ['', '', 'ఇరవై', 'ముప్పై', 'నలభై', 'యాభై', 'అరవై', 'డెబ్బై', 'ఎనభై', 'తొంభై'],
+      one: 'ఒక',
+      pre: '', suf: ' రూపాయలు మాత్రమే'
+    },
+    kn: {
+      u: ['', 'ಒಂದು', 'ಎರಡು', 'ಮೂರು', 'ನಾಲ್ಕು', 'ಐದು', 'ಆರು', 'ಏಳು', 'ಎಂಟು', 'ಒಂಬತ್ತು'],
+      teen: ['ಹತ್ತು', 'ಹನ್ನೊಂದು', 'ಹನ್ನೆರಡು', 'ಹದಿಮೂರು', 'ಹದಿನಾಲ್ಕು', 'ಹದಿನೈದು', 'ಹದಿನಾರು', 'ಹದಿನೇಳು', 'ಹದಿನೆಂಟು', 'ಹತ್ತೊಂಬತ್ತು'],
+      tens: ['', '', 'ಇಪ್ಪತ್ತು', 'ಮೂವತ್ತು', 'ನಲವತ್ತು', 'ಐವತ್ತು', 'ಅರವತ್ತು', 'ಎಪ್ಪತ್ತು', 'ಎಂಬತ್ತು', 'ತೊಂಬತ್ತು'],
+      hund: ['', 'ನೂರು', 'ಇನ್ನೂರು', 'ಮುನ್ನೂರು', 'ನಾನೂರು', 'ಐನೂರು', 'ಆರುನೂರು', 'ಏಳುನೂರು', 'ಎಂಟುನೂರು', 'ಒಂಬೈನೂರು'],
+      one: 'ಒಂದು',
+      pre: '', suf: ' ರೂಪಾಯಿಗಳು ಮಾತ್ರ'
+    },
+    ml: {
+      u: ['', 'ഒന്ന്', 'രണ്ട്', 'മൂന്ന്', 'നാല്', 'അഞ്ച്', 'ആറ്', 'ഏഴ്', 'എട്ട്', 'ഒൻപത്'],
+      teen: ['പത്ത്', 'പതിനൊന്ന്', 'പന്ത്രണ്ട്', 'പതിമൂന്ന്', 'പതിനാല്', 'പതിനഞ്ച്', 'പതിനാറ്', 'പതിനേഴ്', 'പതിനെട്ട്', 'പത്തൊൻപത്'],
+      tens: ['', '', 'ഇരുപത്', 'മുപ്പത്', 'നാൽപത്', 'അൻപത്', 'അറുപത്', 'എഴുപത്', 'എൺപത്', 'തൊണ്ണൂറ്'],
+      tensC: ['', '', 'ഇരുപത്തി', 'മുപ്പത്തി', 'നാൽപത്തി', 'അൻപത്തി', 'അറുപത്തി', 'എഴുപത്തി', 'എൺപത്തി', 'തൊണ്ണൂറ്റി'],
+      hund: ['', 'നൂറ്', 'ഇരുനൂറ്', 'മുന്നൂറ്', 'നാനൂറ്', 'അഞ്ഞൂറ്', 'അറുനൂറ്', 'എഴുനൂറ്', 'എണ്ണൂറ്', 'തൊള്ളായിരം'],
+      hundC: ['', 'നൂറ്റി', 'ഇരുനൂറ്റി', 'മുന്നൂറ്റി', 'നാനൂറ്റി', 'അഞ്ഞൂറ്റി', 'അറുനൂറ്റി', 'എഴുനൂറ്റി', 'എണ്ണൂറ്റി', 'തൊള്ളായിരത്തി'],
+      one: 'ഒരു',
+      pre: '', suf: ' രൂപ മാത്രം'
+    }
+  };
+  // Kannada: 21 = ಇಪ್ಪತ್ತ + ೊಂದು -> ಇಪ್ಪತ್ತೊಂದು ; 23 = ಇಪ್ಪತ್ತ + ಮೂರು -> ಇಪ್ಪತ್ತಮೂರು
+  const KN_V = { 'ಒ': 'ೊ', 'ಎ': 'ೆ', 'ಐ': 'ೈ', 'ಆ': 'ಾ', 'ಏ': 'ೇ' };
+  // Malayalam: 21 = ഇരുപത്തി + യൊന്ന് ; 22 = ഇരുപത്തി + രണ്ട്
+  const ML_V = { 'ഒ': 'യൊ', 'അ': 'യ', 'ആ': 'യാ', 'ഏ': 'യേ', 'എ': 'യെ' };
+  function dr2(n, L) {
+    const D = DR[L];
+    if (n < 10) return D.u[n];
+    if (n < 20) return D.teen[n - 10];
+    const t = Math.floor(n / 10), r = n % 10;
+    if (!r) return D.tens[t];
+    if (L === 'ta') return D.tensC[t] + ' ' + D.u[r];
+    if (L === 'te') return D.tens[t] + ' ' + D.u[r];
+    if (L === 'kn') {
+      const stem = D.tens[t].replace(/ು$/, ''), u = D.u[r], v = KN_V[u[0]];
+      return v ? stem + v + u.slice(1) : stem + u;
+    }
+    if (L === 'ml') {
+      const u = D.u[r], v = ML_V[u[0]];
+      return v ? D.tensC[t] + v + u.slice(1) : D.tensC[t] + u;
+    }
+  }
+  function drCore(n, L) {
+    const D = DR[L];
+    const cr = Math.floor(n / 1e7); n %= 1e7;
+    const lk = Math.floor(n / 1e5); n %= 1e5;
+    const th = Math.floor(n / 1e3); n %= 1e3;
+    const h = Math.floor(n / 100), r = n % 100;
+    const mult = m => m === 1 ? D.one : dr2(m, L);
+    const p = [];
+    const more = (...xs) => xs.some(Boolean);
+    if (L === 'ta') {
+      if (cr) p.push((cr > 99 ? drCore(cr, L) : mult(cr)) + ' ' + D.cr[more(lk, th, h, r) ? 1 : 0]);
+      if (lk) p.push(mult(lk) + ' ' + D.lk[more(th, h, r) ? 1 : 0]);
+      if (th) p.push((th === 1 ? '' : dr2(th, L) + ' ') + D.th[more(h, r) ? 1 : 0]);
+      if (h) p.push(r ? D.hundC[h] : D.hund[h]);
+      if (r) p.push(dr2(r, L));
+    } else if (L === 'te') {
+      const big = (m, sg, pl, plC, last) => m === 1 ? D.one + ' ' + sg : mult(m) + ' ' + (last ? pl : plC);
+      if (cr) p.push(cr > 99 ? drCore(cr, L) + ' కోట్లు' : big(cr, 'కోటి', 'కోట్లు', 'కోట్ల', !more(lk, th, h, r)));
+      if (lk) p.push(big(lk, 'లక్ష', 'లక్షలు', 'లక్షల', !more(th, h, r)));
+      if (th) p.push(th === 1 ? 'వెయ్యి' : mult(th) + ' ' + (more(h, r) ? 'వేల' : 'వేలు'));
+      if (h) p.push(h === 1 ? (r ? 'నూట' : 'వంద') : D.u[h] + ' ' + (r ? 'వందల' : 'వందలు'));
+      if (r) p.push(dr2(r, L));
+    } else if (L === 'kn') {
+      if (cr) p.push((cr > 99 ? drCore(cr, L) : mult(cr)) + ' ಕೋಟಿ');
+      if (lk) p.push(mult(lk) + ' ಲಕ್ಷ');
+      if (th) p.push(mult(th) + ' ಸಾವಿರ');
+      if (h) p.push(D.hund[h]);
+      if (r) p.push(dr2(r, L));
+    } else if (L === 'ml') {
+      if (cr) p.push((cr > 99 ? drCore(cr, L) : mult(cr)) + ' കോടി');
+      if (lk) p.push(mult(lk) + ' ' + (more(th, h, r) ? 'ലക്ഷത്തി' : 'ലക്ഷം'));
+      if (th) p.push((th === 1 ? '' : dr2(th, L) + ' ') + (more(h, r) ? 'ആയിരത്തി' : 'ആയിരം'));
+      if (h) p.push(r ? D.hundC[h] : D.hund[h]);
+      if (r) p.push(dr2(r, L));
+    }
+    return p.join(' ');
+  }
+
+  function numWords(amount, lang) {
+    let n = Math.round(Math.abs(Number(amount) || 0));
+    if (lang === 'en' || !lang) return n ? 'Rupees ' + enCore(n) + ' Only' : 'Rupees Zero Only';
+    if (NORTH[lang]) { const C = NORTH[lang]; return C.pre + (n ? northCore(n, lang) : T99[lang][0]) + C.suf; }
+    if (DR[lang]) { const D = DR[lang]; return D.pre + (n ? drCore(n, lang) : '0') + D.suf; }
+    return numWords(amount, 'en');
+  }
+  g.numWords = numWords;
+  g.NUMWORD_LANGS = ['en', 'hi', 'mr', 'gu', 'bn', 'pa', 'ur', 'or', 'ta', 'te', 'kn', 'ml'];
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>
+// Folder (virtual directory) name is case-sensitive: Offer-Calculator
+const VD_NAME = 'Offer-Calculator';
+// Works for /Offer-Calculator, /Offer-Calculator/ and /Offer-Calculator/index.html
+const DATA_DIR = (location.pathname.endsWith('/') || /\.[a-z]+$/i.test(location.pathname)) ? 'data/' : VD_NAME + '/data/';
+const FILES = ['flats','developers','offers_area','offers_general','settings','developer_profile','sources','i18n'];
+const OPTIONAL_FILES = ['i18n'];   // page still works (in English) if these are missing
+const BUILDING_ORDER = ['A1','A2','B1','C1','D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','E1','Shops/Units'];
+const DB = {};
+
+/* ---------- CSV ---------- */
+function parseCSV(text){
+  const rows=[]; let row=[], f='', q=false;
+  text=text.replace(/^﻿/,'');
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c=='"'){ if(text[i+1]=='"'){f+='"';i++;} else q=false; } else f+=c; }
+    else if(c=='"') q=true;
+    else if(c==','){ row.push(f); f=''; }
+    else if(c=='\n'||c=='\r'){ if(c=='\r'&&text[i+1]=='\n') i++; row.push(f); rows.push(row); row=[]; f=''; }
+    else f+=c;
+  }
+  if(f!==''||row.length){ row.push(f); rows.push(row); }
+  const head=rows.shift().map(h=>h.trim());
+  return rows.filter(r=>r.some(v=>v.trim()!=='')).map(r=>Object.fromEntries(head.map((h,i)=>[h,(r[i]??'').trim()])));
+}
+async function loadAll(){
+  await Promise.all(FILES.map(async n=>{
+    const res=await fetch(DATA_DIR+n+'.csv?v='+Date.now(),{cache:'no-store'});
+    if(!res.ok){ if(OPTIONAL_FILES.includes(n)){ DB[n]=[]; return; } throw new Error(n+'.csv: HTTP '+res.status); }
+    DB[n]=parseCSV(await res.text());
+  }));
+}
+
+/* ---------- helpers ---------- */
+const num=v=>v===''||v==null||isNaN(+v)?null:+v;
+const inr=v=>v==null?'—':'₹ '+Math.round(v).toLocaleString('en-IN')+'/-';   // amounts shown as ₹ 1,23,567/-
+const inr0=v=>v==null?'—':'₹ '+Math.round(v).toLocaleString('en-IN');        // rates followed by '/month' or '×'
+const sqft=v=>v==null?'—':(+v).toLocaleString('en-IN',{maximumFractionDigits:1})+' '+T('sqft');
+
+/* ---------- languages (data/i18n.csv = UI text, flats.csv "language" column = flat -> language code) ---------- */
+const LANGS=[['en','English'],['hi','हिन्दी (Hindi)'],['mr','मराठी (Marathi)'],['gu','ગુજરાતી (Gujarati)'],['bn','বাংলা (Bengali)'],
+  ['pa','ਪੰਜਾਬੀ (Punjabi)'],['ur','اردو (Urdu)'],['or','ଓଡ଼ିଆ (Odia)'],['ta','தமிழ் (Tamil)'],['te','తెలుగు (Telugu)'],['kn','ಕನ್ನಡ (Kannada)'],['ml','മലയാളം (Malayalam)']];
+const FONTS={hi:'Noto Sans Devanagari',mr:'Noto Sans Devanagari',gu:'Noto Sans Gujarati',bn:'Noto Sans Bengali',pa:'Noto Sans Gurmukhi',
+  ur:'Noto Naskh Arabic',or:'Noto Sans Oriya',ta:'Noto Sans Tamil',te:'Noto Sans Telugu',kn:'Noto Sans Kannada',ml:'Noto Sans Malayalam'};
+let LANG='en', manualLang=false, I18N={};
+function T(k,vars){ const r=I18N[k]; let s=(r&&(r[LANG]||r.en))||k;
+  if(vars) for(const [a,b] of Object.entries(vars)) s=s.split('{'+a+'}').join(b);
+  return s; }
+function loadFont(l){ const f=FONTS[l]; if(!f||document.getElementById('font-'+l)) return;
+  const ln=document.createElement('link'); ln.id='font-'+l; ln.rel='stylesheet';
+  ln.href='https://fonts.googleapis.com/css2?family='+f.replace(/ /g,'+')+':wght@400;600;700&display=swap'; document.head.appendChild(ln); }
+function flatLang(f){ const l=(f.language||'').trim(); return LANGS.some(x=>x[0]===l)?l:'en'; }   // 'language' column of flats.csv
+function applyLang(){
+  document.documentElement.lang=LANG;
+  document.body.style.setProperty('--lfont',FONTS[LANG]?'"'+FONTS[LANG]+'"':'"Noto Sans Devanagari"');
+  if($('rentNoteTxt')) $('rentNoteTxt').innerHTML=rentNoteHTML();
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent=T(el.dataset.i18n); if(LANG==='ur') el.dir='auto'; else el.removeAttribute('dir'); });
+  $('updateBtn').textContent=T(shown?'update':'submit');
+  const bo=$('buildingNum').querySelector('option[value=""]'); if(bo) bo.textContent=T('choose');
+  const fo=$('flatNum').querySelector('option[value=""]'); if(fo) fo.textContent=T($('flatNum').disabled?'choose_bldg_first':'choose');
+  $('langSel').value=LANG;
+  $('footer').textContent=T('source',{date:setting('statement_date','')})+' '+T('indicative');
+  document.title=T('title')+' – Asmita Jyoti CHSL';
+}
+function setLang(l,manual){
+  if(!LANGS.some(x=>x[0]===l)) l='en';
+  LANG=l; if(manual){ manualLang=true; $('langNote').classList.add('hidden'); }
+  loadFont(l); applyLang();
+  if(shown) render(true);          // redraw the results already on screen in the new language
+}
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const flatSort=(a,b)=>{const na=parseInt(a.flat_no.replace(/\D/g,'')),nb=parseInt(b.flat_no.replace(/\D/g,''));
+  const ta=a.flat_no[0],tb=b.flat_no[0]; return ta===tb?na-nb:ta.localeCompare(tb);};
+function setting(k,d){const r=DB.settings.find(s=>s.key===k);return r?r.value:d;}
+let CUR=null;  // currently selected flat row
+/* rows for dev/type/item; rows whose applies_to matches the flat's building or location_tag override the default (blank) rows */
+function areaItems(dev,type,item){
+  const all=DB.offers_area.filter(o=>o.dev_id===dev&&o.unit_type===type&&o.item===item);
+  if(CUR){ const norm=v=>String(v||'').trim().toUpperCase();
+    const sp=all.filter(o=>o.applies_to&&(norm(o.applies_to)===norm(CUR.building)||(CUR.location_tag&&norm(o.applies_to)===norm(CUR.location_tag))));
+    if(sp.length) return sp; }
+  return all.filter(o=>!o.applies_to);
+}
+function grouped(rows,fmt){const g={};rows.forEach(x=>{(g[x.value]=g[x.value]||[]).push(x.applies_to);});
+  return Object.entries(g).map(([v,t])=>fmt(v)+' ('+t.join(', ')+')').join('; ');}
+function variants(dev,type,item){return DB.offers_area.filter(o=>o.dev_id===dev&&o.unit_type===type&&o.item===item);}
+function areaVal(dev,type,item){const r=areaItems(dev,type,item)[0];return r?num(r.value):null;}
+
+/* rent per sq ft for year y (1-based); after the last quoted year the escalation rule continues */
+function rentRate(dev,type,y){
+  const rows=areaItems(dev,type,'rent').filter(r=>num(r.value)!=null);
+  if(!rows.length) return null;
+  const byYear=rows.map(r=>({y:num(r.year)||1,v:num(r.value)})).sort((a,b)=>a.y-b.y);
+  let v=byYear[0].v, ly=byYear[0].y; for(const r of byYear) if(r.y<=y){v=r.v;ly=r.y;}
+  const last=byYear[byYear.length-1];
+  if(y>last.y){
+    const pct=areaVal(dev,type,'rent_escalation_pct'), abs=areaVal(dev,type,'rent_escalation_abs');
+    if(pct) return last.v*Math.pow(1+pct/100,y-last.y);
+    if(abs) return last.v+abs*(y-last.y);
+  }
+  return v;
+}
+function rentFor(dev,type,area,months){
+  let total=0; const years=[];
+  for(let m=0;m<months;m++){const y=Math.floor(m/12)+1; const r=rentRate(dev,type,y); if(r==null) return null;
+    total+=r*area; if(!years[y-1]) years[y-1]={year:y,rate:r,months:0,amount:0}; years[y-1].months++; years[y-1].amount+=r*area;}
+  return {total,first:rentRate(dev,type,1)*area,years};
+}
+/* generic amount: per_sqft_onetime | lumpsum | months_rent (year col = which year's rent; counted only if that year falls in the period) | months_rent_per_N_months */
+function amountFor(dev,type,item,area,months){
+  const rows=areaItems(dev,type,item).filter(r=>num(r.value)!=null); if(!rows.length) return null;
+  let s=0;
+  for(const r of rows){
+    const v=num(r.value);
+    if(r.basis==='per_sqft_onetime') s+=v*area;
+    else if(r.basis==='lumpsum') s+=v;
+    else if(r.basis==='months_rent'){ const y=num(r.year)||1; if((y-1)*12<months){ const rr=rentRate(dev,type,y); if(rr==null) return null; s+=v*rr*area; } }
+    else { const m=r.basis.match(/months_rent_per_(\d+)_months/); if(!m) return null;
+      const per=+m[1], blocks=Math.ceil(months/per);
+      for(let b=0;b<blocks;b++){ const rr=rentRate(dev,type,Math.floor(b*per/12)+1); if(rr==null) return null; s+=v*rr*area; } }
+  }
+  return s;
+}
+function noteFor(dev,type,item){return areaItems(dev,type,item).map(r=>r.note).filter(Boolean).join(' ');}
+function perSqft(dev,type,item,area){const v=areaVal(dev,type,item);return v==null?null:v*area;}
+function generalAmt(dev,item){const r=DB.offers_general.find(g=>g.dev_id===dev&&g.item===item);return r?num(r.amount):null;}
+
+/* ---------- UI ---------- */
+const $=id=>document.getElementById(id);
+function initSelectors(){
+  const present=[...new Set(DB.flats.map(f=>f.building))];
+  const order=[...BUILDING_ORDER.filter(b=>present.includes(b)),...present.filter(b=>!BUILDING_ORDER.includes(b))];
+  (DB.i18n||[]).forEach(r=>{ if(r.key) I18N[r.key]=r; });
+  $('langSel').innerHTML=LANGS.map(([c,n])=>`<option value="${c}">${esc(n)}</option>`).join('');
+  $('langSel').onchange=()=>setLang($('langSel').value,true);
+  $('buildingNum').innerHTML='<option value="" disabled selected>'+esc(T('choose'))+'</option>'+order.map(b=>`<option value="${esc(b)}">${esc(b)}</option>`).join('');
+  $('rentMonths').value=setting('rent_months',48);
+  $('buildingNum').onchange=()=>{
+    const flats=DB.flats.filter(f=>f.building===$('buildingNum').value).sort(flatSort);
+    $('flatNum').innerHTML='<option value="" disabled selected>'+esc(T('choose'))+'</option>'+flats.map(f=>`<option value="${esc(f.flat_no)}">${esc(f.flat_no)}</option>`).join('');
+    $('flatNum').disabled=false;
+    if(shown) markDirty(); else hideResults();
+    $('updateBtn').disabled=true;
+  };
+  $('flatNum').onchange=()=>{
+    $('updateBtn').disabled=false; if(shown) markDirty();
+    // language follows the selected flat (from the owner's surname) unless the visitor picked one themselves
+    if(!manualLang){
+      const f=DB.flats.find(x=>x.building===$('buildingNum').value&&x.flat_no===$('flatNum').value);
+      const l=f?flatLang(f):'en';
+      $('langNote').classList.toggle('hidden',l==='en');
+      if(l!==LANG){ LANG=l; loadFont(l); applyLang(); }
+    }
+  };
+  $('rentMonths').oninput=()=>{ if(shown) markDirty(); };
+  $('isRented').onchange=()=>{ $('curRentGroup').classList.toggle('hidden',!$('isRented').checked); if(shown) markDirty(); };
+  $('curRent').oninput=()=>{ if(shown) markDirty(); };
+  $('updateBtn').onclick=()=>{ render(); if(shown) calcLog('view'); };
+  $('printBtn').onclick=doPrint;
+  $('pdfBtn').onclick=()=>{ calcLog('pdf'); exportPDF(); };
+  window.addEventListener('beforeprint',()=>{ if(shown) calcLog('print'); if(!shown || PRINT_IMG) return; if(!(reportStyle()==='graphics' && usePrintImage())) prepPrint(); });
+  document.querySelectorAll('input[name=rstyle]').forEach(r=>r.addEventListener('change',schedulePrintImage));
+  $('lastUpdated').textContent=setting('offers_last_updated','09-Oct-2026');
+  applyLang();
+  calcLog('open');
+}
+let shown=false, rentOpen=false;
+/* ---- Usage log (for the committee's admin page). Records only: event, building / flat viewed, language, Text/Graphics,
+   whether "rented" was ticked (not the amount), device type and an anonymous per-browser visitor id. No names / contacts.
+   Sent to Firebase (collection calculator_access) by the module script at the end of the page; skipped on localhost. */
+const LOG_ON=!/^(localhost|127\.|0\.0\.0\.0|$)/.test(location.hostname);
+const rid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+let VISITOR=''; try{ VISITOR=localStorage.getItem('ajcVisitor')||''; if(!VISITOR){ VISITOR=rid(); localStorage.setItem('ajcVisitor',VISITOR); } }catch(e){ VISITOR=rid(); }
+const SESSION=rid();
+function calcLog(event){
+  if(!LOG_ON) return;
+  try{
+    const ua=navigator.userAgent||'';
+    const p={event, visitor:VISITOR, session:SESSION,
+      building:(LASTIN&&LASTIN.b)||'', flat:(LASTIN&&LASTIN.f)||'', unit:(LAST&&LAST.unit)||'',
+      lang:LANG||'', style:reportStyle(), rented:!!(LASTIN&&LASTIN.curRent>0),
+      device:(/Mobi|Android|iPhone|iPad/i.test(ua)?'mobile':'desktop'), ua:ua.slice(0,250),
+      screen:`${screen.width}x${screen.height}`, ref:(document.referrer||'').slice(0,200),
+      page:location.pathname.slice(0,100), clientTime:new Date().toISOString()};
+    if(window._calcSend) window._calcSend(p); else (window._calcQ=window._calcQ||[]).push(p);
+  }catch(e){}
+}
+function unitLabel(){ if(!CUR) return 'Offer'; return (CUR.building==='Shops/Units'?CUR.flat_no:CUR.building+'-'+CUR.flat_no).replace(/[^A-Za-z0-9-]+/g,'_'); }
+function loadPdfLib(){
+  if(typeof html2pdf!=='undefined') return Promise.resolve(true);
+  return new Promise(res=>{const sc=document.createElement('script');
+    sc.src=DATA_DIR.replace(/data\/$/,'')+'lib/html2pdf.bundle.min.js';
+    sc.onload=()=>res(true); sc.onerror=()=>res(false); document.head.appendChild(sc);});
+}
+let LAST=null;
+const PM=12.7;   // print / PDF page margin on all four sides, in mm (0.5 inch)
+const HEADER_IMG='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjM0MCIgdmlld0JveD0iMCAwIDEyMDAgMzQwIj4gPGRlZnM+IDxsaW5lYXJHcmFkaWVudCBpZD0ic2t5IiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOWNjN2VhIi8+PHN0b3Agb2Zmc2V0PSIuNiIgc3RvcC1jb2xvcj0iI2U2ZWVmMyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2ZiZThjOCIvPjwvbGluZWFyR3JhZGllbnQ+IDxyYWRpYWxHcmFkaWVudCBpZD0ic3VuIiBjeD0iLjUiIGN5PSIuNSIgcj0iLjUiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2ZmZjZkOCIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjZmZlNmE2IiBzdG9wLW9wYWNpdHk9Ii45Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZmZlNmE2IiBzdG9wLW9wYWNpdHk9IjAiLz48L3JhZGlhbEdyYWRpZW50PiA8bGluZWFyR3JhZGllbnQgaWQ9InR3IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMCI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZjFjNDhjIi8+PHN0b3Agb2Zmc2V0PSIuNTUiIHN0b3AtY29sb3I9IiNlN2FkNmMiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNjOThhNGMiLz48L2xpbmVhckdyYWRpZW50PiA8bGluZWFyR3JhZGllbnQgaWQ9InR3MiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2Y3ZTJjMiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2UwYmY5MyIvPjwvbGluZWFyR3JhZGllbnQ+IDxwYXR0ZXJuIGlkPSJ3aW4iIHdpZHRoPSIyMiIgaGVpZ2h0PSIyMCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHJlY3Qgd2lkdGg9IjIyIiBoZWlnaHQ9IjIwIiBmaWxsPSJub25lIi8+PHJlY3QgeD0iNCIgeT0iNSIgd2lkdGg9IjEzIiBoZWlnaHQ9IjEwIiByeD0iMS41IiBmaWxsPSIjNmY4ZmFlIiBvcGFjaXR5PSIuODUiLz48cmVjdCB4PSI0IiB5PSIxNSIgd2lkdGg9IjEzIiBoZWlnaHQ9IjIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii41NSIvPjwvcGF0dGVybj4gPHBhdHRlcm4gaWQ9IndpbjIiIHdpZHRoPSIxOCIgaGVpZ2h0PSIxNiIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHJlY3QgeD0iNCIgeT0iNCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjgiIHJ4PSIxIiBmaWxsPSIjOGFhNmJmIiBvcGFjaXR5PSIuNiIvPjwvcGF0dGVybj4gPGxpbmVhckdyYWRpZW50IGlkPSJmYWRlIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMCI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMGY0YzgxIiBzdG9wLW9wYWNpdHk9Ii45MiIvPjxzdG9wIG9mZnNldD0iLjQyIiBzdG9wLWNvbG9yPSIjMGY0YzgxIiBzdG9wLW9wYWNpdHk9Ii41NSIvPjxzdG9wIG9mZnNldD0iLjYyIiBzdG9wLWNvbG9yPSIjMGY0YzgxIiBzdG9wLW9wYWNpdHk9IjAiLz48L2xpbmVhckdyYWRpZW50PiA8bGluZWFyR3JhZGllbnQgaWQ9Imdyb3VuZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzZmOWE0ZSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzNmNmIyZSIvPjwvbGluZWFyR3JhZGllbnQ+IDwvZGVmcz4gPHJlY3Qgd2lkdGg9IjEyMDAiIGhlaWdodD0iMzQwIiBmaWxsPSJ1cmwoI3NreSkiLz4gPGNpcmNsZSBjeD0iMTA0MCIgY3k9IjcwIiByPSIxMjAiIGZpbGw9InVybCgjc3VuKSIvPiA8ZyBvcGFjaXR5PSIuNTUiIGZpbGw9InVybCgjdHcyKSI+IDxyZWN0IHg9IjQzMCIgeT0iMTIwIiB3aWR0aD0iOTAiIGhlaWdodD0iMTkwIi8+PHJlY3QgeD0iOTgwIiB5PSIxMzUiIHdpZHRoPSI4NSIgaGVpZ2h0PSIxNzUiLz48cmVjdCB4PSIxMDkwIiB5PSIxNTAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIxNjAiLz4gPC9nPiA8ZyBvcGFjaXR5PSIuNTUiPjxyZWN0IHg9IjQzMCIgeT0iMTIwIiB3aWR0aD0iOTAiIGhlaWdodD0iMTkwIiBmaWxsPSJ1cmwoI3dpbjIpIi8+PHJlY3QgeD0iOTgwIiB5PSIxMzUiIHdpZHRoPSI4NSIgaGVpZ2h0PSIxNzUiIGZpbGw9InVybCgjd2luMikiLz48cmVjdCB4PSIxMDkwIiB5PSIxNTAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIxNjAiIGZpbGw9InVybCgjd2luMikiLz48L2c+IDxnPiA8cmVjdCB4PSI1NDAiIHk9IjQwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjI4MCIgZmlsbD0idXJsKCN0dykiLz48cmVjdCB4PSI1NDAiIHk9IjQwIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjI4MCIgZmlsbD0idXJsKCN3aW4pIi8+PHJlY3QgeD0iNTMyIiB5PSIzMiIgd2lkdGg9IjE2NiIgaGVpZ2h0PSIxMiIgZmlsbD0iI2I5ODE0YSIvPiA8cmVjdCB4PSI3MDUiIHk9Ijg1IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjIzNSIgZmlsbD0idXJsKCN0dykiLz48cmVjdCB4PSI3MDUiIHk9Ijg1IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjIzNSIgZmlsbD0idXJsKCN3aW4pIi8+PHJlY3QgeD0iNjk5IiB5PSI3OCIgd2lkdGg9IjEzMiIgaGVpZ2h0PSIxMCIgZmlsbD0iI2I5ODE0YSIvPiA8cmVjdCB4PSI4NDAiIHk9IjYwIiB3aWR0aD0iMTMwIiBoZWlnaHQ9IjI2MCIgZmlsbD0idXJsKCN0dykiLz48cmVjdCB4PSI4NDAiIHk9IjYwIiB3aWR0aD0iMTMwIiBoZWlnaHQ9IjI2MCIgZmlsbD0idXJsKCN3aW4pIi8+PHJlY3QgeD0iODM0IiB5PSI1MiIgd2lkdGg9IjE0MiIgaGVpZ2h0PSIxMSIgZmlsbD0iI2I5ODE0YSIvPiA8cmVjdCB4PSI2OTAiIHk9IjE1MCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjE3MCIgZmlsbD0iI2M5OGE0YyIvPjxyZWN0IHg9IjgyNSIgeT0iMTcwIiB3aWR0aD0iMTUiIGhlaWdodD0iMTUwIiBmaWxsPSIjYzk4YTRjIi8+IDwvZz4gPHJlY3QgeT0iMjkyIiB3aWR0aD0iMTIwMCIgaGVpZ2h0PSI0OCIgZmlsbD0idXJsKCNncm91bmQpIi8+IDxnIGZpbGw9IiM0ZjdkMzkiPjxjaXJjbGUgY3g9IjQ3MCIgY3k9IjMwMCIgcj0iMzQiLz48Y2lyY2xlIGN4PSI1MjAiIGN5PSIyOTIiIHI9IjI4Ii8+PGNpcmNsZSBjeD0iNjAwIiBjeT0iMzA1IiByPSIzMCIvPjxjaXJjbGUgY3g9IjcwMCIgY3k9IjI5OCIgcj0iMzYiLz48Y2lyY2xlIGN4PSI3OTAiIGN5PSIzMDYiIHI9IjMwIi8+PGNpcmNsZSBjeD0iODgwIiBjeT0iMjk2IiByPSIzNCIvPjxjaXJjbGUgY3g9Ijk2MCIgY3k9IjMwNCIgcj0iMzAiLz48Y2lyY2xlIGN4PSIxMDUwIiBjeT0iMjk0IiByPSIzOCIvPjxjaXJjbGUgY3g9IjExNDAiIGN5PSIzMDIiIHI9IjMyIi8+PC9nPiA8ZyBmaWxsPSIjM2M2YTJjIj48Y2lyY2xlIGN4PSI0NDAiIGN5PSIzMTgiIHI9IjI2Ii8+PGNpcmNsZSBjeD0iNjUwIiBjeT0iMzIwIiByPSIyNCIvPjxjaXJjbGUgY3g9IjgzMCIgY3k9IjMyMiIgcj0iMjYiLz48Y2lyY2xlIGN4PSIxMDAwIiBjeT0iMzIwIiByPSIyNCIvPjxjaXJjbGUgY3g9IjExODAiIGN5PSIzMTgiIHI9IjI2Ii8+PC9nPiA8ZyBmaWxsPSIjMWQyZjQ1Ij4gPGNpcmNsZSBjeD0iNzYwIiBjeT0iMjQ2IiByPSIyNCIvPjxwYXRoIGQ9Ik03MTIgMzQwIEM3MTIgMjkyIDcyOCAyNzIgNzYwIDI3MiBDNzkyIDI3MiA4MDggMjkyIDgwOCAzNDAgWiIvPiA8Y2lyY2xlIGN4PSI4MzAiIGN5PSIyNTYiIHI9IjIxIi8+PHBhdGggZD0iTTc5MCAzNDAgQzc5MCAzMDAgODAzIDI4MiA4MzAgMjgyIEM4NTcgMjgyIDg3MCAzMDAgODcwIDM0MCBaIi8+PHBhdGggZD0iTTgxMiAyNTAgQzgwOCAyOTAgODE4IDMxMiA4MzIgMzE4IEw4NDggMzE4IEM4NTIgMjkyIDg1MiAyNjggODQ2IDI1MCBaIiBvcGFjaXR5PSIuOTUiLz4gPGNpcmNsZSBjeD0iODkwIiBjeT0iMjkyIiByPSIxNSIvPjxwYXRoIGQ9Ik04NjQgMzQwIEM4NjQgMzE2IDg3MyAzMDYgODkwIDMwNiBDOTA3IDMwNiA5MTYgMzE2IDkxNiAzNDAgWiIvPiA8L2c+IDxyZWN0IHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjM0MCIgZmlsbD0idXJsKCNmYWRlKSIvPiA8L3N2Zz4=';
+const reportStyle=()=>(document.querySelector('input[name=rstyle]:checked')||{}).value||'text';
+/* Build a clean, A4-ready report from the current results */
+function buildReport(){
+  const host=$('printHost'); const L=LAST||{}; const G=reportStyle()==='graphics';
+  const clone=id=>{const el=$(id); if(!el||el.closest('.hidden')) return '';
+    const t=el.cloneNode(true); t.removeAttribute('id');
+    t.querySelectorAll('tr.rent-year').forEach(r=>{ if(G) r.remove(); else r.classList.remove('hidden'); });   // graphics: keep to one page
+    t.querySelectorAll('.tri,tr.rent-toggle small').forEach(x=>x.remove());
+    t.querySelectorAll('[onclick]').forEach(x=>x.removeAttribute('onclick'));
+    return t.outerHTML;};
+  const sec=(title,html)=>html?`<div class="sec"><h2>${title}</h2>${html}</div>`:'';
+  const gen=new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+  const sum=`<table class="sumtbl"><tr>
+      ${G?`<td class="unitcell"><b>${esc(L.unit||'')}</b></td>`:`<td>${esc(T('unit'))}<br><b>${esc(L.unit||'')}</b></td>`}<td>${esc(T('type'))}<br><b>${esc(L.type?T('t_'+L.type):'')}</b></td>
+      <td>${esc(T('existing_area'))}<br><b>${L.area==null?esc(T('not_available')):sqft(L.area)}</b></td>
+      <td>${esc(T('rent_period_l'))} <span class="hash">#</span><br><b>${esc(T('months_n',{n:L.months||''}))}</b></td>
+      ${L.curRent>0?`<td>${esc(T('cur_rent_recv'))}<br><b>${inr(L.curRent)} ${esc(T('per_month'))}</b></td>`:''}</tr></table>`;
+  const ref2=' <a class="ref" href="#ref-2">#2</a>';
+  const profile=$('profileCard').classList.contains('hidden')?'':$('profileBody').innerHTML;
+  const refs=(DB.sources||[]).map(r=>`<li><b>#${esc(r.ref_id)}</b> ${esc(r.title)}${r.note?` — ${esc(r.note)}`:''}${r.url?`<br><a href="${esc(r.url)}">${esc(r.url)}</a>`:''}</li>`).join('');
+  const words=['savingsBox','wordsBox'].map(id=>$(id).classList.contains('hidden')?'':`<div class="${$(id).className}" lang="${LANG}">${$(id).innerHTML}</div>`).join('');
+  const img=setting('graphics_header_image','').trim();
+  const head=G?`<div class="rh-g"><img src="${img?esc(DATA_DIR.replace(/data\/$/,'')+img):HEADER_IMG}" alt=""><div class="ov"></div>
+      <div class="txt"><h1>${esc(T('report_title'))}</h1>
+        <div class="sub">Asmita Jyoti Co-operative Housing Society Ltd., Charkop Naka,<br>Marve Road, Malad (W), Mumbai - 400 095</div>
+        <div class="unitbadge">${esc(L.unit||'')}</div></div>
+      <div class="meta">${esc(T('indicative'))}</div></div>`
+    :`<div class="rh"><h1>${esc(T('report_title'))}</h1>
+      <div class="sub">Asmita Jyoti Co-operative Housing Society Ltd., Charkop Naka,<br>Marve Road, Malad (W), Mumbai - 400 095</div>
+      <div class="meta"><span>${esc(T('last_updated'))}: <b>${esc(setting('offers_last_updated',''))}</b></span><span>${esc(T('generated_on'))}: ${gen}</span></div>
+      <div class="meta"><span class="warn">${esc(T('indicative'))}</span></div></div>`;
+  host.innerHTML=`<div id="report" class="${G?'g':'t'}" lang="${LANG}">
+    ${head}
+    ${G?`<div class="facts">${sum}</div>`:sec(esc(T('your_unit')),sum)}
+    ${sec(esc(T('offer_comparison'))+ref2, clone('memberTable')+`<p class="note">${esc(T('legend'))}</p><p class="note rentnote" style="font-weight:800;color:#000">${rentNoteHTML()}</p>`+words)}
+    ${sec(esc(T('sec_other'))+ref2, clone('generalTable'))}
+    ${sec(esc(T('sec_commercial'))+ref2, clone('commercialTable'))}
+    ${sec(esc(T('sec_society'))+ref2, clone('societyTable'))}
+    ${sec(esc(T('sec_compliance'))+' <a class="ref" href="#ref-12">#12</a>', clone('complianceTable'))}
+    ${profile?`<div class="sec pb"><h2>${esc(T('sec_profile'))}</h2>${profile}<p class="note">Financial figures <a class="ref" href="#ref-3">#3</a> as submitted in Proforma 'D', converted to ₹ crore. Profile details compiled from public sources as of Oct-2026; verify independently.</p></div>`:''}
+    ${!show('closing_disclaimer')?'':`<div class="sec"><h2>${esc(T('sec_disclaimer'))}</h2><div class="disc"><p>${esc(T('disc_text'))}</p></div></div>`}
+    ${refs&&show('references')?sec(esc(T('sec_refs')),`<ol class="refs">${refs}</ol>`):''}
+  </div>`;
+  return $('report');
+}
+/* Lay the report out at A4 content width and insert spacers so that no row, heading or block is cut
+   across a page, headings stay with their tables, and continued tables repeat their header row. */
+/* Some browsers / fonts (e.g. Windows fonts for Indian scripts) draw text wider; if a table would then be wider than
+   the page, reduce that table's font size until it fits, so nothing is cut off at the right edge. */
+function fitTables(el){
+  const box=el.getBoundingClientRect(); if(!box.width) return;
+  if(el.classList.contains('g')) el.querySelectorAll('.rentnote .nl').forEach(n=>{   // Graphics: keep each line of the # note on one line
+    let fs=parseFloat(getComputedStyle(n).fontSize), g=0; while(n.scrollWidth>n.clientWidth+1 && fs>8 && g++<40){ fs-=0.25; n.style.fontSize=fs+'px'; } });
+  el.querySelectorAll('table').forEach(t=>{
+    const cells=[...t.querySelectorAll('th,td')]; if(!cells.length) return;
+    let fs=parseFloat(getComputedStyle(cells[0]).fontSize)||9.5, guard=0;
+    const too=()=>t.scrollWidth>t.getBoundingClientRect().width+1 || t.getBoundingClientRect().right>box.right+1 || el.scrollWidth>el.clientWidth+1;
+    while(too() && fs>6 && guard++<16){ fs-=0.5; cells.forEach(c=>{ c.style.fontSize=fs+'px'; c.querySelectorAll('small').forEach(x=>x.style.fontSize=Math.max(5.5,fs-1.5)+'px'); }); }
+  });
+}
+function paginate(el,W,H){
+  const wrap=document.createElement('div');
+  wrap.style.cssText=`position:absolute;left:0;top:0;width:${W}px;visibility:hidden;z-index:-1;pointer-events:none`;
+  document.body.appendChild(wrap); wrap.appendChild(el); fitTables(el);
+  const top0=()=>el.getBoundingClientRect().top;
+  const isHead=n=>n&&/^H[23]$/.test(n.tagName);
+  const spacer=(before,h)=>{ if(h<=0) return;
+    if(before.tagName==='TR'){ const tr=document.createElement('tr'); tr.className='sp';
+      tr.innerHTML=`<td colspan="${before.cells.length||4}" style="height:${h}px;padding:0;border:none;background:#fff"></td>`;
+      before.parentNode.insertBefore(tr,before); }
+    else { const d=document.createElement('div'); d.className='sp'; d.style.height=h+'px'; before.parentNode.insertBefore(d,before); } };
+  let pageEnd=H;
+  const blocks=[...el.querySelectorAll('.rh, .sec, h2, h3:not(.words h3), .words, tr:not(.words tr), .disc, li, p.note')];
+  for(const b of blocks){
+    if(!b.isConnected||b.classList.contains('sp')) continue;
+    let r=b.getBoundingClientRect(), t=r.top-top0(), bt=r.bottom-top0();
+    while(t>=pageEnd) pageEnd+=H;
+    if(b.classList.contains('pb')){ spacer(b,pageEnd-t+4); pageEnd+=H; continue; }   // forced new page
+    if(b.classList.contains('sec')) continue;
+    const keepNext=isHead(b)?90:0;                    // a heading needs room for at least a few rows after it
+    if(bt+keepNext<=pageEnd-2 || r.height>H*0.9) continue;
+    let target=b, header=null;
+    if(b.tagName==='TR'){
+      const tbl=b.closest('table'), rows=[...tbl.rows].filter(x=>!x.classList.contains('sp')), idx=rows.indexOf(b);
+      if(idx<=1){ target=tbl.closest('.table-wrap')||tbl; }           // don't leave a lonely header row behind
+      else if(tbl.tHead){ header=tbl.tHead.rows[0]; }
+    }
+    let prev=target.previousElementSibling;
+    if(isHead(prev)){ target=prev; prev=target.previousElementSibling; if(isHead(prev)) target=prev; }
+    const tt=target.getBoundingClientRect().top-top0();
+    spacer(target,pageEnd-tt+4);
+    if(header && target===b){ const hc=header.cloneNode(true); hc.classList.add('rep'); b.parentNode.insertBefore(hc,b); }
+    pageEnd+=H;
+  }
+  return wrap;
+}
+/* Graphics style: shrink the report so that it fits on ONE A4 page. Returns the layout width to use. */
+function measure(el,w){ const wrap=document.createElement('div'); wrap.className='measure'; el.style.width=w+'px';
+  wrap.style.cssText=`position:absolute;left:0;top:0;width:${w}px;visibility:hidden;z-index:-1;pointer-events:none`;
+  document.body.appendChild(wrap); wrap.appendChild(el); const h=el.getBoundingClientRect().height; return {wrap,h}; }
+function fitWidth(el,W,H){
+  let w=W, m=measure(el,w);
+  if(m.h*W/w<=H){   // short report: use a narrower layout so it is scaled UP and fills more of the page
+    while(w>W*0.72){ const w2=Math.round(w*0.95); const m2=(m.wrap.remove(),measure(el,w2));
+      if(m2.h*W/w2>H){ m2.wrap.remove(); m=measure(el,w); break; } w=w2; m=m2; }
+  }
+  while(m.h*W/w>H && w<W*2.6){ m.wrap.remove(); w=Math.round(w*1.06); m=measure(el,w); }   // wider layout = smaller when scaled to the page
+  return {wrap:m.wrap,w};
+}
+function prepPrint(){
+  const el=buildReport();
+  { const W=Math.floor((210-2*PM)/25.4*96); const m=measure(el,W); fitTables(el); m.wrap.remove(); el.style.width=''; $('printHost').appendChild(el); }
+  if(reportStyle()==='graphics'){
+    const W=Math.floor((210-2*PM)/25.4*96), H=Math.floor((297-2*PM)/25.4*96)-10;  // printable box at the @page margins
+    const {wrap}=measure(el,W); const h=el.getBoundingClientRect().height; wrap.remove(); el.style.width=''; $('printHost').appendChild(el);
+    const lim=H*(matchMedia('print').matches?1:0.8);   // measured on screen: print fonts run a little taller, keep a margin
+    if(h>lim) el.style.zoom=(lim/h).toFixed(3);                              // shrink to one page
+  }
+  return el;
+}
+/* Graphics print: the one-page layout (same as the PDF) is rendered to an image in the background, so both the
+   Print button and Ctrl+P give a clean, full-page preview. */
+let PRINT_CACHE=null, PRINT_KEY='', PRINT_BUSY=null, prepTimer=null;
+const printKey=()=>JSON.stringify([LASTIN,LANG,reportStyle(),$('printStamp').textContent.slice(0,0)]);
+async function preparePrintImage(){
+  if(!shown||reportStyle()!=='graphics') return null;
+  const key=printKey(); if(PRINT_CACHE&&PRINT_KEY===key) return PRINT_CACHE;
+  if(PRINT_BUSY) return PRINT_BUSY;
+  PRINT_BUSY=(async()=>{
+    try{
+      const ok=await loadPdfLib(); if(!ok||typeof html2pdf==='undefined') return null;
+      const {target,wrap}=await onePageBox();
+      const bw=target.offsetWidth, bh=target.offsetHeight;
+      // same A4 page set-up as the PDF, and capture exactly the one-page box (no blank area to the right / below)
+      const full=await html2pdf().set({margin:[PM,PM,PM,PM],jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+        html2canvas:{scale:3,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0}}).from(target).toCanvas().get('canvas');
+      // keep only the one-page box (top-left), dropping any blank area to the right / below
+      const k=3, canvas=document.createElement('canvas'); canvas.width=Math.min(full.width,Math.round(bw*k)); canvas.height=Math.min(full.height,Math.round(bh*k));
+      canvas.getContext('2d').drawImage(full,0,0,canvas.width,canvas.height,0,0,canvas.width,canvas.height);
+      wrap.remove();
+      PRINT_CACHE=canvas.toDataURL('image/png'); PRINT_KEY=key; return PRINT_CACHE;
+    }catch(e){ return null; } finally{ PRINT_BUSY=null; }
+  })();
+  return PRINT_BUSY;
+}
+function schedulePrintImage(){ clearTimeout(prepTimer); PRINT_CACHE=null; if(reportStyle()==='graphics') prepTimer=setTimeout(preparePrintImage,400); }
+function usePrintImage(){   // put the cached one-page image into the print area (synchronous, for Ctrl+P)
+  if(!PRINT_CACHE||PRINT_KEY!==printKey()) return false;
+  $('printHost').innerHTML=`<img id="printImg" src="${PRINT_CACHE}" alt="" style="display:block;width:100%;height:auto;max-height:${297-2*PM-1}mm;object-fit:contain;margin:0 auto">`;
+  return true;
+}
+async function doPrint(){
+  if(reportStyle()!=='graphics'){ prepPrint(); setTimeout(()=>window.print(),50); return; }
+  const btn=$('printBtn'); btn.disabled=true;
+  try{
+    await preparePrintImage();
+    if(usePrintImage()){ PRINT_IMG=true; await $('printImg').decode().catch(()=>{}); }
+    else prepPrint();
+    setTimeout(()=>{ window.print(); PRINT_IMG=false; },50);
+  } finally { btn.disabled=false; }
+}
+let PRINT_IMG=false;
+/* Build the report and fit it into one A4 content box (174 x 267 mm) via a wider layout + CSS scale */
+async function onePageBox(){
+  const el=buildReport();
+  await Promise.all([...el.querySelectorAll('img')].map(i=>i.decode().catch(()=>{})));
+  try{ await document.fonts.ready; }catch(e){}
+  const MT=PM, MS=PM, MB=PM, cw=210-2*MS, ch=297-MT-MB;
+  const W=Math.floor(cw/25.4*96), H=Math.floor(W*2*ch/cw)/2;
+  const f=fitWidth(el,W,H); fitTables(el); const sc=W/f.w, h=el.getBoundingClientRect().height;
+  const wrap=f.wrap; wrap.style.width=W+'px';
+  const box=document.createElement('div'); box.style.cssText=`width:${W}px;height:${Math.ceil(h*sc)+2}px;overflow:hidden;background:#fff`;
+  wrap.appendChild(box); box.appendChild(el);
+  el.style.width=f.w+'px'; el.style.maxWidth='none'; el.style.transformOrigin='0 0'; el.style.transform=`scale(${sc})`;
+  return {target:box,wrap,W,H};
+}
+async function exportPDF(){
+  const name='Offer_Comparison_'+unitLabel()+'.pdf';
+  const btn=$('pdfBtn'); btn.disabled=true; const old=btn.innerHTML; btn.textContent=T('preparing');
+  const ok=await loadPdfLib();
+  const el=buildReport();
+  try{ await document.fonts.ready; }catch(e){}
+  if(!ok||typeof html2pdf==='undefined'){ const t=document.title; document.title=name.replace('.pdf',''); window.print(); document.title=t; btn.disabled=false; btn.innerHTML=old; return; }
+  const sx=window.scrollX, sy=window.scrollY;
+  window.scrollTo(0,0);
+  const MT=PM, MS=PM, MB=PM;                        // page margins in mm (footer sits in the bottom margin)
+  const cw=210-2*MS, ch=297-MT-MB;
+  const W=Math.floor(cw/25.4*96), H=Math.floor(W*2*ch/cw)/2;   // A4 content box in CSS px (same rounding as html2pdf at scale 2)
+  const G=reportStyle()==='graphics';
+  let wrap;
+  let target=el;
+  if(G){ const o=await onePageBox(); target=o.target; wrap=o.wrap; }   // one page: wider layout scaled into an A4-sized box
+  else wrap=paginate(el,W,H);
+  try{
+    await html2pdf().set({
+      margin:[MT,MS,MB,MS], filename:name,
+      image:{type:'jpeg',quality:0.92},
+      html2canvas:{scale:2,useCORS:true,scrollX:0,scrollY:0,backgroundColor:'#ffffff'},
+      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}, enableLinks:true,
+      pagebreak:{mode:[]}
+    }).from(target).toPdf().get('pdf').then(pdf=>{
+      // footer on every page: unit on the left, "Page X of Y" on the right
+      const n=pdf.internal.getNumberOfPages(), pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
+      const left='Asmita Jyoti CHSL - Offer comparison - '+(LAST&&LAST.unit?LAST.unit:'');
+      for(let i=1;i<=n;i++){
+        pdf.setPage(i); pdf.setFontSize(8); pdf.setTextColor(110);
+        pdf.setDrawColor(210); pdf.line(MS,ph-MB+4,pw-MS,ph-MB+4);
+        pdf.text(left,MS,ph-MB+8);
+        pdf.text('Page '+i+' of '+n,pw-MS,ph-MB+8,{align:'right'});
+      }
+    }).save();
+  } finally { wrap.remove(); window.scrollTo(sx,sy); btn.disabled=false; btn.innerHTML=old; }
+}
+function toggleRent(){
+  rentOpen=!rentOpen;
+  document.querySelectorAll('#memberTable tr.rent-year').forEach(r=>r.classList.toggle('hidden',!rentOpen));
+  const t=document.querySelector('#memberTable .rent-toggle .tri'); if(t) t.textContent=rentOpen?'▾':'▸';
+}
+function markDirty(){ $('updateBtn').classList.add('dirty'); $('updateHint').classList.remove('hidden'); }
+function hideResults(){['flatInfo','areaNotice','memberCard','wordsBox','savingsBox','generalCard','commercialCard','societyCard','complianceCard','profileCard','actions','finalDisclaimer','refCard'].forEach(i=>$(i).classList.add('hidden'));}
+
+/* '# note' under the comparison: first sentence on line 1, the rest (48-month period ...) on line 2 */
+function rentNoteHTML(){ const t=T('rent_note'), m=t.match(/^(.+?[.।۔])\s+(.+)$/s);
+  return m?`<span class="nl"># ${esc(m[1])}</span><br><span class="nl">${esc(m[2])}</span>`:'# '+esc(t); }
+function rowHTML(label,sub,vals,fmt,bestMode,cls){
+  const nums=vals.map(v=>typeof v==='number'?v:null).filter(v=>v!=null);
+  const best=bestMode&&nums.length>1?(bestMode==='max'?Math.max(...nums):Math.min(...nums)):null;
+  return `<tr class="${cls||''}"><td class="row-head">${label}${sub?`<small>${sub}</small>`:''}</td>`+
+    vals.map((v,i)=>{ if(typeof v==='number') return `<td>${fmt(v,i)}</td>`;
+                  return `<td class="muted">${esc(v??'—')}</td>`;}).join('')+'</tr>';
+}
+function devHead(devs){return '<thead><tr><th></th>'+devs.map(d=>`<th class="dev">${esc(d.short_name)}<small>${esc(d.name)}</small></th>`).join('')+'</tr></thead>';}
+
+/* render(true) redraws the results already on screen (e.g. after a language change) without picking up unsubmitted selector changes */
+let LASTIN=null;
+function render(redraw){
+  let b,f,months,curRent;
+  if(redraw===true&&LASTIN){ ({b,f,months,curRent}=LASTIN); }
+  else{
+    b=$('buildingNum').value; f=$('flatNum').value; if(!b||!f) return;
+    months=Math.max(1,parseInt($('rentMonths').value)||+setting('rent_months',48));
+    curRent=$('isRented').checked?(num($('curRent').value)||0):0;   // current monthly rent the member receives
+    LASTIN={b,f,months,curRent};
+    $('updateBtn').classList.remove('dirty'); $('updateHint').classList.add('hidden');
+  }
+  const flat=DB.flats.find(x=>x.building===b&&x.flat_no===f); if(!flat) return;
+  CUR=flat; shown=true; $('updateBtn').textContent=T('update');
+  const type=flat.unit_type, area=num(flat.existing_carpet_area_sqft);
+  const signed=v=>v==null?'—':`<span class="${v<0?'neg':''}">${v<0?'− ':'+ '}${inr(Math.abs(v))}</span>`;
+  const devs=DB.developers;
+  const unit=(b==='Shops/Units'?f:b+'/'+f);
+
+  $('flatInfo').innerHTML=`<div class="pill">${esc(T('unit'))} <b>${esc(unit)}</b></div>
+    <div class="pill">${esc(T('type'))} <b>${esc(T('t_'+type))}</b></div>
+    <div class="pill">${esc(T('existing_area'))} <b>${area==null?esc(T('not_available')):sqft(area)}</b></div>`;
+  LAST={unit,type,area,months,curRent};
+  $('actions').classList.toggle('hidden',!show('print_pdf_buttons')); $('finalDisclaimer').classList.toggle('hidden',!show('closing_disclaimer'));
+  $('printStamp').textContent=T('generated_on')+' '+new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})+' · '+T('offers_as_of')+' '+setting('offers_last_updated','');
+  $('flatInfo').classList.remove('hidden');
+
+  // general + society tables (always)
+  renderGeneral(devs);
+
+  if(area==null){
+    $('areaNotice').textContent=T('area_na')+' '+T(type==='Shop'?'rates_shop':'rates_unit');
+    $('areaNotice').classList.remove('hidden'); $('wordsBox').classList.add('hidden'); $('savingsBox').classList.add('hidden');
+    renderRates(devs,type); schedulePrintImage(); return;
+  }
+  $('areaNotice').classList.add('hidden'); $('legend').classList.remove('hidden'); $('rentNote').classList.remove('hidden');
+
+  // member does not pay society maintenance / property tax while the building is being redeveloped (same for every developer)
+  const mMaint=num(flat.monthly_maintenance)||0, mTax=num(flat.monthly_property_tax)||0;
+  const maintSave=mMaint*months, taxSave=mTax*months;
+  const calc=devs.map(d=>{
+    const pct=areaVal(d.dev_id,type,'additional_area_pct');
+    const fixed=areaVal(d.dev_id,type,'new_area_fixed');
+    const newArea=fixed!=null?fixed:(pct==null?null:Math.round(area*(1+pct/100)));
+    const rent=rentFor(d.dev_id,type,area,months);
+    const brokerage=amountFor(d.dev_id,type,'brokerage',area,months);
+    const relocation=amountFor(d.dev_id,type,'relocation',area,months);
+    const hardship=amountFor(d.dev_id,type,'hardship',area,months);
+    const deposit=amountFor(d.dev_id,type,'refundable_deposit',area,months);
+    const buyback=perSqft(d.dev_id,type,'buyback',area);
+    const parking=areaVal(d.dev_id,type,'free_parking');
+    const total=[rent?.total,brokerage,relocation,hardship].reduce((s,v)=>s+(v||0),0);
+    return {d,pct,fixed,newArea,addArea:newArea==null?null:newArea-area,rent,brokerage,relocation,hardship,deposit,buyback,parking,total};
+  });
+  const e=k=>esc(T(k)), ev=(k,v)=>esc(T(k,v));
+
+  let h=devHead(devs)+'<tbody>';
+  h+=rowHTML(e('add_area_pct'),e('on_existing'),calc.map(c=>(c.fixed!=null&&!(c.pct!=null&&Math.abs(Math.round(area*(1+c.pct/100))-c.fixed)<=1))?(c.addArea/area*100):c.pct),v=>(Math.round(v*10)/10)+' %');
+  h+=rowHTML(e('add_area'),null,calc.map(c=>c.addArea),sqft);
+  h+=rowHTML(e('new_area'),e('existing_plus'),calc.map(c=>c.newArea),sqft,null,'highlight');
+  if(calc.some(c=>c.parking!=null)) h+=rowHTML(e('parking'),null,calc.map(c=>c.parking),v=>v+' '+e('car_park'),null);
+  // Rent – first month, expandable to year-wise rent
+  h+=`<tr class="rent-toggle" onclick="toggleRent()"><td class="row-head"><span class="tri">${rentOpen?'▾':'▸'}</span> ${e('rent_first')}<small>${e('click_years')}</small></td>`+
+     calc.map(c=>`<td>${c.rent?inr(c.rent.first):'—'}</td>`).join('')+'</tr>';
+  for(let y=1;y<=Math.ceil(months/12);y++){
+    const m=Math.min(12,months-(y-1)*12);
+    h+=`<tr class="rent-year${rentOpen?'':' hidden'}"><td class="row-head">${e('year')} ${y}<small>${ev('months_n',{n:m})}</small></td>`+calc.map(c=>{const yr=c.rent?.years[y-1];
+      return yr?`<td>${inr(yr.amount)}<small>₹${yr.rate.toFixed(2)}/${e('sqft')} · ${inr(yr.rate*area)} ${e('per_month')}</small></td>`:'<td>—</td>';}).join('')+'</tr>';
+  }
+  if(curRent>0) h+=rowHTML(e('adv_month'),ev('vs_rent',{amt:inr0(curRent)}),calc.map(c=>c.rent?c.rent.first-curRent:null),signed,null,'adv');
+  h+=rowHTML(ev('rent_total',{n:months})+' <span class="hash">#</span>',e('incl_esc'),calc.map(c=>c.rent?c.rent.total:null),inr,'max');
+  if(curRent>0) h+=rowHTML(ev('rent_adv',{n:months}),ev('vs_rent_total',{amt:inr0(curRent),n:months,tot:inr(curRent*months)}),calc.map(c=>c.rent?c.rent.total-curRent*months:null),signed,null,'adv');
+  h+=rowHTML(e('brokerage'),null,calc.map(c=>c.brokerage),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'brokerage'))}</small>`,'max');
+  h+=rowHTML(e('relocation'),null,calc.map(c=>c.relocation),inr,'max');
+  h+=rowHTML(e('corpus'),null,calc.map(c=>c.hardship),inr,'max');
+  h+=`<tr class="total"><td>${e('total')}</td>`+calc.map(c=>`<td>${inr(c.total)}</td>`).join('')+'</tr>';
+  if(curRent>0) h+=rowHTML(e('net_gain'),ev('net_gain_sub',{n:months,amt:inr(curRent*months)}),calc.map(c=>c.total-curRent*months),signed,null,'adv');
+  h+=rowHTML(e('deposit'),e('not_added'),calc.map(c=>c.deposit??T('not_stated')),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'refundable_deposit'))}</small>`,null);
+  h+=rowHTML(e('buyback'),e('buyback_sub'),calc.map(c=>c.buyback??T('na')),(v,i)=>inr(v)+`<small>${esc(noteFor(calc[i].d.dev_id,type,'buyback'))}</small>`,null);
+  h+='</tbody>';
+  $('memberTable').innerHTML=h;
+  renderSavings(mMaint,mTax,months);
+  renderWords(calc,curRent,months,(mMaint+mTax)*months);
+
+  $('memberCard').classList.remove('hidden');
+  schedulePrintImage();
+}
+
+/* Savings that do not depend on the developer: society maintenance and property tax not payable during the rent period */
+function renderSavings(mMaint,mTax,months){
+  const box=$('savingsBox');
+  if(!(mMaint||mTax)){ box.classList.add('hidden'); return; }
+  const e=k=>esc(T(k));
+  const line=(lab,sub,v)=>`<div class="w-line"><b>${lab}<small>${sub}</small></b><div class="w-amt">${inr(v)}</div></div>`;
+  let h=`<h3>${e('savings_title')}</h3><p>${e('savings_note')}</p>`;
+  if(mMaint) h+=line(esc(T('maint_save',{n:months})),esc(T('save_sub',{amt:inr0(mMaint),n:months})),mMaint*months);
+  if(mTax) h+=line(esc(T('tax_save',{n:months})),esc(T('save_sub',{amt:inr0(mTax),n:months})),mTax*months);
+  const tot=(mMaint+mTax)*months;
+  h+=`<div class="w-line w-tot"><b>${e('savings_total')}</b><div class="w-amt">${inr(tot)}<small>${esc(numWords(tot,LANG))}</small></div></div>`;
+  box.innerHTML=h; box.setAttribute('lang',LANG); box.classList.remove('hidden');
+}
+
+/* Benefit in words, in the selected language only. Shows the range across developers WITHOUT naming any developer. */
+function renderWords(calc,curRent,months,sav){   // sav = maintenance + property tax saving
+  /* Same figures as the printed letters: benefit = total cash benefit + savings, minus current rent for the rent period
+     when the flat is rented. Upper / lower amounts come from the developers set in settings.csv
+     (words_high_dev / words_low_dev, letters used RAMKY / MAHINDRA); developer names are never shown. */
+  sav=sav||0;
+  const box=$('wordsBox');
+  const ok=calc.filter(c=>c.total>0);
+  if(!ok.length){ box.classList.add('hidden'); return; }
+  const val=c=>c.total+sav-(curRent>0?curRent*months:0);
+  const pick=(key,fn)=>{ const id=String(setting(key,'')).trim().toUpperCase(); const c=ok.find(x=>String(x.d.dev_id).toUpperCase()===id); return c?val(c):fn(...ok.map(val)); };
+  let hi=pick('words_high_dev',Math.max), lo=pick('words_low_dev',Math.min);
+  if(lo>hi) [lo,hi]=[hi,lo];
+  const amt=v=>(v<0?'− ':'')+inr(Math.abs(v)), wds=v=>(v<0?'− ':'')+numWords(Math.abs(v),LANG);
+  const line=(lab,v)=>`<div class="w-line"><b>${esc(lab)}</b><div class="w-amt">${amt(v)}<small>${esc(wds(v))}</small></div></div>`;
+  const intro=curRent>0?T(sav?'words_net_intro_s':'words_net_intro'):T(sav?'words_intro_s':'words_intro');
+  let h=`<h3>${esc(T('words_title'))}</h3><p>${esc(intro)}</p>`;
+  h+=Math.round(lo)===Math.round(hi)?line('',lo):line(T('words_to'),hi)+line(T('words_from'),lo);   // maximum first, then minimum
+  if(curRent>0) h+=`<p class="w-ded">${esc(T('words_rent_ded',{amt:inr0(curRent),n:months,tot:inr(curRent*months)}))}</p>`;
+  h+=`<p class="w-note">${sav?esc(T('words_incl',{amt:inr(sav)}))+' ':''}${esc(T('words_note'))}</p>`;
+  box.innerHTML=h; box.setAttribute('lang',LANG); box.classList.remove('hidden');
+}
+
+function renderRates(devs,type){
+  const pctTxt=d=>{const v=areaVal(d.dev_id,type,'additional_area_pct');return v==null?'—':v;};
+  const rentTxt=d=>{const r=areaItems(d.dev_id,type,'rent');
+    if(r.length) return num(r[0].value);
+    const vs=variants(d.dev_id,type,'rent').filter(x=>x.applies_to);
+    return vs.length?grouped(vs,v=>'₹'+v):null;};
+  const brkTxt=d=>{const r=areaItems(d.dev_id,type,'brokerage');
+    if(r.length) return r[0].basis==='per_sqft_onetime'?'₹'+r[0].value+' '+T('per_sqft'):(r.map(x=>x.note).join(' ')||'—');
+    const vs=variants(d.dev_id,type,'brokerage').filter(x=>x.applies_to);
+    return vs.length?grouped(vs,v=>'₹'+v+'/'+T('sqft')):'—';};
+  let h=devHead(devs)+'<tbody>';
+  const e=k=>esc(T(k));
+  h+=rowHTML(e('add_area_pct'),null,devs.map(pctTxt),x=>x+' %');
+  h+=rowHTML(e('rent_y1'),e('per_sqft_pm'),devs.map(rentTxt),inr);
+  h+=rowHTML(e('escalation'),null,devs.map(d=>{const p=areaVal(d.dev_id,type,'rent_escalation_pct');return p==null?'—':p+T('per_year');}),x=>x);
+  h+=rowHTML(e('brokerage'),null,devs.map(brkTxt),x=>x);
+  h+=rowHTML(e('corpus'),e('per_sqft'),devs.map(d=>areaVal(d.dev_id,type,'hardship')),inr);
+  h+=rowHTML(e('relocation'),null,devs.map(d=>amountFor(d.dev_id,type,'relocation',0,1)),inr);
+  h+='</tbody>';
+  $('memberTable').innerHTML=h; $('legend').classList.add('hidden'); $('rentNote').classList.add('hidden');
+  $('memberCard').classList.remove('hidden');
+}
+
+function refs(ids){ return String(ids||'').split(/[;,\s]+/).filter(Boolean).map(i=>`<a class="ref" href="#ref-${esc(i)}">#${esc(i)}</a>`).join(' '); }
+function renderReferences(){
+  const rows=DB.sources||[]; if(!rows.length) return;
+  $('refList').innerHTML=rows.map(r=>`<li id="ref-${esc(r.ref_id)}"><b>#${esc(r.ref_id)}</b> ${esc(r.title)}${r.note?` <span class="muted">— ${esc(r.note)}</span>`:''}${r.url?`<br><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url)}</a>`:''}</li>`).join('');
+  $('refCard').classList.remove('hidden');
+}
+function renderProfile(devs){
+  const rows=DB.developer_profile||[]; if(!rows.length) return;
+  const titles={'Profile':'Company profile','Financials':'Financials (₹ crore)'};
+  let out='';
+  for(const sec of [...new Set(rows.map(r=>r.section))]){
+    const items=[...new Set(rows.filter(r=>r.section===sec).map(r=>r.item))];
+    let h=devHead(devs)+'<tbody>';
+    for(const it of items){
+      h+=`<tr><td class="row-head">${esc(it)}</td>`+devs.map(d=>{const g=rows.find(x=>x.dev_id===d.dev_id&&x.section===sec&&x.item===it);
+        if(!g) return '<td class="text">—</td>';
+        const v=esc(g.value||'—').split(' | ').join('<br>');
+        return `<td class="text">${v}${g.ref_ids?` <span class="refs">${refs(g.ref_ids)}</span>`:''}</td>`;}).join('')+'</tr>';
+    }
+    out+=`<h3 class="sub">${esc(titles[sec]||sec)}</h3><div class="table-wrap"><table>${h}</tbody></table></div>`;
+  }
+  $('profileBody').innerHTML=out; $('profileCard').classList.remove('hidden');
+}
+/* Section switches (data/settings.csv): 1 = show, 0 = hide. Missing key = hidden. */
+const show=k=>String(setting('show_'+k,'0')).trim()==='1';
+function renderGeneral(devs){
+  const build=(cat,id,card)=>{
+    const items=[...new Set(DB.offers_general.filter(g=>g.category===cat).map(g=>g.item))];
+    let h=devHead(devs)+'<tbody>';
+    for(const it of items){
+      const [lab,...sub]=it.split(' | ');
+      h+=`<tr><td class="row-head">${esc(lab)}${sub.length?`<small>${esc(sub.join(' | '))}</small>`:''}</td>`+devs.map(d=>{const g=DB.offers_general.find(x=>x.dev_id===d.dev_id&&x.item===it);
+        return `<td class="text">${esc(g?.detail||'—')}</td>`;}).join('')+'</tr>';
+    }
+    $(id).innerHTML=h+'</tbody>'; $(card).classList.remove('hidden');
+  };
+  const gate=(flag,card)=>{ if(!show(flag)){ $(card).classList.add('hidden'); return false; } return true; };
+  if(gate('other_offers','generalCard')) build('Per member','generalTable','generalCard');
+  if(CUR && CUR.unit_type!=='Residential' && show('commercial_terms')) build('Commercial','commercialTable','commercialCard'); else $('commercialCard').classList.add('hidden');
+  if(gate('society_offers','societyCard')) build('Society','societyTable','societyCard');
+  if(gate('tender_compliance','complianceCard')) build('Tender compliance','complianceTable','complianceCard');
+  if(gate('developer_profile','profileCard')) renderProfile(devs);
+  if(gate('references','refCard')) renderReferences();
+  document.body.classList.toggle('no-refs',!show('references'));
+}
+
+loadAll().then(initSelectors).catch(e=>{
+  $('error').style.display='block';
+  $('error').innerHTML='Could not load data files ('+esc(e.message)+'). This page must be opened from a web server (e.g. GitHub Pages), not by double-clicking the file.';
+});
+</script>
+<!-- Usage log -> Firebase Firestore (same project as the meeting page). Failures are ignored; the calculator works without it. -->
+<script type="module">
+  if(!/^(localhost|127\.|0\.0\.0\.0|$)/.test(location.hostname)){
+    try{
+      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
+      const { getFirestore, collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+      const app = initializeApp({
+        apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
+        authDomain: "asmitajyoti-sgbm.firebaseapp.com",
+        projectId: "asmitajyoti-sgbm",
+        storageBucket: "asmitajyoti-sgbm.firebasestorage.app",
+        messagingSenderId: "85179629629",
+        appId: "1:85179629629:web:81718858a1d21aba752a54"
+      }, "calc-log");
+      const db = getFirestore(app);
+      window._calcSend = p => addDoc(collection(db, "calculator_access"), { ...p, ts: serverTimestamp() }).catch(() => {});
+      (window._calcQ || []).splice(0).forEach(window._calcSend);
+    }catch(e){ /* logging unavailable */ }
+  }
+</script>
+</body>
+</html>
