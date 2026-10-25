@@ -405,7 +405,7 @@
 
       } catch (error) {
           console.error(error);
-          tbody.innerHTML = `<tr><td colspan="${COLS}" style="color:red;">Access Denied: Rules validation parameter error.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="${COLS}" style="color:red;">Access Denied: Rules validation parameter error.<br><small style="color:#666;">Signed in as: ${esc((auth.currentUser && auth.currentUser.phoneNumber) || '')} · error: ${esc((error && error.code) || '')} ${esc((error && error.message) || '')}</small></td></tr>`;
       }
   }
 
@@ -551,7 +551,11 @@
           renderCalc();
       } catch (error) {
           console.error(error);
-          tbody.innerHTML = '<tr><td colspan="8" style="color:red;">Access Denied: Rules validation parameter error (check the calculator_access rule).</td></tr>';
+          const who = (auth.currentUser && auth.currentUser.phoneNumber) || 'not signed in';
+          const why = error && error.code === 'permission-denied'
+              ? `Firestore rules do not allow ${esc(who)} to read <b>calculator_access</b>. Publish the new rules (with this number in isAdmin()) and press Refresh.`
+              : `Could not load the log: ${esc((error && (error.code || error.message)) || error)}`;
+          tbody.innerHTML = `<tr><td colspan="8" style="color:red;">${why}<br><small style="color:#666;">Signed in as: ${esc(who)} · error: ${esc((error && error.code) || '')} ${esc((error && error.message) || '')}</small></td></tr>`;
       }
   }
 
