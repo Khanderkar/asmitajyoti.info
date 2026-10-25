@@ -99,6 +99,23 @@
   @media (max-width:760px) and (orientation:portrait){ body.has-results .rotate-tip{display:flex} }
   @media (prefers-reduced-motion:reduce){ .rotate-tip,.rotate-tip .rot-phone{animation:none} }
   @media print{ .rotate-tip{display:none!important} }
+  .contact-card{border:2px solid #f5b94a;border-left:6px solid #f5b94a;background:#fffaf0}
+  .contact-card h3{margin:0 0 6px;color:#b54708;font-size:1.1rem}
+  .contact-card p{margin:0 0 12px;font-weight:600;color:#1c2230}
+  .ci-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+  .ci-f{display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:.9rem;color:#1c2230}
+  .ci-f input{width:100%;padding:10px 12px;border:1px solid #cfd4dc;border-radius:8px;font:inherit;font-weight:400;background:#fff;box-sizing:border-box}
+  .ci-consent{display:flex;gap:10px;align-items:flex-start;margin:12px 0;font-size:.88rem;font-weight:600;color:#1c2230;cursor:pointer}
+  .ci-consent input{width:20px;height:20px;flex:none;margin-top:1px;accent-color:#0f4c81}
+  .ci-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .ci-send{width:auto;margin:0;padding:10px 22px}
+  .ci-skip{background:#fff;border:1px solid #98a2b3;color:#344054;border-radius:8px;padding:9px 18px;font:inherit;font-weight:600;cursor:pointer}
+  .ci-skip:hover{background:#f2f4f7}
+  .ci-err{color:#b42318;font-weight:700;font-size:.9rem}
+  .ci-thanks{color:#1a7f3c!important;font-weight:800!important;margin:0!important}
+  .ci-linkrow{margin:-6px 0 14px;text-align:right;font-size:.9rem}
+  .ci-linkrow a{color:#0f4c81;font-weight:700}
+  @media print{ .contact-card,.ci-linkrow{display:none!important} }
   .words.savings .w-line.w-tot{grid-template-columns:1fr auto} .words.savings .w-tot .w-amt{white-space:nowrap} .words.savings .w-tot .w-amt small{white-space:normal}
   /* phones held sideways: let the 3-developer table fit the screen width */
   @media (orientation:landscape) and (max-height:500px){ #memberCard table{min-width:0} #memberCard th,#memberCard td{padding:8px 7px;font-size:.92rem} }
@@ -340,6 +357,22 @@
     </div>
   </div>
 
+  <!-- Contact details: asks for missing mobile / email (flags has_mobile / has_email in flats.csv); saved to Firebase for the committee -->
+  <section class="card contact-card hidden" id="contactCard">
+    <h3 id="ciTitle"></h3>
+    <p id="ciMsg"></p>
+    <div id="ciForm">
+      <div class="ci-grid">
+        <label class="ci-f"><span data-i18n="ci_name">Your name</span><input type="text" id="ciName" maxlength="80" autocomplete="name"></label>
+        <label class="ci-f" id="ciMobileF"><span data-i18n="ci_mobile">Mobile number</span><input type="tel" id="ciMobile" maxlength="16" inputmode="tel" autocomplete="tel" placeholder="98XXXXXXXX"></label>
+        <label class="ci-f" id="ciEmailF"><span data-i18n="ci_email">Email address</span><input type="email" id="ciEmail" maxlength="90" autocomplete="email" placeholder="name@example.com"></label>
+      </div>
+      <label class="ci-consent"><input type="checkbox" id="ciConsent"> <span data-i18n="ci_consent">I am the owner (or a family member of the owner) of this flat, and the Managing Committee may use these details to contact me.</span></label>
+      <div class="ci-actions"><button type="button" class="btn ci-send" id="ciSend" data-i18n="ci_send">Send details</button><button type="button" class="ci-skip" id="ciSkip" data-i18n="ci_skip">Not now</button><span class="ci-err" id="ciErr" role="alert"></span></div>
+    </div>
+    <p class="ci-thanks hidden" id="ciThanks" data-i18n="ci_thanks">Thank you! Your details have been sent to the Managing Committee.</p>
+  </section>
+  <p class="ci-linkrow hidden" id="ciLinkRow"><a href="#" id="ciLink" data-i18n="ci_link">Update my contact details</a></p>
   <!-- Mobile, portrait: ask to turn the phone so all 3 developers fit side by side (shown only after Submit) -->
   <div class="rotate-tip" role="status">
     <svg class="rot-ico" viewBox="0 0 64 64" width="46" height="46" aria-hidden="true">
@@ -769,6 +802,9 @@ function initSelectors(){
   $('isRented').onchange=()=>{ $('curRentGroup').classList.toggle('hidden',!$('isRented').checked); if(shown) markDirty(); };
   $('curRent').oninput=()=>{ if(shown) markDirty(); };
   $('updateBtn').onclick=()=>{ render(); if(shown) calcLog('view'); };
+  $('ciSend').onclick=sendContact;
+  $('ciLink').onclick=e=>{ e.preventDefault(); showContactForm(true); };
+  $('ciSkip').onclick=()=>{ try{ sessionStorage.setItem(ciSkipKey(CI.unit),'1'); }catch(e){} $('ciErr').textContent=''; $('contactCard').classList.add('hidden'); $('ciLinkRow').classList.remove('hidden'); };
   $('printBtn').onclick=doPrint;
   $('pdfBtn').onclick=()=>{ calcLog('pdf'); exportPDF(); };
   window.addEventListener('beforeprint',()=>{ if(shown) calcLog('print'); if(!shown || PRINT_IMG) return; if(!(reportStyle()==='graphics' && usePrintImage())) prepPrint(); });
@@ -778,6 +814,56 @@ function initSelectors(){
   calcLog('open');
 }
 let shown=false, rentOpen=false;
+/* ---- Contact details (mobile / email) ---- */
+let CI={flat:null,unit:'',mode:'',needM:false,needE:false};
+const ciKey=u=>'ajcContactSent:'+u, ciSkipKey=u=>'ajcContactSkip:'+u;
+function ciSkipped(u){ try{ return !!sessionStorage.getItem(ciSkipKey(u)); }catch(e){ return false; } }
+function ciSent(u){ try{ return !!localStorage.getItem(ciKey(u)); }catch(e){ return false; } }
+function renderContact(flat,unit){
+  const card=$('contactCard'), link=$('ciLinkRow');
+  card.classList.add('hidden'); link.classList.add('hidden');
+  if(!('has_mobile' in flat)) return;                       // older flats.csv without the flags
+  const needM=flat.has_mobile!=='Y', needE=flat.has_email!=='Y';
+  CI={flat,unit,mode:(needM||needE)?'missing':'update',needM,needE};
+  $('ciErr').textContent='';
+  if(ciSent(unit)){ showContactForm(false); $('ciTitle').textContent=T('ci_title_update'); $('ciMsg').textContent=''; $('ciMsg').classList.add('hidden');
+    $('ciForm').classList.add('hidden'); $('ciThanks').classList.remove('hidden'); card.classList.remove('hidden'); return; }
+  $('ciThanks').classList.add('hidden'); $('ciForm').classList.remove('hidden'); $('ciMsg').classList.remove('hidden');
+  if(CI.mode==='missing' && !ciSkipped(unit)) showContactForm(true); else link.classList.remove('hidden');   // optional: 'Not now' hides it for this visit
+}
+function showContactForm(open){
+  const card=$('contactCard'), u=CI.unit;
+  if(!open){ return; }
+  const upd=CI.mode==='update';
+  $('ciTitle').textContent=T(upd?'ci_title_update':'ci_title_missing');
+  $('ciMsg').textContent=upd?T('ci_msg_update'):T(CI.needM&&CI.needE?'ci_msg_both':CI.needM?'ci_msg_mobile':'ci_msg_email',{unit:u});
+  $('ciMobileF').classList.toggle('hidden',!(upd||CI.needM));
+  $('ciEmailF').classList.toggle('hidden',!(upd||CI.needE));
+  card.dir=LANG==='ur'?'rtl':'ltr';
+  card.classList.remove('hidden'); $('ciLinkRow').classList.add('hidden');
+}
+function normMobile(v){ let d=(v||'').replace(/\D/g,''); if(d.length===12&&d.startsWith('91')) d=d.slice(2); else if(d.length===11&&d.startsWith('0')) d=d.slice(1); return d; }
+async function sendContact(){
+  const err=$('ciErr'); err.textContent='';
+  const upd=CI.mode==='update';
+  const name=$('ciName').value.trim().replace(/\s+/g,' ');
+  const mRaw=(upd||CI.needM)?$('ciMobile').value.trim():'', eRaw=(upd||CI.needE)?$('ciEmail').value.trim().toLowerCase():'';
+  const mobile=mRaw?normMobile(mRaw):'', email=eRaw;
+  if(!name){ err.textContent=T('ci_err_name'); return; }
+  const mOk=!mRaw||/^[6-9]\d{9}$/.test(mobile), eOk=!eRaw||/^[^\s@,;]+@[^\s@,;]+\.[a-z]{2,}$/i.test(email);
+  if((!mobile&&!email)||!mOk||!eOk){ err.textContent=T('ci_err_contact'); return; }
+  if(!$('ciConsent').checked){ err.textContent=T('ci_err_consent'); return; }
+  if(!window._contactSend){ err.textContent=T('ci_err_send'); return; }
+  const btn=$('ciSend'); btn.disabled=true;
+  try{
+    await window._contactSend({building:CI.flat.building, flat:CI.flat.flat_no, unit:CI.unit, name:name.slice(0,80), mobile, email:email.slice(0,90),
+      missing:[CI.needM?'mobile':'',CI.needE?'email':''].filter(Boolean).join(','), mode:CI.mode, lang:LANG||'', visitor:VISITOR, status:'pending'});
+    try{ localStorage.setItem(ciKey(CI.unit),'1'); }catch(e){}
+    $('ciForm').classList.add('hidden'); $('ciMsg').classList.add('hidden'); $('ciThanks').classList.remove('hidden');
+    ['ciName','ciMobile','ciEmail'].forEach(id=>$(id).value=''); $('ciConsent').checked=false;
+  }catch(e){ err.textContent=T('ci_err_send'); }
+  finally{ btn.disabled=false; }
+}
 /* ---- Usage log (for the committee's admin page). Records only: event, building / flat viewed, language, Text/Graphics,
    whether "rented" was ticked (not the amount), device type and an anonymous per-browser visitor id. No names / contacts.
    Sent to Firebase (collection calculator_access) by the module script at the end of the page; skipped on localhost. */
@@ -1064,6 +1150,7 @@ function render(redraw){
     <div class="pill">${esc(T('type'))} <b>${esc(T('t_'+type))}</b></div>
     <div class="pill">${esc(T('existing_area'))} <b>${area==null?esc(T('not_available')):sqft(area)}</b></div>`;
   LAST={unit,type,area,months,curRent};
+  renderContact(flat,unit);
   $('actions').classList.toggle('hidden',!show('print_pdf_buttons')); $('finalDisclaimer').classList.toggle('hidden',!show('closing_disclaimer'));
   $('printStamp').textContent=T('generated_on')+' '+new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})+' · '+T('offers_as_of')+' '+setting('offers_last_updated','');
   $('flatInfo').classList.remove('hidden');
@@ -1256,6 +1343,7 @@ loadAll().then(initSelectors).catch(e=>{
       }, "calc-log");
       const db = getFirestore(app);
       window._calcSend = p => addDoc(collection(db, "calculator_access"), { ...p, ts: serverTimestamp() }).catch(() => {});
+      window._contactSend = p => addDoc(collection(db, "contact_updates"), { ...p, ts: serverTimestamp() });
       (window._calcQ || []).splice(0).forEach(window._calcSend);
     }catch(e){ /* logging unavailable */ }
   }
