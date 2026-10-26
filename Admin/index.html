@@ -47,6 +47,12 @@
         .ev { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; color: #fff; }
         .ev-open { background: #7f8c8d; } .ev-view { background: #0099ff; } .ev-print { background: #e67e22; } .ev-pdf { background: #8e44ad; }
         .vid { font-family: monospace; font-size: 0.85rem; color: #555; }
+        .st { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; color: #fff; }
+        .st-pending { background: #e67e22; } .st-approved { background: #00a65a; } .st-merged { background: #0099ff; } .st-rejected { background: #999; }
+        .act-btn { border: none; border-radius: 4px; padding: 5px 10px; font-weight: bold; cursor: pointer; font-size: 0.8rem; margin: 2px; }
+        .act-ok { background: #00a65a; color: #fff; } .act-no { background: #e9eef5; color: #b42318; } .act-undo { background: #e9eef5; color: #003366; }
+        .tab-count { background: #e67e22; color: #fff; border-radius: 10px; padding: 1px 7px; font-size: 0.8rem; margin-left: 4px; }
+        .tab-count:empty { display: none; }
         .hint-text { font-size: 0.85rem; color: #666; margin: -5px 0 12px; }
         .secure-box { background: #fff8e6; border: 1px solid #f5b94a; border-left: 5px solid #f5b94a; border-radius: 6px; padding: 12px 15px; margin-bottom: 15px; font-size: 0.9rem; }
 
@@ -98,13 +104,14 @@
 <div class="dashboard" id="dashboardContainer">
 
     <div class="admin-header">
-        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v25-Oct-2026b</span></h2>
+        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v26-Oct-2026d</span></h2>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
 
     <div class="tabs">
         <button class="tab-btn active" data-tab="meetingTab">Online meeting data</button>
         <button class="tab-btn" data-tab="calcTab">Offer calculator access</button>
+        <button class="tab-btn" data-tab="contactTab">Contact updates <span class="tab-count" id="ctPendingTab"></span></button>
     </div>
 
     <!-- ===== TAB 1: ONLINE MEETING DATA (unchanged) ===== -->
@@ -150,7 +157,7 @@
                 <h2 style="margin:0;">Offer calculator access</h2>
                 <span class="count-badge" id="cEvents">Events: 0</span>
                 <span class="unique-badge" id="cVisitors">Visitors: 0</span>
-                <span class="flat-badge" id="cFlats">Flats viewed: 0</span>
+                <span class="flat-badge" id="cFlats" title="Different flats for which Submit / Update was pressed">Unique flats: 0</span>
                 <span class="print-badge" id="cPrints">Prints: 0</span>
                 <span class="face-badge" id="cPdfs">PDFs: 0</span>
             </div>
@@ -171,6 +178,8 @@
                 <option value="view">Flat viewed</option>
                 <option value="print">Printed</option>
                 <option value="pdf">PDF exported</option>
+                <option value="__flats">▸ Flat-wise summary</option>
+                <option value="__unseen">▸ Flats not viewed yet</option>
             </select>
             <label for="cSearch">Flat</label>
             <input id="cSearch" placeholder="e.g. D7/21 or D7" size="14">
@@ -190,7 +199,7 @@
 
         <div class="table-scroll">
         <table>
-            <thead>
+            <thead id="cHead">
                 <tr>
                     <th>Time (IST)</th>
                     <th>Event</th>
@@ -203,6 +212,63 @@
                 </tr>
             </thead>
             <tbody id="cBody"><tr><td colspan="8">Open this tab to load the log.</td></tr></tbody>
+        </table>
+        </div>
+    </div>
+
+    <!-- ===== TAB 3: CONTACT UPDATES (mobile / email sent by members from the calculator) ===== -->
+    <div class="tab-panel" id="contactTab">
+        <div class="admin-header" style="background:#00509e;">
+            <div class="header-left-group">
+                <h2 style="margin:0;">Contact updates</h2>
+                <span class="count-badge" id="ctTotal">Total: 0</span>
+                <span class="print-badge" id="ctPending">Pending: 0</span>
+                <span class="unique-badge" id="ctApproved">Approved: 0</span>
+                <span class="flat-badge" id="ctMerged">Merged: 0</span>
+                <span class="face-badge" id="ctRejected">Rejected: 0</span>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <label for="ctStatus">Status</label>
+            <select id="ctStatus">
+                <option value="">All</option>
+                <option value="pending" selected>Pending</option>
+                <option value="approved">Approved</option>
+                <option value="merged">Merged</option>
+                <option value="rejected">Rejected</option>
+            </select>
+            <label for="ctSearch">Flat</label>
+            <input id="ctSearch" placeholder="e.g. D7/21 or D7" size="14">
+            <span class="spacer"></span>
+            <button class="tool-btn" id="ctRefresh">Refresh</button>
+            <button class="tool-btn yellow" id="ctExport">Export (CSV)</button>
+        </div>
+
+        <div class="secure-box">
+            <b>Update flats.csv</b> – builds a new, encrypted <i>flats.csv</i> with all <b>Approved</b> details added (newest entry per flat; an existing number / email is kept as the second one).
+            Upload the downloaded file to GitHub as <i>Offer-Calculator/data/flats.csv</i>. The calculator then stops asking those flats.
+            <div style="margin-top:10px;"><button class="tool-btn red" id="ctBuild">Download updated flats.csv</button> <span id="ctBuildStatus" style="margin-left:8px;font-weight:bold;"></span></div>
+            <div id="ctBuildLog" style="margin-top:8px;font-size:0.85rem;"></div>
+        </div>
+
+        <p class="hint-text">Members who enter details are not verified – please check (e.g. call the number) before approving. "Was missing" shows what flats.csv lacked when the member submitted.</p>
+
+        <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>Time (IST)</th>
+                    <th>Building / Flat</th>
+                    <th>Name given</th>
+                    <th>Mobile</th>
+                    <th>Email</th>
+                    <th>Was missing</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="ctBody"><tr><td colspan="8">Open this tab to load the entries.</td></tr></tbody>
         </table>
         </div>
     </div>
@@ -228,7 +294,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, collection, query, orderBy, getDocs, limit, startAfter, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, collection, query, orderBy, getDocs, limit, startAfter, doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
@@ -281,7 +347,8 @@
           document.getElementById('authContainer').style.display = 'none';
           document.getElementById('dashboardContainer').style.display = 'block';
           fetchMasterData();
-          calcLoaded = false;
+          calcLoaded = false; ctLoaded = false;
+          fetchContacts();
           if (document.getElementById('calcTab').classList.contains('active')) fetchCalcLog();
       } else {
           document.getElementById('authContainer').style.display = 'block';
@@ -343,6 +410,7 @@
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === btn.dataset.tab));
       if (btn.dataset.tab === 'calcTab' && !calcLoaded) fetchCalcLog();
+      if (btn.dataset.tab === 'contactTab' && !ctLoaded) fetchContacts();
   }));
 
   // =====================================================================
@@ -559,6 +627,7 @@
               });
           });
           calcLoaded = true;
+          loadAllUnits().then(renderCalc).catch(() => {});
           renderCalc();
       } catch (error) {
           console.error(error);
@@ -570,9 +639,26 @@
       }
   }
 
+  const LOG_HEAD = ['Time (IST)', 'Event', 'Building / Flat', 'Language', 'Style', 'Rented', 'Device', 'Visitor ID'];
+  const BORDER = ['A1','A2','B1','C1','D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','E1','Shops/Units'];
+  let ALL_UNITS = null, calcView = 'log', calcSummary = [];
+  async function loadAllUnits() {   // every unit from the public flats.csv (plain columns only) – for "not viewed yet"
+      if (ALL_UNITS) return ALL_UNITS;
+      const rows = parseCsv(await (await fetch(FLATS_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' })).text());
+      const h = rows[0], iB = h.indexOf('building'), iF = h.indexOf('flat_no'), iT = h.indexOf('unit_type');
+      ALL_UNITS = rows.slice(1).map(r => ({ building: r[iB], flat: r[iF], type: r[iT] || '',
+          unit: r[iB] === 'Shops/Units' ? r[iF] : r[iB] + '/' + r[iF] }));
+      return ALL_UNITS;
+  }
+  const unitKey = u => { const [b, f] = String(u).split('/'); const bi = BORDER.indexOf(b); return [bi < 0 ? 99 : bi, parseInt((f || u).replace(/\D/g, '')) || 0, u]; };
+  const byUnit = (a, b) => { const x = unitKey(a), y = unitKey(b); return x[0] - y[0] || x[1] - y[1] || String(x[2]).localeCompare(y[2]); };
+  function setHead(cols) { document.getElementById('cHead').innerHTML = '<tr>' + cols.map(c => `<th>${esc(c)}</th>`).join('') + '</tr>'; }
+
   function renderCalc() {
       const period = document.getElementById('cPeriod').value;
-      const ev = document.getElementById('cEvent').value;
+      const evSel = document.getElementById('cEvent').value;
+      calcView = evSel === '__flats' ? 'flats' : evSel === '__unseen' ? 'unseen' : 'log';
+      const ev = calcView === 'log' ? evSel : '';
       const term = document.getElementById('cSearch').value.trim().toLowerCase().replace(/[-\s]+/g, '/');
 
       let since = null;
@@ -587,11 +673,49 @@
       const inPeriod = calcRecords.filter(r => !since || (r.date && r.date >= since));
       document.getElementById('cEvents').innerText = `Events: ${calcFiltered.length}`;
       document.getElementById('cVisitors').innerText = `Visitors: ${new Set(inPeriod.map(r => r.visitor).filter(Boolean)).size}`;
-      document.getElementById('cFlats').innerText = `Flats viewed: ${new Set(inPeriod.filter(r => r.event === 'view' && r.unit).map(r => r.unit)).size}`;
-      document.getElementById('cPrints').innerText = `Prints: ${inPeriod.filter(r => r.event === 'print').length}`;
-      document.getElementById('cPdfs').innerText = `PDFs: ${inPeriod.filter(r => r.event === 'pdf').length}`;
+      const uniq = e => new Set(inPeriod.filter(r => r.event === e && r.unit).map(r => r.unit)).size;
+      const totalUnits = ALL_UNITS ? ALL_UNITS.length : 875;
+      document.getElementById('cFlats').innerText = `Unique flats: ${uniq('view')} / ${totalUnits}`;
+      document.getElementById('cPrints').innerText = `Prints: ${inPeriod.filter(r => r.event === 'print').length} · ${uniq('print')} flats`;
+      document.getElementById('cPdfs').innerText = `PDFs: ${inPeriod.filter(r => r.event === 'pdf').length} · ${uniq('pdf')} flats`;
 
       const tbody = document.getElementById('cBody');
+      if (calcView !== 'log') {
+          // ---- per flat: views / prints / PDFs / visitors / languages / first & last time ----
+          const map = new Map();
+          inPeriod.filter(r => r.unit && r.event !== 'open' && (!term || r.unit.toLowerCase().replace(/[-\s]+/g, '/').includes(term))).forEach(r => {
+              let x = map.get(r.unit);
+              if (!x) map.set(r.unit, x = { unit: r.unit, view: 0, print: 0, pdf: 0, vis: new Set(), langs: new Set(), first: r.date, last: r.date, firstT: r.time, lastT: r.time });
+              x[r.event] = (x[r.event] || 0) + 1; if (r.visitor) x.vis.add(r.visitor); if (r.lang) x.langs.add(LANG_NAMES[r.lang] || r.lang);
+              if (r.date && r.date < x.first) { x.first = r.date; x.firstT = r.time; }
+              if (r.date && r.date > x.last) { x.last = r.date; x.lastT = r.time; }
+          });
+          if (calcView === 'flats') {
+              calcSummary = [...map.values()].sort((a, b) => byUnit(a.unit, b.unit));
+              setHead(['Building / Flat', 'Views', 'Prints', 'PDFs', 'Visitors', 'Languages', 'First seen (IST)', 'Last seen (IST)']);
+              calcFiltered = calcSummary;
+              tbody.innerHTML = calcSummary.length ? calcSummary.map(x => `<tr><td><strong>${esc(x.unit)}</strong></td><td>${x.view}</td><td>${x.print || ''}</td><td>${x.pdf || ''}</td>
+                  <td>${x.vis.size}</td><td>${esc([...x.langs].join(', '))}</td><td>${esc(x.firstT)}</td><td>${esc(x.lastT)}</td></tr>`).join('')
+                  + `<tr><td colspan="8"><b>${calcSummary.length} flats</b> for this selection.</td></tr>`
+                  : '<tr><td colspan="8">No flats for this selection.</td></tr>';
+          } else {
+              setHead(['Building / Flat', 'Type', '', '', '', '', '', '']);
+              tbody.innerHTML = '<tr><td colspan="8">Loading the list of all flats…</td></tr>';
+              loadAllUnits().then(all => {
+                  if (calcView !== 'unseen') return;
+                  calcSummary = all.filter(u => !map.has(u.unit) && (!term || u.unit.toLowerCase().includes(term))).sort((a, b) => byUnit(a.unit, b.unit));
+                  calcFiltered = calcSummary;
+                  const byB = {}; calcSummary.forEach(u => byB[u.building] = (byB[u.building] || 0) + 1);
+                  setHead(['Building / Flat', 'Type', 'Building', 'Not viewed in this building', '', '', '', '']);
+                  tbody.innerHTML = `<tr><td colspan="8"><b>${calcSummary.length} of ${all.length} units</b> have not been viewed in this period – by building: ${esc(Object.entries(byB).sort((a, b) => byUnit(a[0] + '/0', b[0] + '/0')).map(([b, n]) => b + ' ' + n).join(' · '))}</td></tr>`
+                      + calcSummary.map(u => `<tr><td><strong>${esc(u.unit)}</strong></td><td>${esc(u.type)}</td><td>${esc(u.building)}</td><td>${byB[u.building]}</td><td></td><td></td><td></td><td></td></tr>`).join('');
+                  document.getElementById('cFlats').innerText = `Unique flats: ${uniq('view')} / ${all.length}`;
+              }).catch(e => { tbody.innerHTML = `<tr><td colspan="8" style="color:red;">Could not read flats.csv: ${esc(e.message)}</td></tr>`; });
+          }
+          document.getElementById('cEvents').innerText = `Events: ${inPeriod.length}`;
+          return;
+      }
+      setHead(LOG_HEAD);
       if (!calcFiltered.length) { tbody.innerHTML = '<tr><td colspan="8">No calculator activity for this selection.</td></tr>'; return; }
       tbody.innerHTML = calcFiltered.slice(0, 2000).map(r => `<tr>
           <td>${esc(r.time)}</td>
@@ -622,6 +746,15 @@
 
   document.getElementById('cExportLog').addEventListener('click', () => {
       if (!calcFiltered.length) { alert('Nothing to export for this selection.'); return; }
+      if (calcView === 'flats') {
+          downloadCsv(`Offer_Calculator_Flatwise_${today()}.csv`, [['unit', 'views', 'prints', 'pdfs', 'visitors', 'languages', 'first_seen_ist', 'last_seen_ist'],
+              ...calcSummary.map(x => [x.unit, x.view, x.print, x.pdf, x.vis.size, [...x.langs].join(' / '), x.firstT, x.lastT])]);
+          return;
+      }
+      if (calcView === 'unseen') {
+          downloadCsv(`Offer_Calculator_Not_Viewed_${today()}.csv`, [['unit', 'building', 'flat', 'type'], ...calcSummary.map(u => [u.unit, u.building, u.flat, u.type])]);
+          return;
+      }
       downloadCsv(`Offer_Calculator_Access_${today()}.csv`, [
           ['time_ist', 'event', 'building', 'flat', 'unit', 'language', 'style', 'rented_ticked', 'device', 'visitor_id', 'session_id', 'screen', 'referrer', 'user_agent'],
           ...calcFiltered.map(r => [r.time, EVENT_NAMES[r.event] || r.event, r.building, r.flat, r.unit, LANG_NAMES[r.lang] || r.lang, r.style,
@@ -654,7 +787,7 @@
   async function deriveKey(password, saltB64, iterations) {
       const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
       return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64ToBytes(saltB64), iterations, hash: 'SHA-256' },
-                                     base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+                                     base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
   }
 
   async function decryptCell(key, cell) {
@@ -674,6 +807,162 @@
       return { rows, cells: n };
   }
   window._decryptFlatsCsv = decryptFlatsCsv;   // (used for testing)
+
+  // =====================================================================
+  //  TAB 3 – CONTACT UPDATES
+  // =====================================================================
+  const PAD = { member_name: 64, monthly_rent: 16, permanent_address: 256, mobile: 32, email: 96 };   // fixed plaintext lengths (bytes)
+  let ctRecords = [], ctFiltered = [], ctLoaded = false;
+  const normUnit = u => String(u || '').toLowerCase().replace(/[-\s]+/g, '/');
+
+  async function fetchContacts() {
+      const tbody = document.getElementById('ctBody');
+      tbody.innerHTML = '<tr><td colspan="8">Fetching contact updates...</td></tr>';
+      try {
+          const snap = await getDocs(query(collection(db, 'contact_updates'), orderBy('ts', 'desc'), limit(5000)));
+          ctRecords = [];
+          snap.forEach(d => {
+              const x = d.data(); const t = x.ts ? x.ts.toDate() : null;
+              ctRecords.push({ id: d.id, date: t, time: t ? t.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : '',
+                  building: x.building || '', flat: x.flat || '', unit: x.unit || '', name: x.name || '', mobile: x.mobile || '',
+                  email: x.email || '', missing: x.missing || '', mode: x.mode || '', lang: x.lang || '', status: x.status || 'pending',
+                  reviewedBy: x.reviewedBy || '' });
+          });
+          ctLoaded = true;
+          renderContacts();
+      } catch (error) {
+          console.error(error);
+          tbody.innerHTML = `<tr><td colspan="8" style="color:red;">Could not load contact updates: ${esc(error.code || error.message)} – publish the contact_updates rule.</td></tr>`;
+      }
+  }
+
+  function renderContacts() {
+      const st = document.getElementById('ctStatus').value;
+      const term = normUnit(document.getElementById('ctSearch').value.trim());
+      const count = s => ctRecords.filter(r => r.status === s).length;
+      document.getElementById('ctTotal').innerText = `Total: ${ctRecords.length}`;
+      document.getElementById('ctPending').innerText = `Pending: ${count('pending')}`;
+      document.getElementById('ctApproved').innerText = `Approved: ${count('approved')}`;
+      document.getElementById('ctMerged').innerText = `Merged: ${count('merged')}`;
+      document.getElementById('ctRejected').innerText = `Rejected: ${count('rejected')}`;
+      document.getElementById('ctPendingTab').innerText = count('pending') || '';
+      ctFiltered = ctRecords.filter(r => (!st || r.status === st) && (!term || normUnit(r.unit).includes(term)));
+      const tbody = document.getElementById('ctBody');
+      if (!ctFiltered.length) { tbody.innerHTML = '<tr><td colspan="8">No entries for this selection.</td></tr>'; return; }
+      tbody.innerHTML = ctFiltered.map(r => {
+          const act = r.status === 'pending'
+              ? `<button class="act-btn act-ok" onclick="setContactStatus('${r.id}','approved')">Approve</button><button class="act-btn act-no" onclick="setContactStatus('${r.id}','rejected')">Reject</button>`
+              : r.status === 'merged' ? '' : `<button class="act-btn act-undo" onclick="setContactStatus('${r.id}','pending')">Undo</button>`;
+          return `<tr>
+              <td>${esc(r.time)}</td>
+              <td><strong>${esc(r.unit)}</strong></td>
+              <td>${esc(r.name)}</td>
+              <td>${esc(r.mobile)}</td>
+              <td>${esc(r.email)}</td>
+              <td>${esc(r.mode === 'update' ? '(update)' : r.missing.replace(',', ' + '))}</td>
+              <td><span class="st st-${esc(r.status)}">${esc(r.status)}</span></td>
+              <td>${act}</td>
+          </tr>`; }).join('');
+  }
+
+  window.setContactStatus = async function (id, status) {
+      try {
+          await updateDoc(doc(db, 'contact_updates', id), { status, reviewedAt: serverTimestamp(), reviewedBy: (auth.currentUser && auth.currentUser.phoneNumber) || '' });
+          const r = ctRecords.find(x => x.id === id); if (r) r.status = status;
+          renderContacts();
+      } catch (e) { console.error(e); alert('Could not update: ' + (e.code || e.message)); }
+  };
+
+  document.getElementById('ctStatus').addEventListener('change', renderContacts);
+  document.getElementById('ctSearch').addEventListener('input', renderContacts);
+  document.getElementById('ctRefresh').addEventListener('click', fetchContacts);
+  document.getElementById('ctExport').addEventListener('click', () => {
+      if (!ctFiltered.length) { alert('Nothing to export for this selection.'); return; }
+      downloadCsv(`Contact_Updates_${today()}.csv`, [
+          ['time_ist', 'building', 'flat', 'unit', 'name_given', 'mobile', 'email', 'was_missing', 'type', 'language', 'status', 'reviewed_by'],
+          ...ctFiltered.map(r => [r.time, r.building, r.flat, r.unit, r.name, r.mobile, r.email, r.missing, r.mode, r.lang, r.status, r.reviewedBy])]);
+  });
+
+  // ---- build updated flats.csv ----
+  const bytesToB64 = u8 => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
+  async function encryptCell(key, value, col) {
+      const enc = new TextEncoder().encode(value);
+      const n = PAD[col]; if (enc.length > n) throw new Error(`${col} value too long (${enc.length} > ${n} bytes)`);
+      const pt = new Uint8Array(n); pt.fill(0x20); pt.set(enc);
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, pt));
+      const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12);
+      return 'ENC1:' + bytesToB64(out);
+  }
+  function rowsToCsv(rows) { return '\uFEFF' + rows.map(r => r.map(csvCell).join(',')).join('\r\n') + '\r\n'; }   // same format as the original file
+  function mergeList(existing, value, sep, maxBytes) {
+      const list = existing.split(sep.trim()).map(x => x.trim()).filter(Boolean);
+      if (list.some(x => x.toLowerCase() === value.toLowerCase())) return existing;
+      const both = [value, ...list].slice(0, 2).join(sep);
+      return new TextEncoder().encode(both).length <= maxBytes ? both : value;
+  }
+
+  async function buildUpdatedFlats(csvText, password, saltB64, iterations, approved) {
+      const key = await deriveKey(password, saltB64, iterations);
+      const rows = parseCsv(csvText); const h = rows[0];
+      const ix = c => { const i = h.indexOf(c); if (i < 0) throw new Error('flats.csv has no column ' + c); return i; };
+      const iB = ix('building'), iF = ix('flat_no'), iM = ix('mobile'), iE = ix('email'), iHM = ix('has_mobile'), iHE = ix('has_email');
+      const latest = new Map();   // newest approved entry per flat (records are newest first)
+      approved.forEach(r => { const k = r.building + '|' + r.flat; if (!latest.has(k)) latest.set(k, r); });
+      const changes = [], used = [];
+      for (const [k, r] of latest) {
+          const row = rows.find((x, i) => i > 0 && (x[iB] + '|' + x[iF]) === k);
+          if (!row) { changes.push(`${r.unit}: flat not found in flats.csv – skipped`); continue; }
+          const curM = await decryptCell(key, row[iM]), curE = await decryptCell(key, row[iE]);
+          let newM = curM, newE = curE;
+          if (r.mobile) newM = mergeList(curM, r.mobile, ' / ', PAD.mobile);
+          if (r.email) newE = mergeList(curE, r.email, '; ', PAD.email);
+          if (newM !== curM) row[iM] = await encryptCell(key, newM, 'mobile');
+          if (newE !== curE) row[iE] = await encryptCell(key, newE, 'email');
+          row[iHM] = newM.trim() ? 'Y' : 'N'; row[iHE] = newE.trim() ? 'Y' : 'N';
+          const dropped = (cur, nw, sep) => cur.split(sep).map(x => x.trim()).filter(x => x && !nw.split(sep).map(y => y.trim()).includes(x));
+          const dM = newM !== curM ? dropped(curM, newM, '/') : [], dE = newE !== curE ? dropped(curE, newE, ';') : [];
+          const parts = [newM !== curM ? `mobile → ${newM}` : '', newE !== curE ? `email → ${newE}` : '',
+                         dM.length ? `removed old mobile ${dM.join(', ')}` : '', dE.length ? `removed old email ${dE.join(', ')}` : ''].filter(Boolean);
+          changes.push(parts.length ? `${r.unit}: ${parts.join('; ')}` : `${r.unit}: no change (already on file)`);
+          approved.filter(x => x.building + '|' + x.flat === k).forEach(x => used.push(x.id));
+      }
+      return { csv: rowsToCsv(rows), changes, used };
+  }
+  window._buildUpdatedFlats = buildUpdatedFlats;   // (used for testing)
+
+  document.getElementById('ctBuild').addEventListener('click', async () => {
+      const btn = document.getElementById('ctBuild'), st = document.getElementById('ctBuildStatus'), log = document.getElementById('ctBuildLog');
+      const approved = ctRecords.filter(r => r.status === 'approved');
+      log.innerHTML = '';
+      if (!approved.length) { st.style.color = '#b42318'; st.textContent = 'No Approved entries – approve some first.'; return; }
+      const user = auth.currentUser; if (!user || !user.phoneNumber) { alert('Please sign in again.'); return; }
+      btn.disabled = true; st.style.color = '#003366'; st.textContent = 'Reading key…';
+      try {
+          const snap = await getDoc(doc(db, 'admins', user.phoneNumber));
+          const sec = snap.exists() ? snap.data() : null;
+          if (!sec || !sec.password) throw new Error(`No decryption password found for ${user.phoneNumber}.`);
+          st.textContent = 'Downloading flats.csv…';
+          const res = await fetch(FLATS_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' });
+          if (!res.ok) throw new Error('Could not download flats.csv (' + res.status + ').');
+          st.textContent = 'Merging & encrypting…';
+          const { csv, changes, used } = await buildUpdatedFlats(await res.text(), sec.password, sec.salt || ENC_SALT_B64, +(sec.iterations || ENC_ITERATIONS), approved);
+          const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+          const a = document.createElement('a'); a.href = url; a.download = 'flats.csv'; document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 5000);
+          log.innerHTML = '<b>Changes in the downloaded flats.csv:</b><br>' + changes.map(esc).join('<br>');
+          st.style.color = '#1a7f3c'; st.textContent = `Downloaded flats.csv (${changes.length} flat(s)). Upload it to GitHub: Offer-Calculator/data/flats.csv`;
+          if (used.length && confirm(`flats.csv downloaded.\n\nMark these ${used.length} approved entr${used.length === 1 ? 'y' : 'ies'} as "merged"?\n(Do this once you have uploaded the file to GitHub.)`)) {
+              for (const id of used) await updateDoc(doc(db, 'contact_updates', id), { status: 'merged', reviewedAt: serverTimestamp(), reviewedBy: user.phoneNumber });
+              ctRecords.forEach(r => { if (used.includes(r.id)) r.status = 'merged'; });
+              renderContacts();
+          }
+      } catch (e) {
+          console.error(e);
+          st.style.color = '#b42318';
+          st.textContent = (e && e.name === 'OperationError') ? 'Wrong password – the stored password does not match flats.csv.' : (e.message || 'Failed.');
+      } finally { btn.disabled = false; }
+  });
 
   document.getElementById('cExportFlats').addEventListener('click', async () => {
       const btn = document.getElementById('cExportFlats'), st = document.getElementById('cExportStatus');
