@@ -1,1538 +1,1615 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asmita Jyoti - Admin</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f4f6f9; color: #333; margin: 0; padding: 20px; }
-        .admin-header { background: #003366; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); gap: 12px; flex-wrap: wrap; }
-        .header-left-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .meeting-dropdown-selector { padding: 10px 15px; font-size: 1rem; font-weight: bold; border-radius: 4px; border: 2px solid #ffcc00; background: #fff; color: #003366; cursor: pointer; outline: none; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asmita Jyoti – Member SGBM</title>
 
-        /* COUNTER BADGES DESIGN */
-        .count-badge { background: #ffcc00; color: #000; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .unique-badge { background: #00cc66; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .flat-badge { background: #0099ff; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .face-badge { background: #8e44ad; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .print-badge { background: #e67e22; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+<!-- Favicon configs inherited from your main layout -->
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
 
-        .login-box { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
-        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; box-sizing: border-box; }
-        .login-box button { background: #003366; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 1rem; margin-top: 10px; }
-        .dashboard { display: none; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
-        th { background: #ffcc00; color: black; }
-        tr:hover { background: #f9f9f9; }
-        .logout-btn { background: #ff3333; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        #recaptcha-container { margin: 15px 0; display: flex; justify-content: center; }
+<style>
+* { box-sizing: border-box; }
 
-        /* --- TABS --- */
-        .tabs { display: flex; gap: 6px; margin: -10px 0 20px; flex-wrap: wrap; }
-        .tab-btn { background: #e9eef5; color: #003366; border: 2px solid #003366; padding: 10px 18px; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; }
-        .tab-btn.active { background: #003366; color: #fff; }
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; }
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    /* Smooth scrolling behavior for anchor targets and programmatic scrolls */
+    scroll-behavior: smooth;
+}
 
-        /* --- CALCULATOR TAB --- */
-        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 15px; background: #fff; padding: 12px 15px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .toolbar select, .toolbar input { padding: 9px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; }
-        .toolbar label { font-weight: bold; font-size: 0.9rem; color: #003366; }
-        .tool-btn { background: #003366; color: #fff; border: none; padding: 9px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
-        .tool-btn.yellow { background: #ffcc00; color: #000; }
-        .tool-btn.red { background: #b42318; }
-        .tool-btn:disabled { opacity: 0.5; cursor: wait; }
-        .spacer { flex: 1; }
-        .ev { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; color: #fff; }
-        .ev-open { background: #7f8c8d; } .ev-view { background: #0099ff; } .ev-print { background: #e67e22; } .ev-pdf { background: #8e44ad; }
-        .vid { font-family: monospace; font-size: 0.85rem; color: #555; }
-        .st { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; color: #fff; }
-        .st-pending { background: #e67e22; } .st-approved { background: #00a65a; } .st-merged { background: #0099ff; } .st-rejected { background: #999; }
-        .act-btn { border: none; border-radius: 4px; padding: 5px 10px; font-weight: bold; cursor: pointer; font-size: 0.8rem; margin: 2px; }
-        .act-ok { background: #00a65a; color: #fff; } .act-no { background: #e9eef5; color: #b42318; } .act-undo { background: #e9eef5; color: #003366; }
-        .tab-count { background: #e67e22; color: #fff; border-radius: 10px; padding: 1px 7px; font-size: 0.8rem; margin-left: 4px; }
-        .tab-count:empty { display: none; }
-        /* --- MEETING DAY --- */
-        .noaccess { display:none; background:#fde2e2; color:#b42318; border:1px solid #f5b5b5; border-radius:8px; padding:16px; font-weight:bold; margin-bottom:16px; }
-        .code-pill { background:#fff; color:#003366; font-weight:bold; padding:8px 14px; border-radius:20px; }
-        .day-warn { display:none; background:#fff8e6; border:1px solid #f5b94a; border-radius:6px; padding:10px 14px; margin-bottom:12px; font-weight:bold; }
-        .subtabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
-        .sub-btn { background:#fff; color:#003366; border:2px solid #0099ff; padding:9px 16px; border-radius:6px; font-weight:bold; font-size:0.95rem; cursor:pointer; }
-        .sub-btn.active { background:#0099ff; color:#fff; }
-        .sub-panel { display:none; } .sub-panel.active { display:block; }
-        .form-card { background:#fff; border-radius:8px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:14px; }
-        .fgrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-bottom:10px; }
-        .fgrid label { display:flex; flex-direction:column; gap:5px; font-weight:bold; font-size:0.9rem; color:#003366; }
-        .fgrid input, .fgrid select { padding:11px 12px; border:1px solid #bbb; border-radius:6px; font-size:1.05rem; font-family:inherit; }
-        .fgrid input[readonly] { background:#f1f3f6; font-weight:bold; }
-        .fgrid .span2 { grid-column: span 2; }
-        @media (max-width:560px){ .fgrid .span2 { grid-column: auto; } }
-        .reginfo { background:#eef4fb; border-left:5px solid #0099ff; border-radius:6px; padding:10px 14px; margin:2px 0 12px; font-size:1rem; }
-        .reginfo.bad { background:#fde2e2; border-left-color:#b42318; color:#b42318; font-weight:bold; }
-        .reginfo.ok { background:#e6f6ec; border-left-color:#00a65a; }
-        .factions { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-        .tool-btn.big { padding:12px 26px; font-size:1.05rem; }
-        .fmsg { font-weight:bold; }
-        .fmsg.ok { color:#1a7f3c; } .fmsg.err { color:#b42318; }
-        .bconfirm { display:flex; gap:10px; align-items:flex-start; background:#fff8e6; border-radius:6px; padding:10px; margin-bottom:10px; font-weight:bold; }
-        .bconfirm input { width:20px; height:20px; flex:none; }
-        .hidden { display:none !important; }
-        h3.mini { color:#003366; margin:16px 0 8px; font-size:1rem; }
-        body.staff .adm-only { display:none !important; }
-        .mtype { display:inline-block; margin-left:8px; padding:1px 9px; border-radius:10px; font-size:0.78rem; font-weight:bold; color:#fff; background:#8e44ad; vertical-align:middle; }
-        .mtype.Nomination { background:#0099ff; } .mtype.Expired { background:#b42318; }
-        .chips { display:flex; flex-wrap:wrap; gap:8px; margin:-2px 0 10px; }
-        .chips:empty { display:none; }
-        .chip { border:1px solid #0099ff; background:#eef6ff; color:#003366; border-radius:18px; padding:7px 14px; font-weight:bold; cursor:pointer; font-size:0.95rem; }
-        .chip:hover { background:#0099ff; color:#fff; }
-        .namematch { margin:-2px 0 12px; font-weight:bold; min-height:1.2em; }
-        .namematch.ok { color:#1a7f3c; } .namematch.fam { color:#b54708; } .namematch.bad { color:#b42318; }
-        .mt { display:inline-block; padding:2px 8px; border-radius:10px; font-size:0.8rem; font-weight:bold; color:#fff; white-space:nowrap; }
-        .mt.ok { background:#00a65a; } .mt.fam { background:#e67e22; } .mt.bad { background:#b42318; }
-        .del-btn { border:none; background:#e9eef5; color:#b42318; border-radius:4px; padding:4px 8px; font-weight:bold; cursor:pointer; font-size:0.78rem; margin:1px; }
-        .hint-text { font-size: 0.85rem; color: #666; margin: -5px 0 12px; }
-        .secure-box { background: #fff8e6; border: 1px solid #f5b94a; border-left: 5px solid #f5b94a; border-radius: 6px; padding: 12px 15px; margin-bottom: 15px; font-size: 0.9rem; }
+/* --- TOP YELLOW HEADER BOX --- */
+.top-header {
+    background: #ffcc00;
+    color: #ffffff;
+    padding: 15px 20px;
+    font-size: 1.6rem;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    z-index: 110;
+    letter-spacing: 0.5px;
+}
 
-        /* --- FACE ID COLUMN --- */
-        .view-photo-btn { display: inline-flex; align-items: center; gap: 8px; background: #003366; color: #fff; border: none; padding: 4px 12px 4px 4px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.85rem; white-space: nowrap; }
-        .view-photo-btn:hover { background: #00509e; }
-        .view-photo-btn img { width: 30px; height: 36px; object-fit: cover; border-radius: 50% / 45%; border: 2px solid #ffcc00; background: #ddd; }
-        .no-photo { color: #999; font-size: 0.85rem; font-style: italic; white-space: nowrap; }
+/* --- TOP HORIZONTAL REGISTRATION FORM CONTAINER --- */
+.form-horizontal-container {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    z-index: 105;
+    position: relative;
+    transition: all 0.4s ease;
+}
 
-        /* --- PHOTO POPUP --- */
-        .photo-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
-        .photo-modal.open { display: flex; }
-        .photo-card { background: #fff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); width: 100%; max-width: 400px; max-height: 95vh; overflow-y: auto; position: relative; }
-        .photo-card-header { background: #003366; color: #fff; padding: 12px 45px 12px 16px; font-weight: bold; border-radius: 8px 8px 0 0; }
-        .photo-close { position: absolute; top: 6px; right: 12px; background: transparent; border: none; color: #fff; font-size: 28px; cursor: pointer; line-height: 1; }
-        .photo-card-body { padding: 16px; text-align: center; }
-        .photo-card-body img { height: min(52vh, 440px); max-width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 6px; border: 3px solid #ffcc00; background: #eee; }
-        .photo-meta { text-align: left; font-size: 0.9rem; margin: 12px 0; line-height: 1.7; }
-        .photo-meta span { color: #666; display: inline-block; min-width: 95px; }
-        .photo-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        .photo-actions button, .photo-actions a { padding: 9px 18px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; cursor: pointer; text-decoration: none; border: none; }
-        .btn-nav { background: #e9eef5; color: #003366; }
-        .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
-        .btn-download { background: #ffcc00; color: #000; }
+/* Clear padding entirely when minimized */
+.form-horizontal-container.minimized {
+    padding: 0 !important;
+    border-bottom: none !important;
+}
 
-        @media (max-width: 760px) { body { padding: 10px; } th, td { padding: 8px; font-size: 0.85rem; } .table-scroll { overflow-x: auto; } }
-    </style>
+/* CENTER-ALIGNED FORM TITLE */
+.form-title-inline {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffcc00;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Slidewrapper to handle smooth transition collapse mechanics */
+.form-slide-wrapper {
+    max-height: 750px;
+    padding: 20px 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), padding 0.4s ease;
+}
+
+.form-horizontal-container.minimized .form-slide-wrapper {
+    max-height: 0 !important;
+    padding: 0 !important;
+}
+
+.horizontal-form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.input-field-group {
+    flex: 1;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-field-group.optional label::after {
+    content: " (Optional)";
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+label {
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-bottom: 6px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.marathi-label {
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: #ffcc00;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-size: 0.9rem;
+    height: 40px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+input:focus, select:focus {
+    border-color: #ffcc00;
+    background: rgba(255, 255, 255, 0.25);
+}
+
+select option {
+    background: #1e3c72;
+    color: #fff;
+}
+
+.submit-row-container {
+    width: 100%;
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+button.submit-btn {
+    background: #ffcc00;
+    color: #000;
+    border: none;
+    padding: 0 40px;
+    height: 42px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+button.submit-btn:hover {
+    background: #e6b800;
+}
+
+button.submit-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+button.submit-btn:disabled:hover {
+    background: #ffcc00;
+}
+
+.join-hint {
+    margin-top: 8px;
+    font-size: 0.82rem;
+    color: #ffcc00;
+    text-align: center;
+}
+
+/* --- FACE ID ATTACH BUTTON (INSIDE FORM ROW) --- */
+.face-id-btn {
+    width: 100%;
+    height: 40px;
+    border-radius: 4px;
+    border: 1px dashed #ffcc00;
+    background: rgba(255, 204, 0, 0.08);
+    color: #ffcc00;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 10px;
+    transition: all 0.2s ease;
+}
+
+.face-id-btn:hover {
+    background: rgba(255, 204, 0, 0.18);
+}
+
+.face-id-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+.face-id-btn:disabled:hover {
+    background: rgba(255, 204, 0, 0.08);
+}
+
+/* Checkbox to the left of the Face ID label */
+.face-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.face-toggle-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    margin: 0;
+    flex: 0 0 auto;
+    accent-color: #ffcc00;
+    cursor: pointer;
+}
+
+.face-toggle-label .optional-tag {
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.face-id-btn.attached {
+    border: 1px solid #22c55e;
+    background: rgba(34, 197, 94, 0.15);
+    color: #bbf7d0;
+}
+
+.face-id-btn img {
+    width: 28px;
+    height: 34px;
+    object-fit: cover;
+    border-radius: 50% / 45%;
+    border: 1px solid #22c55e;
+}
+
+/* --- FACE CAPTURE POPUP --- */
+.face-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2100;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+}
+
+.face-modal.open {
+    display: flex;
+}
+
+.face-modal-card {
+    background: #1e3c72;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 420px;
+    max-height: 96vh;
+    overflow-y: auto;
+    padding: 16px 18px 18px;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+}
+
+.face-modal-title {
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: #ffcc00;
+    text-align: center;
+    margin: 0 30px 4px;
+}
+
+.face-modal-sub {
+    font-size: 0.82rem;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 12px;
+}
+
+.face-modal-x {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.face-stage {
+    position: relative;
+    width: min(82vw, 330px);
+    aspect-ratio: 3 / 4;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+}
+
+.face-stage video,
+.face-stage img.face-preview {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Mirror the live feed so it behaves like a mirror for the user */
+.face-stage video {
+    transform: scaleX(-1);
+}
+
+.face-stage img.face-preview {
+    display: none;
+}
+
+.face-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.face-overlay .guide {
+    stroke: rgba(255, 255, 255, 0.55);
+    stroke-width: 1;
+    stroke-dasharray: 4 5;
+    fill: none;
+}
+
+.face-overlay .guide-label {
+    fill: rgba(255, 255, 255, 0.7);
+    font-size: 9px;
+    font-family: Arial, sans-serif;
+}
+
+.face-overlay .corner {
+    stroke: #ffcc00;
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+}
+
+.face-overlay #faceOval {
+    fill: none;
+    stroke: #ffcc00;
+    stroke-width: 3;
+    stroke-dasharray: 10 6;
+    transition: stroke 0.2s ease;
+}
+
+.face-overlay.aligned #faceOval {
+    stroke: #22c55e;
+    stroke-dasharray: none;
+    stroke-width: 4;
+}
+
+.face-overlay.aligned .corner {
+    stroke: #22c55e;
+}
+
+.face-status {
+    margin: 12px auto 4px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.95rem;
+    min-height: 1.3em;
+    color: #ffcc00;
+}
+
+.face-status.ok { color: #4ade80; }
+.face-status.err { color: #ff8080; }
+
+.face-tips {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 6px 0 12px;
+    padding-left: 18px;
+    line-height: 1.5;
+}
+
+.face-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.face-actions button {
+    height: 42px;
+    padding: 0 22px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border: none;
+}
+
+.face-btn-primary {
+    background: #ffcc00;
+    color: #000;
+}
+
+.face-btn-primary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.face-btn-secondary {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+}
+
+/* APP DOWNLOAD WARNING SYSTEM (WHITE CENTERED TEXT) */
+.zoom-app-warning-disclaimer {
+    color: #ffffff;
+    font-size: 0.88rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-align: center;
+    max-width: 850px;
+    line-height: 1.4;
+}
+
+/* MINIMIZE / EXPAND TOGGLE ARROW */
+.form-collapse-arrow-btn {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    background: transparent;
+    border: 2px solid #ffcc00;
+    color: #ffcc00;
+    border-radius: 4px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 106;
+}
+
+.form-collapse-arrow-btn:hover {
+    background: rgba(255, 204, 0, 0.15);
+}
+
+/* Relocate button cleanly when minimized */
+.form-horizontal-container.minimized .form-collapse-arrow-btn {
+    bottom: -45px;
+    background: #ffcc00;
+    color: #000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* --- ZOOM SUCCESS DISPLAY UNIFIED 3-LINE BOX --- */
+.zoom-success-box {
+    display: none;
+    text-align: center;
+    padding: 10px 0;
+    animation: fadeIn 0.4s ease;
+}
+
+.zoom-status-title {
+    color: #ffcc00;
+    font-size: 1.35rem;
+    font-weight: bold;
+    margin: 5px 0 10px 0;
+}
+
+.zoom-status-subtitle {
+    font-size: 1.05rem;
+    margin-bottom: 15px;
+}
+
+.zoom-unified-credentials-card {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px dashed #ffcc00;
+    padding: 15px 25px;
+    border-radius: 6px;
+    text-align: left;
+    font-family: monospace;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    max-width: 850px;
+    margin: 0 auto;
+    word-break: break-all;
+}
+
+.zoom-unified-credentials-card a {
+    color: #3399ff;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.zoom-unified-credentials-card a:hover {
+    color: #66b2ff;
+}
+
+/* --- MAIN CONTENTS LOWER SECTION --- */
+.main-wrapper {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 250px);
+    overflow: hidden;
+    position: relative;
+}
+
+/* --- LEFT SIDEBAR --- */
+.sidebar {
+    width: 320px;
+    background: rgba(0, 0, 0, 0.25);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: width 0.3s ease;
+    z-index: 10;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.sidebar.collapsed {
+    width: 0;
+    border-right: none;
+}
+
+.sidebar-content {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: opacity 0.2s ease;
+}
+
+.sidebar.collapsed .sidebar-content {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.sidebar-header {
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    font-weight: bold;
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+}
+
+.sidebar-item {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s ease;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.sidebar-item:hover, .sidebar-item.active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.sidebar-item.active {
+    border-left: 4px solid #ffcc00;
+}
+
+.toggle-btn {
+    background: #ffcc00;
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.toggle-btn.floating {
+    position: absolute;
+    top: 12px;
+    left: 15px;
+    z-index: 100;
+}
+
+/* --- RIGHT SIDE CONTENT AREA --- */
+.content-area {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.welcome-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+    max-width: 500px;
+}
+
+.doc-content {
+    display: none;
+    width: 100%;
+    height: 100%;
+    max-width: 1000px;
+    animation: fadeIn 0.4s ease;
+}
+
+.doc-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.doc-title {
+    font-size: 1.5rem;
+    margin: 0 0 15px 0;
+    text-align: center;
+}
+
+.pdf-scroll-wrapper {
+    width: 100%;
+    flex: 1;
+    min-height: 450px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 6px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    background: #fff;
+    overflow: hidden;
+}
+
+.pdf-object-frame {
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    border: none;
+}
+
+.mobile-pdf-link-fallback {
+    display: block;
+    margin: 15px auto;
+    padding: 12px 24px;
+    background: #003366;
+    color: #fff;
+    text-decoration: none;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.ad-card {
+    background: #fff;
+    color: #000;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.25);
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+    max-width: 600px;
+}
+
+.ad-card img {
+    width: 100%;
+    border-radius: 4px;
+}
+
+/* FLOATING SCROLL TO TOP ARROW BUTTON */
+.scroll-top-floating-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: #ffcc00;
+    color: #000;
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    display: none; /* Controlled dynamically by scrolling checks */
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.scroll-top-floating-btn:hover {
+    background: #e6b800;
+    transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.85);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal img {
+    max-width: 95%;
+    max-height: 95%;
+}
+
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 36px;
+    color: #fff;
+    cursor: pointer;
+}
+
+@media(max-width: 992px) {
+    /* Stacked fields are much taller on phones – give the form room so Join meeting isn't cut off */
+    .form-slide-wrapper {
+        max-height: 2500px;
+    }
+    /* 16px stops iPhone Safari from auto-zooming (and shifting the page) when a field is tapped */
+    input, select {
+        font-size: 16px;
+    }
+    body {
+        overflow-x: hidden;
+    }
+    /* Leave space under Join meeting so the ▲ collapse arrow doesn't sit on top of the hint */
+    .submit-row-container {
+        margin-bottom: 45px;
+    }
+    .horizontal-form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .input-field-group {
+        width: 100%;
+    }
+    .main-wrapper {
+        flex-direction: column;
+        height: auto;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+    }
+    .sidebar.collapsed {
+        height: 0;
+    }
+    .sidebar-content {
+        width: 100%;
+    }
+    .toggle-btn.floating {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin: 10px;
+        align-self: flex-start;
+    }
+    .content-area {
+        padding: 15px;
+    }
+    .form-collapse-arrow-btn {
+        right: 10px;
+    }
+}
+</style>
 </head>
+
 <body>
 
-<!-- PHONE AUTH INTERFACE -->
-<div class="login-box" id="authContainer">
-    <h2>Admin Mobile OTP Login</h2>
+<!-- 1. TOP YELLOW HEADER BOX -->
+<div class="top-header">
+    Asmita Jyoti CHSL Redevelopment updates
+</div>
 
-    <div id="phone-step">
-        <input type="tel" id="adminPhone" placeholder="Mobile with country code (e.g. +919821334896)">
-        <div id="recaptcha-container"></div>
-        <button id="sendOtpBtn">Send Verification Code</button>
-    </div>
+<!-- 2. ATTENDANCE ENTRY MODULE -->
+<div class="form-horizontal-container" id="attendanceContainer">
 
-    <div id="otp-step" style="display: none;">
-        <p style="color: #666; font-size: 0.9rem;">Enter the 6-digit code sent to your mobile device.</p>
-        <input type="text" id="otpCode" placeholder="Enter 6-digit OTP" maxLength="6">
-        <button id="verifyOtpBtn">Verify & Login</button>
+    <!-- Action Minimize Toggle Button -->
+    <button class="form-collapse-arrow-btn" id="formToggleBtn" onclick="toggleAttendanceView()">▲</button>
+
+    <div class="form-slide-wrapper" id="slideWrapper">
+        <!--    <div class="form-title-inline">Asmita Jyoti CHSL Members SGBM Attendance Entry (01Nov2026)</div>  -->
+   <div class="form-title-inline">Asmita Jyoti CHSL Members Meeting Entry (28Oct2026)</div> 
+        <!-- Registration Input Form -->
+        <form id="registryForm">
+            <div class="horizontal-form-row">
+
+                <div class="input-field-group">
+                    <label for="fullName">Full Name <span style="color:#ff3333;">*</span></label>
+                    <input type="text" id="fullName" placeholder="Your answer" required>
+                </div>
+
+                <div class="input-field-group">
+                    <label for="buildingNum">Building Number | <span class="marathi-label">इमारत क्रमांक</span> <span style="color:#ff3333;">*</span></label>
+                    <select id="buildingNum" required>
+                        <option value="" disabled selected>Choose</option>
+                        <option value="A1">A1</option><option value="A2">A2</option><option value="B1">B1</option>
+                        <option value="C1">C1</option><option value="D1">D1</option><option value="D2">D2</option>
+                        <option value="D3">D3</option><option value="D4">D4</option><option value="D5">D5</option>
+                        <option value="D6">D6</option><option value="D7">D7</option><option value="D8">D8</option>
+                        <option value="D9">D9</option><option value="D10">D10</option><option value="D11">D11</option>
+                        <option value="E1">E1</option><option value="Shops/Units">Shops/Units</option>
+                    </select>
+                </div>
+
+                <div class="input-field-group">
+                    <label for="flatNum">Flat Number | <span class="marathi-label">सदनिका क्रमांक</span> <span style="color:#ff3333;">*</span></label>
+                    <select id="flatNum" required>
+                        <option value="" disabled selected>Choose</option>
+                        <option value="01">01</option><option value="02">02</option><option value="03">03</option>
+                        <option value="04">04</option><option value="05">05</option><option value="06">06</option>
+                        <option value="11">11</option><option value="12">12</option><option value="13">13</option>
+                        <option value="14">14</option><option value="15">15</option><option value="16">16</option>
+                        <option value="21">21</option><option value="22">22</option><option value="23">23</option>
+                        <option value="24">24</option><option value="25">25</option><option value="26">26</option>
+                        <option value="31">31</option><option value="32">32</option><option value="33">33</option>
+                        <option value="34">34</option><option value="35">35</option><option value="36">36</option>
+                        <option value="41">41</option><option value="42">42</option><option value="43">43</option>
+                        <option value="44">44</option><option value="45">45</option><option value="46">46</option>
+                        <option value="51">51</option><option value="52">52</option><option value="53">53</option>
+                        <option value="54">54</option><option value="55">55</option><option value="56">56</option>
+                        <option value="61">61</option><option value="62">62</option><option value="63">63</option>
+                        <option value="64">64</option><option value="65">65</option><option value="66">66</option>
+                        <option value="71">71</option><option value="72">72</option><option value="73">73</option>
+                        <option value="74">74</option><option value="75">75</option><option value="76">76</option>
+                        <option value="81">81</option><option value="82">82</option><option value="83">83</option>
+                        <option value="84">84</option><option value="85">85</option><option value="86">86</option>
+                        <option value="91">91</option><option value="92">92</option><option value="93">93</option>
+                        <option value="94">94</option><option value="95">95</option><option value="96">96</option>
+                        <option value="101">101</option><option value="102">102</option><option value="103">103</option>
+                        <option value="104">104</option><option value="105">105</option><option value="106">106</option>
+                        <option value="111">111</option><option value="112">112</option><option value="113">113</option>
+                        <option value="114">114</option><option value="115">115</option><option value="116">116</option>
+                        <option value="121">121</option><option value="122">122</option><option value="123">123</option>
+                        <option value="124">124</option><option value="125">125</option><option value="126">126</option>
+                        <option value="131">131</option><option value="132">132</option><option value="133">133</option>
+                        <option value="134">134</option><option value="135">135</option><option value="136">136</option>
+                        <option value="141">141</option><option value="142">142</option><option value="143">143</option>
+                        <option value="144">144</option><option value="145">145</option><option value="146">146</option>
+                        <option value="151">151</option><option value="152">152</option><option value="153">153</option>
+                        <option value="154">154</option><option value="155">155</option><option value="156">156</option>
+                        <option value="Shop # 01">Shop # 01</option><option value="Shop # 02">Shop # 02</option>
+                        <option value="Shop # 03">Shop # 03</option><option value="Shop # 04">Shop # 04</option>
+                        <option value="Shop # 05">Shop # 05</option><option value="Shop # 06">Shop # 06</option>
+                        <option value="Shop # 08">Shop # 08</option><option value="Shop # 09">Shop # 09</option>
+                        <option value="Shop # 10">Shop # 10</option><option value="Shop # 11">Shop # 11</option>
+                        <option value="Shop # 12">Shop # 12</option><option value="Shop # 13">Shop # 13</option>
+                        <option value="Shop # 14">Shop # 14</option><option value="Shop # 15">Shop # 15</option>
+                        <option value="Shop # 16">Shop # 16</option><option value="Shop # 17">Shop # 17</option>
+                        <option value="Shop # 18">Shop # 18</option><option value="Shop # 19">Shop # 19</option>
+                        <option value="Shop # 20">Shop # 20</option><option value="Shop # 21">Shop # 21</option>
+                        <option value="Shop # 22">Shop # 22</option><option value="Shop # 23">Shop # 23</option>
+                        <option value="Shop # 24">Shop # 24</option><option value="Shop # 25">Shop # 25</option>
+                        <option value="Shop # 26">Shop # 26</option><option value="Shop # 27">Shop # 27</option>
+                        <option value="Shop # 28">Shop # 28</option><option value="Shop # 29">Shop # 29</option>
+                        <option value="Shop # 30">Shop # 30</option><option value="Shop # 31">Shop # 31</option>
+                        <option value="Shop # 32">Shop # 32</option><option value="Shop # 33">Shop # 33</option>
+                        <option value="Shop # 34">Shop # 34</option><option value="Shop # 35">Shop # 35</option>
+                        <option value="Shop # 36">Shop # 36</option><option value="Shop # 37">Shop # 37</option>
+                        <option value="Shop # 38">Shop # 38</option><option value="Shop # 39">Shop # 39</option>
+                        <option value="Shop # 40">Shop # 40</option><option value="Shop # 41">Shop # 41</option>
+                        <option value="Shop # 42">Shop # 42</option><option value="Shop # 43">Shop # 43</option>
+                        <option value="Shop # 44">Shop # 44</option><option value="Shop # 45">Shop # 45</option>
+                        <option value="Shop # 46">Shop # 46</option><option value="Shop # 47">Shop # 47</option>
+                        <option value="Shop # 48">Shop # 48</option><option value="Shop # 49">Shop # 49</option>
+                        <option value="Shop # 50">Shop # 50</option><option value="Shop # 51">Shop # 51</option>
+                        <option value="Shop # 52">Shop # 52</option>
+                        <option value="Unit # 01">Unit # 01</option><option value="Unit # 02">Unit # 02</option>
+                        <option value="Unit # 03">Unit # 03</option><option value="Unit # 04">Unit # 04</option>
+                        <option value="Unit # 05">Unit # 05</option><option value="Unit # 06">Unit # 06</option>
+                        <option value="Unit # 07">Unit # 07</option><option value="Unit # 08">Unit # 08</option>
+                    </select>
+                </div>
+
+                <div class="input-field-group">
+                    <label for="mobileNum">Mobile Number | <span class="marathi-label">मोबाईल क्रमांक</span> <span style="color:#ff3333;">*</span></label>
+                    <input type="tel" id="mobileNum" placeholder="Your answer" pattern="[0-9]{10,13}" required>
+                </div>
+
+                <div class="input-field-group optional">
+                    <label for="emailAddress">Email address | <span class="marathi-label">ईमेल पत्ता</span></label>
+                    <input type="email" id="emailAddress" placeholder="Your answer">
+                </div>
+
+                <!-- NEW: FACE ID ATTACHMENT -->
+                <div class="input-field-group" id="faceIdGroup">
+                    <label class="face-toggle-label" for="faceIdToggle">
+                        <input type="checkbox" id="faceIdToggle" checked onchange="onFaceToggle()">
+                        Face ID | <span class="marathi-label">चेहरा ओळख</span>
+                        <span class="optional-tag">(Optional)</span>
+                    </label>
+                    <button type="button" class="face-id-btn" id="faceIdBtn" onclick="openFaceModal()">
+                        <span id="faceIdBtnIcon">📷</span>
+                        <span id="faceIdBtnText">Attach Face ID</span>
+                    </button>
+                </div>
+
+                <div class="submit-row-container">
+                    <!-- FIXED WHITE CENTER-ALIGNED WARNING TEXT REPOSITIONED ABOVE BUTTON -->
+                    <div class="zoom-app-warning-disclaimer">
+                        Note : It is recommended that you download the Zoom app from the Apple App Store or Google Play Store and join the meeting through the Zoom app. Features such as participation in Poll and viewing Poll results are available only when joining through the Zoom app, not through a web browser.
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="joinBtn">Join meeting</button>
+                    <div class="join-hint" id="joinHint" style="display:none;">Please fill mandatory information and attach your Face ID (or untick the Face ID box) to enable "Join meeting" button.</div>
+                </div>
+
+            </div>
+        </form>
+
+        <!-- ZOOM SUCCESS UNIFIED 3-LINE BOX INTERFACE -->
+        <div class="zoom-success-box" id="zoomSuccessBlock">
+            <div class="zoom-status-title">Verification Successful! Attendance Logged.</div>
+            <div class="zoom-status-subtitle">Click the link below or enter the details manually in the Zoom app:</div>
+
+            <!-- Unified 3-line Single Box Layout -->
+            <div class="zoom-unified-credentials-card">
+                <strong>Zoom URL:</strong> <a href="https://us06web.zoom.us/j/81684774229?pwd=0nUitZrD9iia2eZFvVfp3Qar8pYXaU.1" target="_blank">https://us06web.zoom.us/j/81684774229?pwd=0nUitZrD9iia2eZFvVfp3Qar8pYXaU.1</a><br>
+                <strong>Meeting ID:</strong> 816 8477 4229<br>
+                <strong>Passcode:</strong> 111487
+            </div>
+        </div>
+
     </div>
 </div>
 
-<!-- DASHBOARD -->
-<div class="dashboard" id="dashboardContainer">
+<!-- 3. LOWER DOCUMENT DASHBOARD AREA -->
+<div class="main-wrapper">
 
-    <div class="admin-header">
-        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v29-Oct-2026j</span></h2>
-        <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
-    </div>
-
-    <div class="tabs">
-        <button class="tab-btn active" data-tab="meetingTab">Online meeting data</button>
-        <button class="tab-btn" data-tab="calcTab">Offer calculator access</button>
-        <button class="tab-btn" data-tab="contactTab">Contact updates <span class="tab-count" id="ctPendingTab"></span></button>
-        <button class="tab-btn" data-tab="dayTab">Meeting day (live)</button>
-    </div>
-    <div class="noaccess" id="noAccess">This mobile number is not authorised for this page. Please ask the Managing Committee to add it as meeting staff, then sign in again.</div>
-
-    <!-- ===== TAB 1: ONLINE MEETING DATA (unchanged) ===== -->
-    <div class="tab-panel active" id="meetingTab">
-        <div class="admin-header" style="background:#00509e;">
-            <div class="header-left-group">
-                <h2 style="margin:0;">Online meeting data</h2>
-
-                <!-- FILTER DROP-DOWN SELECTOR -->
-                <select class="meeting-dropdown-selector" id="meetingFilter" onchange="filterTableByMeeting()">
-                    <option value="" disabled selected>Loading Meetings...</option>
-                </select>
-
-                <span class="count-badge" id="meetingCountLabel">Total: 0</span>
-                <span class="unique-badge" id="meetingUniqueCountLabel">Unique: 0</span>
-                <span class="flat-badge" id="meetingUniqueFlatLabel">Unique Flats: 0</span>
-                <span class="face-badge" id="meetingFaceLabel">Face ID: 0</span>
+    <!-- LEFT SIDEBAR (Dynamic Engine Target) -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <div class="sidebar-header">
+                <span>List of Documents</span>
+                <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">&lt;&lt;</button>
             </div>
-        </div>
-
-        <div class="table-scroll">
-        <table id="reportsTable">
-            <thead>
-                <tr>
-                    <th>Submission Timestamp</th>
-                    <th>Meeting Code</th>
-                    <th>Full Name</th>
-                    <th>Building / Flat</th>
-                    <th>Registered Mobile</th>
-                    <th>Registered Email</th>
-                    <th>Face ID</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
+            <ul class="sidebar-menu" id="dynamicSidebarMenu">
+                <!-- Populated dynamically via script from external file -->
+            </ul>
         </div>
     </div>
 
-    <!-- ===== TAB 2: OFFER CALCULATOR ACCESS ===== -->
-    <div class="tab-panel" id="calcTab">
-        <div class="admin-header" style="background:#00509e;">
-            <div class="header-left-group">
-                <h2 style="margin:0;">Offer calculator access</h2>
-                <span class="count-badge" id="cEvents">Events: 0</span>
-                <span class="unique-badge" id="cVisitors">Visitors: 0</span>
-                <span class="flat-badge" id="cFlats" title="Different flats for which Submit / Update was pressed">Unique flats: 0</span>
-                <span class="print-badge" id="cPrints">Prints: 0</span>
-                <span class="face-badge" id="cPdfs">PDFs: 0</span>
-            </div>
+    <button class="toggle-btn floating" id="collapsedToggleBtn" onclick="toggleSidebar()" style="display: none;">&gt;&gt;</button>
+
+    <!-- RIGHT SIDE CONTENT AREA -->
+    <div class="content-area">
+
+        <div class="welcome-placeholder" id="welcomeMsg">
+            Please select an item from the "List of Documents" to view it.
         </div>
 
-        <div class="toolbar">
-            <label for="cPeriod">Period</label>
-            <select id="cPeriod">
-                <option value="all">All time</option>
-                <option value="today">Today</option>
-                <option value="7">Last 7 days</option>
-                <option value="30">Last 30 days</option>
-            </select>
-            <label for="cEvent">Event</label>
-            <select id="cEvent">
-                <option value="">All events</option>
-                <option value="open">Page opened</option>
-                <option value="view">Flat viewed</option>
-                <option value="print">Printed</option>
-                <option value="pdf">PDF exported</option>
-                <option value="__flats">▸ Flat-wise summary</option>
-                <option value="__unseen">▸ Flats not viewed yet</option>
-            </select>
-            <label for="cSearch">Flat</label>
-            <input id="cSearch" placeholder="e.g. D7/21 or D7" size="14">
-            <span class="spacer"></span>
-            <button class="tool-btn" id="cRefresh">Refresh</button>
-            <button class="tool-btn yellow" id="cExportLog">Export log (CSV)</button>
+        <!-- Render Template Target Structure Container -->
+        <div class="doc-content" id="activeDocContainer">
+            <h1 class="doc-title" id="renderTitle"></h1>
+            <div id="renderTarget"></div>
         </div>
 
-        <div class="secure-box">
-            <b>Member data (decrypted)</b> – downloads <i>flats.csv</i> with member name, rent, permanent address, mobile and email in readable form.
-            The key is read from the protected admin record of your mobile number. Keep the downloaded file private and never upload it to GitHub.
-            <div style="margin-top:10px;"><button class="tool-btn red" id="cExportFlats">Export decrypted flats.csv</button> <span id="cExportStatus" style="margin-left:8px;font-weight:bold;"></span></div>
-        </div>
-
-        <p class="hint-text">Members are not asked to sign in, so each browser gets an anonymous visitor ID. "Flat viewed" = the member pressed Submit / Update for that flat.
-            "Rented" shows only whether the rent box was ticked – the amount is never recorded.</p>
-
-        <div class="table-scroll">
-        <table>
-            <thead id="cHead">
-                <tr>
-                    <th>Time (IST)</th>
-                    <th>Event</th>
-                    <th>Building / Flat</th>
-                    <th>Language</th>
-                    <th>Style</th>
-                    <th>Rented</th>
-                    <th>Device</th>
-                    <th>Visitor ID</th>
-                </tr>
-            </thead>
-            <tbody id="cBody"><tr><td colspan="8">Open this tab to load the log.</td></tr></tbody>
-        </table>
-        </div>
-    </div>
-
-    <!-- ===== TAB 3: CONTACT UPDATES (mobile / email sent by members from the calculator) ===== -->
-    <div class="tab-panel" id="contactTab">
-        <div class="admin-header" style="background:#00509e;">
-            <div class="header-left-group">
-                <h2 style="margin:0;">Contact updates</h2>
-                <span class="count-badge" id="ctTotal">Total: 0</span>
-                <span class="print-badge" id="ctPending">Pending: 0</span>
-                <span class="unique-badge" id="ctApproved">Approved: 0</span>
-                <span class="flat-badge" id="ctMerged">Merged: 0</span>
-                <span class="face-badge" id="ctRejected">Rejected: 0</span>
-            </div>
-        </div>
-
-        <div class="toolbar">
-            <label for="ctStatus">Status</label>
-            <select id="ctStatus">
-                <option value="">All</option>
-                <option value="pending" selected>Pending</option>
-                <option value="approved">Approved</option>
-                <option value="merged">Merged</option>
-                <option value="rejected">Rejected</option>
-            </select>
-            <label for="ctSearch">Flat</label>
-            <input id="ctSearch" placeholder="e.g. D7/21 or D7" size="14">
-            <span class="spacer"></span>
-            <button class="tool-btn" id="ctRefresh">Refresh</button>
-            <button class="tool-btn yellow" id="ctExport">Export (CSV)</button>
-        </div>
-
-        <div class="secure-box">
-            <b>Update flats.csv</b> – builds a new, encrypted <i>flats.csv</i> with all <b>Approved</b> details added (newest entry per flat; an existing number / email is kept as the second one).
-            Upload the downloaded file to GitHub as <i>Offer-Calculator/data/flats.csv</i>. The calculator then stops asking those flats.
-            <div style="margin-top:10px;"><button class="tool-btn red" id="ctBuild">Download updated flats.csv</button> <span id="ctBuildStatus" style="margin-left:8px;font-weight:bold;"></span></div>
-            <div id="ctBuildLog" style="margin-top:8px;font-size:0.85rem;"></div>
-        </div>
-
-        <p class="hint-text">Members who enter details are not verified – please check (e.g. call the number) before approving. "Was missing" shows what flats.csv lacked when the member submitted.</p>
-
-        <div class="table-scroll">
-        <table>
-            <thead>
-                <tr>
-                    <th>Time (IST)</th>
-                    <th>Building / Flat</th>
-                    <th>Name given</th>
-                    <th>Mobile</th>
-                    <th>Email</th>
-                    <th>Was missing</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="ctBody"><tr><td colspan="8">Open this tab to load the entries.</td></tr></tbody>
-        </table>
-        </div>
-    </div>
-
-    <!-- ===== TAB 4: MEETING DAY – physical entry register + ballot delivery (live) ===== -->
-    <div class="tab-panel" id="dayTab">
-        <div class="admin-header" style="background:#00509e;">
-            <div class="header-left-group">
-                <h2 style="margin:0;">Meeting day</h2>
-                <span class="code-pill" id="dCode">Meeting: –</span>
-                <span class="unique-badge" id="dPresent" title="Different flats entered in the Entry Register">Present: 0 flats</span>
-                <span class="flat-badge" id="dBallots">Ballots given: 0</span>
-                <span class="print-badge" id="dNoBallot" title="Entered but no ballot yet">Present, no ballot: 0</span>
-                <span class="face-badge" id="dBallotNoEntry" title="Ballot given but flat not in the Entry Register">Ballot, not entered: 0</span>
-                <span class="count-badge" id="dDup" title="Duplicate entries / ballots that were refused">Duplicates blocked: 0</span>
-                <span class="count-badge adm-only" id="dOnline" title="Flats that joined online with the online meeting code">Joined online: 0</span>
-                <span class="count-badge adm-only" id="dBoth" title="Flats present in the hall AND joined online">Online + hall: 0</span>
-            </div>
-        </div>
-        <div class="day-warn" id="dNoCode">No meeting is active yet. The Managing Committee sets it in <b>Setup</b>.</div>
-
-        <div class="subtabs">
-            <button class="sub-btn" data-sub="subEntry">Entry Register</button>
-            <button class="sub-btn" data-sub="subBallot">Ballot Delivery</button>
-            <button class="sub-btn" data-sub="subList">Live list &amp; duplicates</button>
-            <button class="sub-btn adm-only" data-sub="subSetup">Setup (meeting code &amp; staff)</button>
-        </div>
-
-        <!-- Entry Register -->
-        <div class="sub-panel" id="subEntry">
-            <div class="form-card">
-                <div class="fgrid">
-                    <label>Reg #<input id="eReg" inputmode="numeric" maxlength="12" autocomplete="off"></label>
-                    <label>SR #<input id="eSr" inputmode="numeric" maxlength="12" autocomplete="off"></label>
-                    <label>Building #<select id="eBld"></select></label>
-                    <label>Flat #<input id="eFlat" list="eFlatList" autocomplete="off" placeholder="e.g. 21"><datalist id="eFlatList"></datalist></label>
-                </div>
-                <div class="reginfo" id="eInfo">Select building and flat.</div>
-                <div class="fgrid">
-                    <label>First name / initial<input id="eFirst" name="ajx_f" maxlength="40" autocomplete="one-time-code" spellcheck="false"></label>
-                    <label>Last name / surname<input id="eLast" name="ajx_l" maxlength="40" autocomplete="one-time-code" spellcheck="false"></label>
-                    <label class="span2">Full name (as registered in Society records)<input id="eFull" readonly tabindex="-1" placeholder="appears after Building + Flat"></label>
-                </div>
-                <div class="chips" id="eChips"></div>
-                <div class="namematch" id="eMatch"></div>
-                <div class="hint-text" style="margin:-4px 0 10px">At least 3 letters in total; initials are fine (e.g. <b>S</b> Balakrishnan, Tanuja <b>S</b>, a single name like Meena). Tap a registered name above to fill it in.</div>
-                <div class="factions"><button class="tool-btn big" id="eSubmit">Submit entry</button><span class="fmsg" id="eMsg"></span></div>
-            </div>
-            <h3 class="mini">My last entries</h3>
-            <div class="table-scroll"><table><thead><tr><th>Time</th><th>Flat</th><th>Reg #</th><th>SR #</th><th>Name</th></tr></thead><tbody id="eMine"></tbody></table></div>
-        </div>
-
-        <!-- Ballot Delivery -->
-        <div class="sub-panel" id="subBallot">
-            <div class="form-card">
-                <div class="fgrid">
-                    <label>Building #<select id="bBld"></select></label>
-                    <label>Flat #<input id="bFlat" list="bFlatList" autocomplete="off" placeholder="e.g. 21"><datalist id="bFlatList"></datalist></label>
-                </div>
-                <div class="reginfo" id="bInfo">Select building and flat.</div>
-                <label class="bconfirm hidden" id="bConfirmRow"><input type="checkbox" id="bConfirm"> This flat is not in the Entry Register yet – the member is present and I confirm the ballot hand-over.</label>
-                <div class="factions"><button class="tool-btn big" id="bSubmit">Record ballot given</button><span class="fmsg" id="bMsg"></span></div>
-            </div>
-            <h3 class="mini">My last ballots</h3>
-            <div class="table-scroll"><table><thead><tr><th>Time</th><th>Flat</th><th>Registered name</th></tr></thead><tbody id="bMine"></tbody></table></div>
-        </div>
-
-        <!-- Live list -->
-        <div class="sub-panel" id="subList">
-            <div class="toolbar">
-                <label for="lSearch">Flat / name</label><input id="lSearch" placeholder="e.g. D7/21 or Sharma" size="18">
-                <label for="lShow">Show</label>
-                <select id="lShow"><option value="all">All flats with activity</option><option value="noballot">Present, no ballot</option><option value="noentry">Ballot, not entered</option><option value="online">Online only (not in hall)</option></select>
-                <span class="spacer"></span>
-                <button class="tool-btn yellow" id="lExport">Export (CSV)</button>
-            </div>
-            <div class="table-scroll"><table><thead><tr><th>Flat</th><th>Reg #</th><th>SR #</th><th>Name entered</th><th>Registered name</th><th>Match</th><th>Entered (IST · by)</th><th>Ballot (IST · by)</th><th class="adm-only">Online</th><th class="adm-only">Correct</th></tr></thead><tbody id="lBody"></tbody></table></div>
-            <h3 class="mini">Duplicates blocked</h3>
-            <div class="table-scroll"><table><thead><tr><th>Time</th><th>Type</th><th>Flat</th><th>Reg #</th><th>Name typed</th><th>Reason</th><th>By</th></tr></thead><tbody id="lDup"></tbody></table></div>
-        </div>
-
-        <!-- Setup (admin) -->
-        <div class="sub-panel adm-only" id="subSetup">
-            <div class="form-card">
-                <h3 class="mini" style="margin-top:0">Meeting code</h3>
-                <div class="fgrid">
-                    <label>Meeting date<input type="date" id="sDate"></label>
-                    <label class="span2">Meeting code (used for all entries &amp; ballots)<input id="sCode" placeholder="Asmita Jyoti - 01Nov2026"></label>
-                    <label class="span2">Online meeting code on the home page (to compare)<input id="sOnline" placeholder="e.g. SGBM-01Nov2026"></label>
-                </div>
-                <div class="factions"><button class="tool-btn big" id="sSave">Set as current meeting</button><button class="tool-btn" id="sPublish">Publish member names again</button><span class="fmsg" id="sMsg"></span></div>
-                <div class="reginfo" id="sRoster" style="margin-top:10px">Member names: checking…</div>
-                <p class="hint-text" style="margin:10px 0 0">Setting the meeting also publishes the member names (only names – no rent / contacts) so operators can see the registered name for each flat.</p>
-            </div>
-            <div class="form-card">
-                <h3 class="mini" style="margin-top:0">Meeting staff (data-entry operators)</h3>
-                <div class="fgrid">
-                    <label>Mobile (+91…)<input id="stPhone" inputmode="tel" placeholder="+9198XXXXXXXX"></label>
-                    <label>Name<input id="stName" maxlength="40"></label>
-                    <label>Allowed<select id="stRole"><option value="entry">Entry Register</option><option value="ballot">Ballot Delivery</option><option value="both">Both</option></select></label>
-                </div>
-                <div class="factions"><button class="tool-btn" id="stAdd">Add / update operator</button><span class="fmsg" id="stMsg"></span></div>
-                <div class="table-scroll" style="margin-top:10px"><table><thead><tr><th>Mobile</th><th>Name</th><th>Allowed</th><th></th></tr></thead><tbody id="stBody"></tbody></table></div>
-            </div>
-        </div>
     </div>
 </div>
 
-<!-- FACE PHOTO POPUP -->
-<div class="photo-modal" id="photoModal" onclick="if(event.target === this) closePhoto()">
-    <div class="photo-card">
-        <div class="photo-card-header" id="photoTitle">Face ID</div>
-        <button class="photo-close" onclick="closePhoto()" aria-label="Close">×</button>
-        <div class="photo-card-body">
-            <img id="photoImg" alt="Member face photo">
-            <div class="photo-meta" id="photoMeta"></div>
-            <div class="photo-actions">
-                <button class="btn-nav" id="photoPrev" onclick="stepPhoto(-1)">◀ Prev</button>
-                <a class="btn-download" id="photoDownload" download="face.jpg">Download</a>
-                <button class="btn-nav" id="photoNext" onclick="stepPhoto(1)">Next ▶</button>
-            </div>
+<!-- FLOATING RETURN TO TOP ARROW BUTTON -->
+<button class="scroll-top-floating-btn" id="scrollTopBtn" onclick="scrollToTop()" title="Go to Top">▲</button>
+
+<div class="modal" id="imgModal">
+    <span class="modal-close" onclick="closeModal()">×</span>
+    <img id="modalImg">
+</div>
+
+<!-- FACE ID CAPTURE POPUP -->
+<div class="face-modal" id="faceModal" role="dialog" aria-modal="true" aria-labelledby="faceModalTitle">
+    <div class="face-modal-card">
+        <button type="button" class="face-modal-x" onclick="closeFaceModal()" aria-label="Close">×</button>
+        <div class="face-modal-title" id="faceModalTitle">Attach Face ID</div>
+        <div class="face-modal-sub">Fit your full face inside the oval | <span class="marathi-label">चेहरा अंडाकृतीत ठेवा</span></div>
+
+        <div class="face-stage">
+            <video id="faceVideo" autoplay playsinline muted></video>
+            <img class="face-preview" id="facePreview" alt="Captured face">
+
+            <svg class="face-overlay" id="faceOverlay" viewBox="0 0 300 400" preserveAspectRatio="none" aria-hidden="true">
+                <!-- Dim everything outside the oval -->
+                <path fill="rgba(0,0,0,0.5)" fill-rule="evenodd"
+                      d="M0 0H300V400H0Z M150 50 A105 140 0 1 0 150 330 A105 140 0 1 0 150 50 Z"/>
+                <!-- Guide lines -->
+                <g id="faceGuides">
+                    <line class="guide" x1="150" y1="20" x2="150" y2="380"/>
+                    <line class="guide" x1="55"  y1="165" x2="245" y2="165"/>
+                    <line class="guide" x1="95"  y1="255" x2="205" y2="255"/>
+                    <line class="guide" x1="60"  y1="330" x2="240" y2="330"/>
+                    <text class="guide-label" x="248" y="168">eyes</text>
+                    <text class="guide-label" x="208" y="258">mouth</text>
+                    <text class="guide-label" x="243" y="333">chin</text>
+                </g>
+                <!-- Oval outline -->
+                <ellipse id="faceOval" cx="150" cy="190" rx="105" ry="140"/>
+                <!-- Frame corners -->
+                <path class="corner" d="M14 44V14H44"/>
+                <path class="corner" d="M256 14H286V44"/>
+                <path class="corner" d="M14 356V386H44"/>
+                <path class="corner" d="M256 386H286V356"/>
+            </svg>
         </div>
+
+        <div class="face-status" id="faceStatus">Starting camera…</div>
+
+        <ul class="face-tips" id="faceTips">
+            <li>Good lighting on your face, no strong light behind you.</li>
+            <li>Remove mask / sunglasses; look straight at the camera.</li>
+            <li>Keep forehead to chin inside the oval.</li>
+        </ul>
+
+        <div class="face-actions" id="faceActionsLive">
+            <button type="button" class="face-btn-secondary" onclick="closeFaceModal()">Cancel</button>
+            <button type="button" class="face-btn-primary" id="faceCaptureBtn" onclick="captureFace()" disabled>Capture</button>
+        </div>
+        <div class="face-actions" id="faceActionsReview" style="display:none;">
+            <button type="button" class="face-btn-secondary" onclick="retakeFace()">Retake</button>
+            <button type="button" class="face-btn-primary" onclick="confirmFace()">Use this photo</button>
+        </div>
+
+        <canvas id="faceCanvas" style="display:none;"></canvas>
     </div>
 </div>
 
+<footer>
+    Visitor Count:
+    <script src="https://cdn.counter.dev/script.js" data-id="6461317c-4e57-4b01-a820-e81a891f2dd6"></script>
+</footer>
+
+<!-- SYSTEM DATA CONTROL INTERFACE & GLOBAL PARAMETERS SECTION -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-  import { getFirestore, collection, query, orderBy, getDocs, limit, startAfter, doc, getDoc, updateDoc, serverTimestamp, setDoc, deleteDoc, addDoc, onSnapshot, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, Bytes } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
-    authDomain: "asmitajyoti-sgbm.firebaseapp.com",
-    projectId: "asmitajyoti-sgbm",
-    storageBucket: "asmitajyoti-sgbm.firebasestorage.app",
-    messagingSenderId: "85179629629",
-    appId: "1:85179629629:web:81718858a1d21aba752a54",
-    measurementId: "G-D107TNSPL1"
+  const CONFIG = {
+      MEETING_CODE: "Meeting-28Oct2026",
+      ZOOM_URL: "https://us06web.zoom.us/j/81684774229?pwd=0nUitZrD9iia2eZFvVfp3Qar8pYXaU.1",
+      INITIAL_COLLAPSE_STATE: "No", // Case-insensitive: "YES" or "NO"
+
+      // Face ID checkbox state when the page loads ("YES" = ticked, "NO" = unticked).
+      // Ticked   -> member must attach Face ID before Join meeting is enabled.
+      // Unticked -> member skips Face ID and can join straight away.
+      FACE_ID_DEFAULT_TICKED: "YES",
+
+      FIREBASE_KEYS: {
+          apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
+          authDomain: "asmitajyoti-sgbm.firebaseapp.com",
+          projectId: "asmitajyoti-sgbm",
+          storageBucket: "asmitajyoti-sgbm.firebasestorage.app",
+          messagingSenderId: "85179629629",
+          appId: "1:85179629629:web:81718858a1d21aba752a54",
+          measurementId: "G-D107TNSPL1"
+      }
   };
 
-  // ---- Offer calculator settings ----
-  const FLATS_CSV_URL = "/Offer-Calculator/data/flats.csv";   // encrypted member file on the website
-  const ENC_SALT_B64 = "uxvtoV8bzv+Oi4BvERzJxw==";            // PBKDF2 salt used when flats.csv was encrypted (not secret)
-  const ENC_ITERATIONS = 600000;                             // PBKDF2-SHA256 iterations
-  const CALC_LOG_LIMIT = 50000;                              // newest N log entries loaded (read in batches)
-  const CALC_PAGE = 5000;                                    // Firestore allows max 10,000 per query
+  // Apply the initial checkbox state (non-module script handles the rest)
+  document.getElementById('faceIdToggle').checked = CONFIG.FACE_ID_DEFAULT_TICKED.toUpperCase() === "YES";
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+  const app = initializeApp(CONFIG.FIREBASE_KEYS);
   const db = getFirestore(app);
 
-  const COLS = 7;
-  let confirmationResultGlobal = null;
-  let allMasterRecords = [];
-  let photoRecords = [];     // records with a photo in the current filtered view
-  let photoIndex = -1;
+  window.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('attendanceContainer');
+      const wrapper = document.getElementById('slideWrapper');
+      const arrow = document.getElementById('formToggleBtn');
 
-  // Escape user-entered text before putting it into the table
-  function esc(v) {
-      return String(v ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
-  }
-
-  // Convert Firestore binary (Bytes) into an image URL
-  function faceToDataUrl(data) {
-      const b = data.faceImage;
-      if (!b) return null;
-      try {
-          const base64 = typeof b.toBase64 === 'function' ? b.toBase64() : null;
-          if (!base64) return null;
-          return `data:${data.faceImageType || 'image/jpeg'};base64,${base64}`;
-      } catch (e) {
-          console.warn('Unable to read face image for', data.name, e);
-          return null;
-      }
-  }
-
-  // Master admin numbers (UI only – the real protection is in the Firestore rules)
-  const ADMIN_PHONES = ['+919821334896'];
-  let ROLE = null;   // 'admin' | 'entry' | 'ballot' | 'both'
-
-  onAuthStateChanged(auth, async (user) => {
-      if (user) {
-          document.getElementById('authContainer').style.display = 'none';
-          document.getElementById('dashboardContainer').style.display = 'block';
-          const phone = user.phoneNumber || '';
-          if (ADMIN_PHONES.includes(phone)) {
-              ROLE = 'admin';
-              document.body.classList.remove('staff');
-              document.getElementById('noAccess').style.display = 'none';
-              document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('hidden'));
-              fetchMasterData();
-              calcLoaded = false; ctLoaded = false;
-              fetchContacts();
-              if (document.getElementById('calcTab').classList.contains('active')) fetchCalcLog();
-              startMeetingDay(null);
-          } else {
-              // Meeting staff (data-entry operators): only the Meeting day tab
-              document.body.classList.add('staff');
-              let st = null;
-              try { const sn = await getDoc(doc(db, 'meeting_staff', phone)); st = sn.exists() ? sn.data() : null; } catch (e) { st = null; }
-              document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('hidden', b.dataset.tab !== 'dayTab' || !st));
-              document.querySelectorAll('.tab-panel').forEach(pn => pn.classList.toggle('active', !!st && pn.id === 'dayTab'));
-              document.getElementById('noAccess').style.display = st ? 'none' : 'block';
-              if (!st) return;
-              ROLE = st.role || 'entry';
-              startMeetingDay(st);
-          }
-      } else {
-          stopMeetingDay();
-          ROLE = null;
-          document.getElementById('authContainer').style.display = 'block';
-          document.getElementById('dashboardContainer').style.display = 'none';
-          resetAuthUI();
+      if (CONFIG.INITIAL_COLLAPSE_STATE.toUpperCase() === "YES") {
+          container.classList.add('minimized');
+          wrapper.style.display = 'none';
+          arrow.innerHTML = "▼";
       }
   });
 
-  function resetAuthUI() {
-      document.getElementById('phone-step').style.display = 'block';
-      document.getElementById('otp-step').style.display = 'none';
-      document.getElementById('adminPhone').value = '';
-      document.getElementById('otpCode').value = '';
-  }
+  document.getElementById('registryForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-  function initRecaptcha() {
-      if (!window.recaptchaVerifier) {
-          window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-              'size': 'invisible'
-          });
-      }
-  }
+      const btn = document.getElementById('joinBtn');
+      const formElement = document.getElementById('registryForm');
+      const successBlock = document.getElementById('zoomSuccessBlock');
+      const faceWanted = window.isFaceIdTicked();
+      // Only send the photo if the member kept the Face ID box ticked
+      const face = faceWanted ? window.getFaceCapture() : null;
 
-  document.getElementById('sendOtpBtn').addEventListener('click', async () => {
-      const phoneNumber = document.getElementById('adminPhone').value.trim();
-      if(!phoneNumber.startsWith('+')) {
-          alert("Please specify country code (e.g. +91) before your number.");
+      if (faceWanted && !face) {
+          alert("Please attach your Face ID before joining the meeting.");
           return;
       }
-      initRecaptcha();
+
+      btn.innerText = "Connecting...";
+      btn.disabled = true;
+
       try {
-          confirmationResultGlobal = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
-          document.getElementById('phone-step').style.display = 'none';
-          document.getElementById('otp-step').style.display = 'block';
+          const record = {
+              meetingCode: CONFIG.MEETING_CODE,
+              name: document.getElementById('fullName').value.trim(),
+              buildingNumber: document.getElementById('buildingNum').value,
+              flatNumber: document.getElementById('flatNum').value,
+              mobileNumber: document.getElementById('mobileNum').value.trim(),
+              emailAddress: document.getElementById('emailAddress').value.trim() || "Not Provided",
+              faceIdAttached: !!face,
+              timestamp: new Date()
+          };
+
+          if (face) {
+              // Stored as Firestore binary (Bytes) – JPEG image data
+              record.faceImage = Bytes.fromUint8Array(face.bytes);
+              record.faceImageType = face.mime;
+              record.faceImageSizeBytes = face.bytes.length;
+              record.faceImageWidth = face.width;
+              record.faceImageHeight = face.height;
+          }
+
+          // Submit logs to Firestore
+          await addDoc(collection(db, "registrations"), record);
+
+          // Open Zoom in a new window/tab
+          window.open(CONFIG.ZOOM_URL, '_blank');
+
+          // Hide registration form fields and display unified data box
+          formElement.style.display = 'none';
+          successBlock.style.display = 'block';
       } catch (error) {
           console.error(error);
-          alert("SMS Dispatch Failure: " + error.message);
+          alert("Submission failure. Verify configuration framework.");
+          btn.innerText = "Join meeting";
+          window.updateJoinState();
       }
-  });
-
-  document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
-      const code = document.getElementById('otpCode').value.trim();
-      try {
-          await confirmationResultGlobal.confirm(code);
-      } catch (error) {
-          alert("Invalid OTP Code. Access Denied.");
-      }
-  });
-
-  document.getElementById('logoutBtn').addEventListener('click', () => {
-      closePhoto();
-      calcRecords = []; calcLoaded = false;
-      document.getElementById('cBody').innerHTML = '<tr><td colspan="8">Open this tab to load the log.</td></tr>';
-      signOut(auth);
-  });
-
-  // ---- TABS ----
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === btn.dataset.tab));
-      if (btn.dataset.tab === 'calcTab' && !calcLoaded) fetchCalcLog();
-      if (btn.dataset.tab === 'contactTab' && !ctLoaded) fetchContacts();
-  }));
-
-  // =====================================================================
-  //  TAB 1 – ONLINE MEETING DATA (same logic as before)
-  // =====================================================================
-  async function fetchMasterData() {
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = `<tr><td colspan="${COLS}">Fetching database logs...</td></tr>`;
-
-      try {
-          const q = query(collection(db, "registrations"), orderBy("timestamp", "desc"));
-          const querySnapshot = await getDocs(q);
-          allMasterRecords = [];
-
-          if(querySnapshot.empty) {
-              tbody.innerHTML = `<tr><td colspan="${COLS}">No registration entries found.</td></tr>`;
-              document.getElementById('meetingCountLabel').innerText = "Total: 0";
-              document.getElementById('meetingUniqueCountLabel').innerText = "Unique: 0";
-              document.getElementById('meetingUniqueFlatLabel').innerText = "Unique Flats: 0";
-              document.getElementById('meetingFaceLabel').innerText = "Face ID: 0";
-              return;
-          }
-
-          const uniqueMeetingCodes = new Set();
-
-          querySnapshot.forEach((d) => {
-              const data = d.data();
-              const dateObj = data.timestamp ? data.timestamp.toDate() : new Date();
-              const formattedTime = dateObj.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-
-              const record = {
-                  id: d.id,
-                  meetingCode: data.meetingCode || 'N/A',
-                  timestamp: formattedTime,
-                  name: data.name || '',
-                  flatInfo: `${data.buildingNumber || ''} - ${data.flatNumber || ''}`,
-                  mobile: data.mobileNumber || '',
-                  email: data.emailAddress || '',
-                  facePhoto: faceToDataUrl(data)
-              };
-
-              allMasterRecords.push(record);
-              uniqueMeetingCodes.add(record.meetingCode);
-          });
-
-          const dropdown = document.getElementById('meetingFilter');
-          dropdown.innerHTML = '';
-
-          uniqueMeetingCodes.forEach(code => {
-              const opt = document.createElement('option');
-              opt.value = code;
-              opt.innerText = code;
-              dropdown.appendChild(opt);
-          });
-
-          if(allMasterRecords.length > 0) {
-              const latestMeetingCode = allMasterRecords[0].meetingCode;
-              dropdown.value = latestMeetingCode;
-              renderFilteredTable(latestMeetingCode);
-          }
-
-      } catch (error) {
-          console.error(error);
-          tbody.innerHTML = `<tr><td colspan="${COLS}" style="color:red;">Access Denied: Rules validation parameter error.<br><small style="color:#666;">Signed in as: ${esc((auth.currentUser && auth.currentUser.phoneNumber) || '')} · error: ${esc((error && error.code) || '')} ${esc((error && error.message) || '')}</small></td></tr>`;
-      }
-  }
-
-  window.filterTableByMeeting = function() {
-      const selectedMeeting = document.getElementById('meetingFilter').value;
-      renderFilteredTable(selectedMeeting);
-  };
-
-  function renderFilteredTable(filterCode) {
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = '';
-
-      const filtered = allMasterRecords.filter(r => r.meetingCode === filterCode);
-      photoRecords = filtered.filter(r => r.facePhoto);
-
-      const uniqueSubmissionsSet = new Set();
-      const uniqueFlatsSet = new Set();
-
-      filtered.forEach(r => {
-          const normalizedRowKey = `${r.name.trim().toLowerCase()}|${r.flatInfo.trim().toLowerCase()}|${r.mobile.trim().toLowerCase()}|${r.email.trim().toLowerCase()}`;
-          uniqueSubmissionsSet.add(normalizedRowKey);
-          const normalizedFlatKey = r.flatInfo.trim().toLowerCase();
-          uniqueFlatsSet.add(normalizedFlatKey);
-      });
-
-      document.getElementById('meetingCountLabel').innerText = `Total: ${filtered.length}`;
-      document.getElementById('meetingUniqueCountLabel').innerText = `Unique: ${uniqueSubmissionsSet.size}`;
-      document.getElementById('meetingUniqueFlatLabel').innerText = `Unique Flats: ${uniqueFlatsSet.size}`;
-      document.getElementById('meetingFaceLabel').innerText = `Face ID: ${photoRecords.length}`;
-
-      if(filtered.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="${COLS}">No logs for this meeting code.</td></tr>`;
-          return;
-      }
-
-      let html = '';
-      filtered.forEach(r => {
-          const faceCell = r.facePhoto
-              ? `<button class="view-photo-btn" onclick="viewPhoto('${r.id}')" title="View Face ID">
-                     <img src="${r.facePhoto}" alt=""> View Photo
-                 </button>`
-              : `<span class="no-photo">Not attached</span>`;
-
-          html += `<tr>
-              <td>${esc(r.timestamp)}</td>
-              <td><span style="background:#003366;color:#fff;padding:2px 6px;border-radius:3px;font-size:0.85rem;">${esc(r.meetingCode)}</span></td>
-              <td><strong>${esc(r.name)}</strong></td>
-              <td>${esc(r.flatInfo)}</td>
-              <td>${esc(r.mobile)}</td>
-              <td>${esc(r.email)}</td>
-              <td>${faceCell}</td>
-          </tr>`;
-      });
-      tbody.innerHTML = html;
-  }
-
-  // --- PHOTO POPUP ---
-  function showPhotoAt(i) {
-      const r = photoRecords[i];
-      if (!r) return;
-      photoIndex = i;
-
-      document.getElementById('photoTitle').textContent = `Face ID – ${r.name}`;
-      document.getElementById('photoImg').src = r.facePhoto;
-      document.getElementById('photoMeta').innerHTML = `
-          <div><span>Name:</span> <strong>${esc(r.name)}</strong></div>
-          <div><span>Building/Flat:</span> ${esc(r.flatInfo)}</div>
-          <div><span>Mobile:</span> ${esc(r.mobile)}</div>
-          <div><span>Submitted:</span> ${esc(r.timestamp)}</div>
-          <div><span>Photo:</span> ${i + 1} of ${photoRecords.length}</div>`;
-
-      const dl = document.getElementById('photoDownload');
-      dl.href = r.facePhoto;
-      dl.download = `FaceID_${r.flatInfo}_${r.name}`.replace(/[^a-z0-9_-]+/gi, '_') + '.jpg';
-
-      document.getElementById('photoPrev').disabled = i <= 0;
-      document.getElementById('photoNext').disabled = i >= photoRecords.length - 1;
-      document.getElementById('photoModal').classList.add('open');
-  }
-
-  window.viewPhoto = function(id) {
-      const i = photoRecords.findIndex(r => r.id === id);
-      if (i >= 0) showPhotoAt(i);
-  };
-
-  window.stepPhoto = function(delta) {
-      showPhotoAt(photoIndex + delta);
-  };
-
-  function closePhoto() {
-      document.getElementById('photoModal').classList.remove('open');
-      document.getElementById('photoImg').removeAttribute('src');
-      photoIndex = -1;
-  }
-  window.closePhoto = closePhoto;
-
-  document.addEventListener('keydown', (e) => {
-      if (!document.getElementById('photoModal').classList.contains('open')) return;
-      if (e.key === 'Escape') closePhoto();
-      if (e.key === 'ArrowLeft' && photoIndex > 0) showPhotoAt(photoIndex - 1);
-      if (e.key === 'ArrowRight' && photoIndex < photoRecords.length - 1) showPhotoAt(photoIndex + 1);
-  });
-
-  // =====================================================================
-  //  TAB 2 – OFFER CALCULATOR ACCESS
-  // =====================================================================
-  const LANG_NAMES = { en:'English', hi:'Hindi', mr:'Marathi', gu:'Gujarati', bn:'Bengali', pa:'Punjabi', ur:'Urdu',
-                       or:'Odia', ta:'Tamil', te:'Telugu', kn:'Kannada', ml:'Malayalam' };
-  const EVENT_NAMES = { open:'Page opened', view:'Flat viewed', print:'Printed', pdf:'PDF exported' };
-  let calcRecords = [];
-  let calcFiltered = [];
-  let calcLoaded = false;
-
-  async function fetchCalcLog() {
-      const tbody = document.getElementById('cBody');
-      tbody.innerHTML = '<tr><td colspan="8">Fetching calculator log...</td></tr>';
-      try {
-          calcRecords = [];
-          const docs = [];
-          let last = null;
-          while (docs.length < CALC_LOG_LIMIT) {
-              const parts = [collection(db, "calculator_access"), orderBy("ts", "desc")];
-              if (last) parts.push(startAfter(last));
-              parts.push(limit(Math.min(CALC_PAGE, CALC_LOG_LIMIT - docs.length)));
-              const page = await getDocs(query(...parts));
-              page.forEach(d => docs.push(d));
-              if (page.size < CALC_PAGE) break;
-              last = page.docs[page.docs.length - 1];
-              tbody.innerHTML = `<tr><td colspan="8">Fetching calculator log... ${docs.length} entries</td></tr>`;
-          }
-          docs.forEach(d => {
-              const x = d.data();
-              const t = x.ts ? x.ts.toDate() : (x.clientTime ? new Date(x.clientTime) : null);
-              calcRecords.push({
-                  date: t,
-                  time: t ? t.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : '',
-                  event: x.event || '',
-                  building: x.building || '',
-                  flat: x.flat || '',
-                  unit: x.unit || (x.building ? `${x.building}/${x.flat}` : ''),
-                  lang: x.lang || '',
-                  style: x.style || '',
-                  rented: !!x.rented,
-                  device: x.device || '',
-                  visitor: x.visitor || '',
-                  session: x.session || '',
-                  screen: x.screen || '',
-                  ref: x.ref || '',
-                  ua: x.ua || ''
-              });
-          });
-          calcLoaded = true;
-          loadAllUnits().then(renderCalc).catch(() => {});
-          renderCalc();
-      } catch (error) {
-          console.error(error);
-          const who = (auth.currentUser && auth.currentUser.phoneNumber) || 'not signed in';
-          const why = error && error.code === 'permission-denied'
-              ? `Firestore rules do not allow ${esc(who)} to read <b>calculator_access</b>. Publish the new rules (with this number in isAdmin()) and press Refresh.`
-              : `Could not load the log: ${esc((error && (error.code || error.message)) || error)}`;
-          tbody.innerHTML = `<tr><td colspan="8" style="color:red;">${why}<br><small style="color:#666;">Signed in as: ${esc(who)} · error: ${esc((error && error.code) || '')} ${esc((error && error.message) || '')}</small></td></tr>`;
-      }
-  }
-
-  const LOG_HEAD = ['Time (IST)', 'Event', 'Building / Flat', 'Language', 'Style', 'Rented', 'Device', 'Visitor ID'];
-  const BORDER = ['A1','A2','B1','C1','D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','E1','Shops/Units'];
-  let ALL_UNITS = null, calcView = 'log', calcSummary = [];
-  async function loadAllUnits() {   // every unit from the public flats.csv (plain columns only) – for "not viewed yet"
-      if (ALL_UNITS) return ALL_UNITS;
-      const rows = parseCsv(await (await fetch(FLATS_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' })).text());
-      const h = rows[0], iB = h.indexOf('building'), iF = h.indexOf('flat_no'), iT = h.indexOf('unit_type');
-      ALL_UNITS = rows.slice(1).map(r => ({ building: r[iB], flat: r[iF], type: r[iT] || '',
-          unit: r[iB] === 'Shops/Units' ? r[iF] : r[iB] + '/' + r[iF] }));
-      return ALL_UNITS;
-  }
-  const unitKey = u => { const [b, f] = String(u).split('/'); const bi = BORDER.indexOf(b); return [bi < 0 ? 99 : bi, parseInt((f || u).replace(/\D/g, '')) || 0, u]; };
-  const byUnit = (a, b) => { const x = unitKey(a), y = unitKey(b); return x[0] - y[0] || x[1] - y[1] || String(x[2]).localeCompare(y[2]); };
-  function setHead(cols) { document.getElementById('cHead').innerHTML = '<tr>' + cols.map(c => `<th>${esc(c)}</th>`).join('') + '</tr>'; }
-
-  function renderCalc() {
-      const period = document.getElementById('cPeriod').value;
-      const evSel = document.getElementById('cEvent').value;
-      calcView = evSel === '__flats' ? 'flats' : evSel === '__unseen' ? 'unseen' : 'log';
-      const ev = calcView === 'log' ? evSel : '';
-      const term = document.getElementById('cSearch').value.trim().toLowerCase().replace(/[-\s]+/g, '/');
-
-      let since = null;
-      if (period === 'today') { since = new Date(); since.setHours(0, 0, 0, 0); }
-      else if (period !== 'all') { since = new Date(Date.now() - (+period) * 86400000); }
-
-      calcFiltered = calcRecords.filter(r =>
-          (!since || (r.date && r.date >= since)) &&
-          (!ev || r.event === ev) &&
-          (!term || r.unit.toLowerCase().replace(/[-\s]+/g, '/').includes(term)));
-
-      const inPeriod = calcRecords.filter(r => !since || (r.date && r.date >= since));
-      document.getElementById('cEvents').innerText = `Events: ${calcFiltered.length}`;
-      document.getElementById('cVisitors').innerText = `Visitors: ${new Set(inPeriod.map(r => r.visitor).filter(Boolean)).size}`;
-      const uniq = e => new Set(inPeriod.filter(r => r.event === e && r.unit).map(r => r.unit)).size;
-      const totalUnits = ALL_UNITS ? ALL_UNITS.length : 875;
-      document.getElementById('cFlats').innerText = `Unique flats: ${uniq('view')} / ${totalUnits}`;
-      document.getElementById('cPrints').innerText = `Prints: ${inPeriod.filter(r => r.event === 'print').length} · ${uniq('print')} flats`;
-      document.getElementById('cPdfs').innerText = `PDFs: ${inPeriod.filter(r => r.event === 'pdf').length} · ${uniq('pdf')} flats`;
-
-      const tbody = document.getElementById('cBody');
-      if (calcView !== 'log') {
-          // ---- per flat: views / prints / PDFs / visitors / languages / first & last time ----
-          const map = new Map();
-          inPeriod.filter(r => r.unit && r.event !== 'open' && (!term || r.unit.toLowerCase().replace(/[-\s]+/g, '/').includes(term))).forEach(r => {
-              let x = map.get(r.unit);
-              if (!x) map.set(r.unit, x = { unit: r.unit, view: 0, print: 0, pdf: 0, vis: new Set(), langs: new Set(), first: r.date, last: r.date, firstT: r.time, lastT: r.time });
-              x[r.event] = (x[r.event] || 0) + 1; if (r.visitor) x.vis.add(r.visitor); if (r.lang) x.langs.add(LANG_NAMES[r.lang] || r.lang);
-              if (r.date && r.date < x.first) { x.first = r.date; x.firstT = r.time; }
-              if (r.date && r.date > x.last) { x.last = r.date; x.lastT = r.time; }
-          });
-          if (calcView === 'flats') {
-              calcSummary = [...map.values()].sort((a, b) => byUnit(a.unit, b.unit));
-              setHead(['Building / Flat', 'Views', 'Prints', 'PDFs', 'Visitors', 'Languages', 'First seen (IST)', 'Last seen (IST)']);
-              calcFiltered = calcSummary;
-              tbody.innerHTML = calcSummary.length ? calcSummary.map(x => `<tr><td><strong>${esc(x.unit)}</strong></td><td>${x.view}</td><td>${x.print || ''}</td><td>${x.pdf || ''}</td>
-                  <td>${x.vis.size}</td><td>${esc([...x.langs].join(', '))}</td><td>${esc(x.firstT)}</td><td>${esc(x.lastT)}</td></tr>`).join('')
-                  + `<tr><td colspan="8"><b>${calcSummary.length} flats</b> for this selection.</td></tr>`
-                  : '<tr><td colspan="8">No flats for this selection.</td></tr>';
-          } else {
-              setHead(['Building / Flat', 'Type', '', '', '', '', '', '']);
-              tbody.innerHTML = '<tr><td colspan="8">Loading the list of all flats…</td></tr>';
-              loadAllUnits().then(all => {
-                  if (calcView !== 'unseen') return;
-                  calcSummary = all.filter(u => !map.has(u.unit) && (!term || u.unit.toLowerCase().includes(term))).sort((a, b) => byUnit(a.unit, b.unit));
-                  calcFiltered = calcSummary;
-                  const byB = {}; calcSummary.forEach(u => byB[u.building] = (byB[u.building] || 0) + 1);
-                  setHead(['Building / Flat', 'Type', 'Building', 'Not viewed in this building', '', '', '', '']);
-                  tbody.innerHTML = `<tr><td colspan="8"><b>${calcSummary.length} of ${all.length} units</b> have not been viewed in this period – by building: ${esc(Object.entries(byB).sort((a, b) => byUnit(a[0] + '/0', b[0] + '/0')).map(([b, n]) => b + ' ' + n).join(' · '))}</td></tr>`
-                      + calcSummary.map(u => `<tr><td><strong>${esc(u.unit)}</strong></td><td>${esc(u.type)}</td><td>${esc(u.building)}</td><td>${byB[u.building]}</td><td></td><td></td><td></td><td></td></tr>`).join('');
-                  document.getElementById('cFlats').innerText = `Unique flats: ${uniq('view')} / ${all.length}`;
-              }).catch(e => { tbody.innerHTML = `<tr><td colspan="8" style="color:red;">Could not read flats.csv: ${esc(e.message)}</td></tr>`; });
-          }
-          document.getElementById('cEvents').innerText = `Events: ${inPeriod.length}`;
-          return;
-      }
-      setHead(LOG_HEAD);
-      if (!calcFiltered.length) { tbody.innerHTML = '<tr><td colspan="8">No calculator activity for this selection.</td></tr>'; return; }
-      tbody.innerHTML = calcFiltered.slice(0, 2000).map(r => `<tr>
-          <td>${esc(r.time)}</td>
-          <td><span class="ev ev-${esc(r.event)}">${esc(EVENT_NAMES[r.event] || r.event)}</span></td>
-          <td><strong>${esc(r.unit || '—')}</strong></td>
-          <td>${esc(LANG_NAMES[r.lang] || r.lang)}</td>
-          <td>${esc(r.style === 'graphics' ? 'Graphics' : r.style === 'text' ? 'Text' : r.style)}</td>
-          <td>${r.rented ? 'Yes' : ''}</td>
-          <td>${esc(r.device)}</td>
-          <td class="vid" title="${esc(r.visitor)}">${esc(r.visitor.slice(0, 8))}</td>
-      </tr>`).join('') + (calcFiltered.length > 2000 ? `<tr><td colspan="8">Showing the newest 2,000 of ${calcFiltered.length} – use Export log (CSV) for all.</td></tr>` : '');
-  }
-
-  ['cPeriod', 'cEvent'].forEach(id => document.getElementById(id).addEventListener('change', renderCalc));
-  document.getElementById('cSearch').addEventListener('input', renderCalc);
-  document.getElementById('cRefresh').addEventListener('click', fetchCalcLog);
-
-  // ---- CSV helpers ----
-  function csvCell(v) { v = String(v ?? ''); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
-  function downloadCsv(name, rows) {
-      const text = '﻿' + rows.map(r => r.map(csvCell).join(',')).join('\r\n');   // BOM so Excel shows Indian scripts correctly
-      const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
-      const a = document.createElement('a'); a.href = url; a.download = name;
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 5000);
-  }
-  const today = () => new Date().toISOString().slice(0, 10);
-
-  document.getElementById('cExportLog').addEventListener('click', () => {
-      if (!calcFiltered.length) { alert('Nothing to export for this selection.'); return; }
-      if (calcView === 'flats') {
-          downloadCsv(`Offer_Calculator_Flatwise_${today()}.csv`, [['unit', 'views', 'prints', 'pdfs', 'visitors', 'languages', 'first_seen_ist', 'last_seen_ist'],
-              ...calcSummary.map(x => [x.unit, x.view, x.print, x.pdf, x.vis.size, [...x.langs].join(' / '), x.firstT, x.lastT])]);
-          return;
-      }
-      if (calcView === 'unseen') {
-          downloadCsv(`Offer_Calculator_Not_Viewed_${today()}.csv`, [['unit', 'building', 'flat', 'type'], ...calcSummary.map(u => [u.unit, u.building, u.flat, u.type])]);
-          return;
-      }
-      downloadCsv(`Offer_Calculator_Access_${today()}.csv`, [
-          ['time_ist', 'event', 'building', 'flat', 'unit', 'language', 'style', 'rented_ticked', 'device', 'visitor_id', 'session_id', 'screen', 'referrer', 'user_agent'],
-          ...calcFiltered.map(r => [r.time, EVENT_NAMES[r.event] || r.event, r.building, r.flat, r.unit, LANG_NAMES[r.lang] || r.lang, r.style,
-                                    r.rented ? 'Yes' : 'No', r.device, r.visitor, r.session, r.screen, r.ref, r.ua])]);
-  });
-
-  // ---- Decrypted flats.csv export ----
-  // flats.csv cells: "ENC1:" + base64(12-byte IV | AES-256-GCM ciphertext | 16-byte tag), plaintext padded with spaces.
-  // Key = PBKDF2-SHA256(password, salt, 600000 iterations). The password is stored in Firestore: admins/<your mobile> → field "password".
-  function parseCsv(text) {
-      const rows = []; let row = [], cell = '', q = false;
-      text = text.replace(/^﻿/, '');
-      for (let i = 0; i < text.length; i++) {
-          const c = text[i];
-          if (q) {
-              if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; }
-              else cell += c;
-          } else if (c === '"') q = true;
-          else if (c === ',') { row.push(cell); cell = ''; }
-          else if (c === '\n' || c === '\r') {
-              if (c === '\r' && text[i + 1] === '\n') i++;
-              row.push(cell); cell = ''; rows.push(row); row = [];
-          } else cell += c;
-      }
-      if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
-      return rows.filter(r => r.length > 1 || r[0] !== '');
-  }
-  const b64ToBytes = b => Uint8Array.from(atob(b), c => c.charCodeAt(0));
-
-  async function deriveKey(password, saltB64, iterations) {
-      const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
-      return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64ToBytes(saltB64), iterations, hash: 'SHA-256' },
-                                     base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
-  }
-
-  async function decryptCell(key, cell) {
-      if (!cell.startsWith('ENC1:')) return cell;
-      const raw = b64ToBytes(cell.slice(5));
-      const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: raw.slice(0, 12) }, key, raw.slice(12));
-      return new TextDecoder().decode(pt).replace(/ +$/, '');
-  }
-
-  async function decryptFlatsCsv(csvText, password, saltB64, iterations) {
-      const key = await deriveKey(password, saltB64, iterations);
-      const rows = parseCsv(csvText);
-      let n = 0;
-      for (let r = 1; r < rows.length; r++)
-          for (let c = 0; c < rows[r].length; c++)
-              if (rows[r][c].startsWith('ENC1:')) { rows[r][c] = await decryptCell(key, rows[r][c]); n++; }
-      return { rows, cells: n };
-  }
-  window._decryptFlatsCsv = decryptFlatsCsv;   // (used for testing)
-
-  // =====================================================================
-  //  TAB 3 – CONTACT UPDATES
-  // =====================================================================
-  const PAD = { member_name: 64, monthly_rent: 16, permanent_address: 256, mobile: 32, email: 96 };   // fixed plaintext lengths (bytes)
-  let ctRecords = [], ctFiltered = [], ctLoaded = false;
-  const normUnit = u => String(u || '').toLowerCase().replace(/[-\s]+/g, '/');
-
-  async function fetchContacts() {
-      const tbody = document.getElementById('ctBody');
-      tbody.innerHTML = '<tr><td colspan="8">Fetching contact updates...</td></tr>';
-      try {
-          const snap = await getDocs(query(collection(db, 'contact_updates'), orderBy('ts', 'desc'), limit(5000)));
-          ctRecords = [];
-          snap.forEach(d => {
-              const x = d.data(); const t = x.ts ? x.ts.toDate() : null;
-              ctRecords.push({ id: d.id, date: t, time: t ? t.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : '',
-                  building: x.building || '', flat: x.flat || '', unit: x.unit || '', name: x.name || '', mobile: x.mobile || '',
-                  email: x.email || '', missing: x.missing || '', mode: x.mode || '', lang: x.lang || '', status: x.status || 'pending',
-                  reviewedBy: x.reviewedBy || '' });
-          });
-          ctLoaded = true;
-          renderContacts();
-      } catch (error) {
-          console.error(error);
-          tbody.innerHTML = `<tr><td colspan="8" style="color:red;">Could not load contact updates: ${esc(error.code || error.message)} – publish the contact_updates rule.</td></tr>`;
-      }
-  }
-
-  function renderContacts() {
-      const st = document.getElementById('ctStatus').value;
-      const term = normUnit(document.getElementById('ctSearch').value.trim());
-      const count = s => ctRecords.filter(r => r.status === s).length;
-      document.getElementById('ctTotal').innerText = `Total: ${ctRecords.length}`;
-      document.getElementById('ctPending').innerText = `Pending: ${count('pending')}`;
-      document.getElementById('ctApproved').innerText = `Approved: ${count('approved')}`;
-      document.getElementById('ctMerged').innerText = `Merged: ${count('merged')}`;
-      document.getElementById('ctRejected').innerText = `Rejected: ${count('rejected')}`;
-      document.getElementById('ctPendingTab').innerText = count('pending') || '';
-      ctFiltered = ctRecords.filter(r => (!st || r.status === st) && (!term || normUnit(r.unit).includes(term)));
-      const tbody = document.getElementById('ctBody');
-      if (!ctFiltered.length) { tbody.innerHTML = '<tr><td colspan="8">No entries for this selection.</td></tr>'; return; }
-      tbody.innerHTML = ctFiltered.map(r => {
-          const act = r.status === 'pending'
-              ? `<button class="act-btn act-ok" onclick="setContactStatus('${r.id}','approved')">Approve</button><button class="act-btn act-no" onclick="setContactStatus('${r.id}','rejected')">Reject</button>`
-              : r.status === 'merged' ? '' : `<button class="act-btn act-undo" onclick="setContactStatus('${r.id}','pending')">Undo</button>`;
-          return `<tr>
-              <td>${esc(r.time)}</td>
-              <td><strong>${esc(r.unit)}</strong></td>
-              <td>${esc(r.name)}</td>
-              <td>${esc(r.mobile)}</td>
-              <td>${esc(r.email)}</td>
-              <td>${esc(r.mode === 'update' ? '(update)' : r.missing.replace(',', ' + '))}</td>
-              <td><span class="st st-${esc(r.status)}">${esc(r.status)}</span></td>
-              <td>${act}</td>
-          </tr>`; }).join('');
-  }
-
-  window.setContactStatus = async function (id, status) {
-      try {
-          await updateDoc(doc(db, 'contact_updates', id), { status, reviewedAt: serverTimestamp(), reviewedBy: (auth.currentUser && auth.currentUser.phoneNumber) || '' });
-          const r = ctRecords.find(x => x.id === id); if (r) r.status = status;
-          renderContacts();
-      } catch (e) { console.error(e); alert('Could not update: ' + (e.code || e.message)); }
-  };
-
-  document.getElementById('ctStatus').addEventListener('change', renderContacts);
-  document.getElementById('ctSearch').addEventListener('input', renderContacts);
-  document.getElementById('ctRefresh').addEventListener('click', fetchContacts);
-  document.getElementById('ctExport').addEventListener('click', () => {
-      if (!ctFiltered.length) { alert('Nothing to export for this selection.'); return; }
-      downloadCsv(`Contact_Updates_${today()}.csv`, [
-          ['time_ist', 'building', 'flat', 'unit', 'name_given', 'mobile', 'email', 'was_missing', 'type', 'language', 'status', 'reviewed_by'],
-          ...ctFiltered.map(r => [r.time, r.building, r.flat, r.unit, r.name, r.mobile, r.email, r.missing, r.mode, r.lang, r.status, r.reviewedBy])]);
-  });
-
-  // ---- build updated flats.csv ----
-  const bytesToB64 = u8 => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
-  async function encryptCell(key, value, col) {
-      const enc = new TextEncoder().encode(value);
-      const n = PAD[col]; if (enc.length > n) throw new Error(`${col} value too long (${enc.length} > ${n} bytes)`);
-      const pt = new Uint8Array(n); pt.fill(0x20); pt.set(enc);
-      const iv = crypto.getRandomValues(new Uint8Array(12));
-      const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, pt));
-      const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12);
-      return 'ENC1:' + bytesToB64(out);
-  }
-  function rowsToCsv(rows) { return '\uFEFF' + rows.map(r => r.map(csvCell).join(',')).join('\r\n') + '\r\n'; }   // same format as the original file
-  function mergeList(existing, value, sep, maxBytes) {
-      const list = existing.split(sep.trim()).map(x => x.trim()).filter(Boolean);
-      if (list.some(x => x.toLowerCase() === value.toLowerCase())) return existing;
-      const both = [value, ...list].slice(0, 2).join(sep);
-      return new TextEncoder().encode(both).length <= maxBytes ? both : value;
-  }
-
-  async function buildUpdatedFlats(csvText, password, saltB64, iterations, approved) {
-      const key = await deriveKey(password, saltB64, iterations);
-      const rows = parseCsv(csvText); const h = rows[0];
-      const ix = c => { const i = h.indexOf(c); if (i < 0) throw new Error('flats.csv has no column ' + c); return i; };
-      const iB = ix('building'), iF = ix('flat_no'), iM = ix('mobile'), iE = ix('email'), iHM = ix('has_mobile'), iHE = ix('has_email');
-      const latest = new Map();   // newest approved entry per flat (records are newest first)
-      approved.forEach(r => { const k = r.building + '|' + r.flat; if (!latest.has(k)) latest.set(k, r); });
-      const changes = [], used = [];
-      for (const [k, r] of latest) {
-          const row = rows.find((x, i) => i > 0 && (x[iB] + '|' + x[iF]) === k);
-          if (!row) { changes.push(`${r.unit}: flat not found in flats.csv – skipped`); continue; }
-          const curM = await decryptCell(key, row[iM]), curE = await decryptCell(key, row[iE]);
-          let newM = curM, newE = curE;
-          if (r.mobile) newM = mergeList(curM, r.mobile, ' / ', PAD.mobile);
-          if (r.email) newE = mergeList(curE, r.email, '; ', PAD.email);
-          if (newM !== curM) row[iM] = await encryptCell(key, newM, 'mobile');
-          if (newE !== curE) row[iE] = await encryptCell(key, newE, 'email');
-          row[iHM] = newM.trim() ? 'Y' : 'N'; row[iHE] = newE.trim() ? 'Y' : 'N';
-          const dropped = (cur, nw, sep) => cur.split(sep).map(x => x.trim()).filter(x => x && !nw.split(sep).map(y => y.trim()).includes(x));
-          const dM = newM !== curM ? dropped(curM, newM, '/') : [], dE = newE !== curE ? dropped(curE, newE, ';') : [];
-          const parts = [newM !== curM ? `mobile → ${newM}` : '', newE !== curE ? `email → ${newE}` : '',
-                         dM.length ? `removed old mobile ${dM.join(', ')}` : '', dE.length ? `removed old email ${dE.join(', ')}` : ''].filter(Boolean);
-          changes.push(parts.length ? `${r.unit}: ${parts.join('; ')}` : `${r.unit}: no change (already on file)`);
-          approved.filter(x => x.building + '|' + x.flat === k).forEach(x => used.push(x.id));
-      }
-      return { csv: rowsToCsv(rows), changes, used };
-  }
-  window._buildUpdatedFlats = buildUpdatedFlats;   // (used for testing)
-
-  // =====================================================================
-  //  TAB 4 – MEETING DAY: Entry Register + Ballot Delivery (live, duplicates blocked by Firestore rules)
-  //  Firestore: meeting_config/current {code, onlineCode} · meeting_roster/current {names:{flatKey:name}}
-  //             meeting_staff/<+91…> {name, role} · meeting_entries/<code>__<flatKey> · meeting_ballots/<code>__<flatKey>
-  //             meeting_dup_attempts (refused duplicates)
-  // =====================================================================
-  const MD = { code: '', online: '', entries: new Map(), ballots: new Map(), dups: [], onlineSet: new Set(), names: {}, types: {}, units: [],
-               myName: '', unsub: [], base: [] };
-  const $d = id => document.getElementById(id);
-  const myPhone = () => (auth.currentUser && auth.currentUser.phoneNumber) || '';
-  const digitsOf = v => parseInt(String(v || '').replace(/\D/g, ''), 10);
-  function flatKeyOf(b, f) {
-      if (b === 'Shops/Units') return (/unit/i.test(f) ? 'UNIT-' : 'SH-') + (digitsOf(f) || 0);
-      return b + '-' + (digitsOf(f) || String(f).trim());
-  }
-  // ---- typed name vs registered name ----
-  const NSTOP = new Set(['MR','MRS','MS','SMT','SHRI','KUM','KU','DR','MISS','MT','LATE','AND','POA','W','O','D','S/O','W/O','D/O']);
-  // same name, different spellings
-  const NVAR = [[/^(MOHD|MOHAMMED|MOHAMMAD|MOHAMED|MOHAMAD|MUHAMMAD|MUHAMMED|MOHMADD|MOHMAD|MD)$/, 'MOHD'], [/^(SHAIKH|SHEIKH|SHAIK|SHEKH|SK)$/, 'SHAIKH'],
-                [/^(SIDDIQUE|SIDDIQUI|SIDDIKI|SIDIQUI)$/, 'SIDDIQUE'], [/^(CHOUDHARY|CHAUDHARY|CHOUDHARI|CHAUDHARI|CHOWDHARY|CHOUDHURY)$/, 'CHOUDHARY'],
-                [/^(KUMAR|KR)$/, 'KUMAR'], [/^(SINGH|SING)$/, 'SINGH'], [/^(KAUR|KOUR)$/, 'KAUR'], [/^(SYED|SAYYAD|SAIYED|SAYED)$/, 'SYED']];
-  const canon = t => { for (const [re, v] of NVAR) if (re.test(t)) return v; return t; };
-  const splitTok = n => String(n || '').toUpperCase().replace(/(?:^|[\s.])(S|W|D)\/O\b/g, ' ').split(/[^A-Z]+/).filter(t => t && !NSTOP.has(t)).map(canon);
-  // registered name → list of persons (joint owners, associated member in brackets …)
-  function persons(reg) {
-      return String(reg || '').toUpperCase().split(/\s*(?:\/|&|\bAND\b|,|\(|\)|-(?=\s*(?:MR|MRS|SMT|MS|MISS)\b))\s*/).map(splitTok).filter(t => t.length);
-  }
-  function sim(a, b) {   // similarity 0..1 (Levenshtein)
-      if (a === b) return 1; const m = a.length, n = b.length; if (!m || !n) return 0;
-      let prev = Array.from({ length: n + 1 }, (_, j) => j);
-      for (let i = 1; i <= m; i++) { const cur = [i]; for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; }
-      return 1 - prev[n] / Math.max(m, n);
-  }
-  function tokEq(a, b) {
-      if (a === b) return true;
-      if (a.length === 1 || b.length === 1) return a[0] === b[0];                 // initial ↔ name
-      if (a.length >= 4 && b.length >= 4 && sim(a, b) >= 0.75) return true;      // small spelling slips
-      const [s1, l1] = a.length <= b.length ? [a, b] : [b, a];
-      return l1.startsWith(s1) && s1.length >= 4 && s1.length >= 0.7 * l1.length; // short form (KHANDERKAR ↔ KHANDERKER etc.)
-  }
-  const anyEq = (t, P) => P.some(x => tokEq(t, x));
-  // surnames: no initial-matching (an initial "K" must not match surname "Khan"); both one letter is fine (Tanuja S ↔ TANUJA S.)
-  const surEq = (a, b) => (a.length === 1 && b.length === 1) ? a === b : (a.length > 1 && b.length > 1 && tokEq(a, b));
-  // also compare with two neighbouring words joined (AMAR SINGH ↔ AMARSINGH)
-  const withJoins = P => P.concat(P.slice(0, -1).map((t, i) => t + P[i + 1]));
-  // typed word is the start of a registered word (KHAND… → KHANDERKAR): incomplete, not "different"
-  const prefEq = (a, b) => a.length >= 3 && b.length > a.length && b.startsWith(a);
-  let LAST_HINT = '';
-  // 'ok' = same person · 'part' = looks incomplete · 'fam' = same surname · 'bad' = different
-  function nameMatch(first, last, registered) {
-      LAST_HINT = '';
-      const PS = persons(registered); if (!PS.length) return '';
-      const typed = splitTok(first).concat(splitTok(last)); if (!typed.length) return '';
-      const given = typed[0], sur = typed[typed.length - 1];
-      let fam = false, part = '';
-      for (const P of PS) {
-          const pSur = P[P.length - 1], gPart = withJoins(P.length > 1 ? P.slice(0, -1) : P);
-          if (typed.length === 1) { if (given.length > 1 && P.some(x => surEq(given, x))) return P.length === 1 ? 'ok' : 'fam'; continue; }
-          const normal  = anyEq(given, gPart) && (surEq(sur, pSur) || P.slice(0, -1).some(x => x.length > 1 && surEq(sur, x) && x !== P[0]));
-          const swapped = surEq(given, pSur) && anyEq(sur, gPart);            // "Khan Parveen"
-          if (normal || swapped) return 'ok';
-          if (surEq(sur, pSur) || surEq(given, pSur)) fam = true;
-          // incomplete: first name fits (or is the start of one) and the surname is the start of the registered surname, or the other way round
-          const givenFit = anyEq(given, gPart) || gPart.some(x => prefEq(given, x));
-          if (!part && givenFit && (prefEq(sur, pSur) || surEq(sur, pSur))) part = nice(pSur);
-          if (!part && typed.length > 1 && anyEq(sur, [pSur]) && gPart.some(x => prefEq(given, x))) part = nice(gPart.find(x => prefEq(given, x)));
-      }
-      if (part) { LAST_HINT = part; return 'part'; }
-      return fam ? 'fam' : 'bad';
-  }
-  // tap-to-fill buttons with the registered person(s)
-  function renderChips(reg) {
-      const box = $d('eChips'); box.innerHTML = '';
-      String(reg || '').split(/\s*(?:\/|&|\bAND\b|,|\(|\)|-(?=\s*(?:MR|MRS|SMT|MS|MISS)\b))\s*/i).map(x => x.trim()).filter(x => /[A-Za-z]{2}/.test(x)).forEach(p => {
-          const words = nice(p).replace(/^(Mr|Mrs|Ms|Smt|Shri|Kum|Ku|Dr|Miss|Mt|Late)\.?(\s+|$)/i, '').split(' ').filter(Boolean);
-          if (!words.length || words.join('').replace(/[^A-Za-z]/g, '').length < 2) return;
-          const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = words.join(' ');
-          b.onclick = () => { $d('eFirst').value = words.length > 1 ? words.slice(0, -1).join(' ') : words[0]; $d('eLast').value = words.length > 1 ? words[words.length - 1] : ''; refreshMatch(); $d('eSubmit').focus(); };
-          box.appendChild(b);
-      });
-  }
-  const MATCH_TXT = { ok: '✓ Matches the registered member', part: 'Looks incomplete – did you mean', fam: 'Same surname – family member?', bad: '✗ Name differs from the registered member – please check' };
-  const MATCH_SHORT = { ok: '✓ Match', part: 'Incomplete?', fam: 'Family?', bad: '✗ Differs' };
-  function refreshMatch() {
-      const box = $d('eMatch'), u = resolveFlat($d('eBld').value, $d('eFlat').value);
-      const reg = u ? MD.names[flatKeyOf(u.building, u.flat)] : '';
-      const m = reg ? nameMatch($d('eFirst').value, $d('eLast').value, reg) : '';
-      box.className = 'namematch ' + (m === 'part' ? 'fam' : m); box.textContent = m ? (m === 'part' ? `${MATCH_TXT.part} “${LAST_HINT}”?` : MATCH_TXT[m]) : '';
-  }
-  const nice = n => String(n || '').replace(/\.(?=[A-Za-z])/g, '. ').replace(/\s*\/\s*/g, ' / ').replace(/\s+/g, ' ').trim()
-      .toLowerCase().replace(/(^|[\s(/.&-])([a-z])/g, (m, a, c) => a + c.toUpperCase());
-  const tIST = ts => ts && ts.toDate ? ts.toDate().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }) : '…';
-  const shortBy = (ph, nm) => nm ? nm : (ph ? '…' + ph.slice(-4) : '');
-  function setMsg(id, text, ok) { const m = $d(id); m.textContent = text; m.className = 'fmsg ' + (ok ? 'ok' : 'err'); }
-
-  function resolveFlat(b, txt) {
-      txt = String(txt || '').trim(); if (!b || !txt) return null;
-      const list = MD.units.filter(u => u.building === b);
-      const ex = list.find(u => u.flat.toLowerCase() === txt.toLowerCase()); if (ex) return ex;
-      const n = digitsOf(txt); if (!n && n !== 0) return null;
-      if (b === 'Shops/Units') { const wantUnit = /^u/i.test(txt); return list.find(u => digitsOf(u.flat) === n && /unit/i.test(u.flat) === wantUnit) || null; }
-      return list.find(u => digitsOf(u.flat) === n) || null;
-  }
-
-  async function startMeetingDay(staffDoc) {
-      stopMeetingDay();
-      MD.myName = staffDoc ? (staffDoc.name || '') : 'Admin';
-      $d('subEntry').parentElement.querySelectorAll('.sub-btn').forEach(b => {
-          const s = b.dataset.sub;
-          const hide = (s === 'subSetup' && ROLE !== 'admin') || (s === 'subEntry' && ROLE === 'ballot') || (s === 'subBallot' && ROLE === 'entry');
-          b.classList.toggle('hidden', hide);
-      });
-      const first = [...document.querySelectorAll('.sub-btn')].find(b => !b.classList.contains('hidden'));
-      showSub(first ? first.dataset.sub : 'subList');
-      try {
-          MD.units = await loadAllUnits();
-      } catch (e) { MD.units = []; }
-      const blds = BORDER.filter(b => MD.units.some(u => u.building === b));
-      ['eBld', 'bBld'].forEach(id => { $d(id).innerHTML = '<option value="">Choose…</option>' + blds.map(b => `<option>${esc(b)}</option>`).join(''); });
-      MD.base.push(onSnapshot(doc(db, 'meeting_config', 'current'), sn => {
-          const c = sn.exists() ? sn.data() : {};
-          setMeetingCode(c.code || '', c.onlineCode || '');
-          if (ROLE === 'admin') { if (!$d('sCode').value) $d('sCode').value = c.code || ''; if (!$d('sOnline').value) $d('sOnline').value = c.onlineCode || ''; }
-      }, e => console.error('config', e)));
-      MD.base.push(onSnapshot(doc(db, 'meeting_roster', 'current'), sn => {
-          MD.names = sn.exists() ? (sn.data().names || {}) : {};
-          MD.types = sn.exists() ? (sn.data().types || {}) : {};
-          const n = Object.keys(MD.names).length, x = sn.exists() ? sn.data() : null, rb = $d('sRoster');
-          rb.className = 'reginfo ' + (n ? 'ok' : 'bad');
-          rb.innerHTML = n ? `Member names published: <b>${n}</b> flats/shops · <b>${Object.values(MD.names).filter(v => / \(/.test(v)).length}</b> with associate/nominee · types: ${Object.keys(MD.types).length ? esc(Object.entries(Object.values(MD.types).reduce((m, t) => (m[t] = (m[t] || 0) + 1, m), {})).map(([t, c]) => t + ' ' + c).join(', ')) : '<b style="color:#b00">none – old roster, publish again</b>'}${x.publishedAt && x.publishedAt.toDate ? ' on ' + esc(x.publishedAt.toDate().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })) : ''}.`
-                           : 'Member names are NOT published – operators will not see registered names. Press “Publish member names again”.';
-          refreshEntryInfo(); refreshBallotInfo(); renderDay(); },
-          e => console.error('roster', e)));
-      if (ROLE === 'admin') MD.base.push(onSnapshot(collection(db, 'meeting_staff'), sn => {
-          $d('stBody').innerHTML = sn.docs.map(d => { const x = d.data(); return `<tr><td>${esc(d.id)}</td><td>${esc(x.name || '')}</td><td>${esc({ entry: 'Entry Register', ballot: 'Ballot Delivery', both: 'Both' }[x.role] || x.role)}</td>
-              <td><button class="del-btn" onclick="mdRemoveStaff('${esc(d.id)}')">Remove</button></td></tr>`; }).join('') || '<tr><td colspan="4">No operators yet.</td></tr>';
-      }, e => console.error('staff', e)));
-  }
-
-  function stopMeetingDay() { MD.unsub.concat(MD.base).forEach(u => { try { u(); } catch (e) {} }); MD.unsub = []; MD.base = []; MD.code = null; MD.online = null; }
-
-  function setMeetingCode(code, online) {
-      if (code === MD.code && online === MD.online) return;
-      MD.unsub.forEach(u => { try { u(); } catch (e) {} }); MD.unsub = [];
-      MD.code = code; MD.online = online; MD.entries = new Map(); MD.ballots = new Map(); MD.dups = []; MD.onlineSet = new Set();
-      $d('dCode').textContent = 'Meeting: ' + (code || '–');
-      $d('dNoCode').style.display = code ? 'none' : 'block';
-      ['eSubmit', 'bSubmit'].forEach(id => $d(id).disabled = !code);
-      if (code) {
-          const q = c => query(collection(db, c), where('code', '==', code));
-          MD.unsub.push(onSnapshot(q('meeting_entries'), sn => { MD.entries = new Map(sn.docs.map(d => [d.data().flatKey, { id: d.id, ...d.data() }])); refreshEntryInfo(); refreshBallotInfo(); renderDay(); }, e => console.error('entries', e)));
-          MD.unsub.push(onSnapshot(q('meeting_ballots'), sn => { MD.ballots = new Map(sn.docs.map(d => [d.data().flatKey, { id: d.id, ...d.data() }])); refreshBallotInfo(); renderDay(); }, e => console.error('ballots', e)));
-          MD.unsub.push(onSnapshot(q('meeting_dup_attempts'), sn => { MD.dups = sn.docs.map(d => d.data()).sort((a, b) => (b.ts ? b.ts.seconds : 9e9) - (a.ts ? a.ts.seconds : 9e9)); renderDay(); }, e => console.error('dups', e)));
-          if (ROLE === 'admin' && online) MD.unsub.push(onSnapshot(query(collection(db, 'registrations'), where('meetingCode', '==', online)),
-              sn => { MD.onlineSet = new Set(sn.docs.map(d => flatKeyOf(d.data().buildingNumber || '', d.data().flatNumber || ''))); renderDay(); }, e => console.error('online', e)));
-      }
-      renderDay();
-  }
-
-  function unitOfKey(k) { const u = MD.units.find(x => flatKeyOf(x.building, x.flat) === k); return u ? u.unit : k; }
-
-  function renderDay() {
-      const E = MD.entries, B = MD.ballots, O = MD.onlineSet;
-      const present = E.size, noBallot = [...E.keys()].filter(k => !B.has(k)).length, ballotNoEntry = [...B.keys()].filter(k => !E.has(k)).length;
-      $d('dPresent').textContent = `Present: ${present} flats`;
-      $d('dBallots').textContent = `Ballots given: ${B.size}`;
-      $d('dNoBallot').textContent = `Present, no ballot: ${noBallot}`;
-      $d('dBallotNoEntry').textContent = `Ballot, not entered: ${ballotNoEntry}`;
-      $d('dDup').textContent = `Duplicates blocked: ${MD.dups.length}`;
-      $d('dOnline').textContent = `Joined online: ${O.size}`;
-      $d('dBoth').textContent = `Online + hall: ${[...E.keys()].filter(k => O.has(k)).length}`;
-      // my recent entries / ballots
-      const me = myPhone();
-      const mine = (M) => [...M.values()].filter(x => x.by === me).sort((a, b) => (b.ts ? b.ts.seconds : 9e9) - (a.ts ? a.ts.seconds : 9e9)).slice(0, 8);
-      $d('eMine').innerHTML = mine(E).map(x => `<tr><td>${tIST(x.ts)}</td><td><strong>${esc(x.unit)}</strong></td><td>${esc(x.regNo)}</td><td>${esc(x.srNo)}</td><td>${esc(x.fullName)}</td></tr>`).join('') || '<tr><td colspan="5">None yet.</td></tr>';
-      $d('bMine').innerHTML = mine(B).map(x => `<tr><td>${tIST(x.ts)}</td><td><strong>${esc(x.unit)}</strong></td><td>${esc(nice(x.registeredName))}</td></tr>`).join('') || '<tr><td colspan="3">None yet.</td></tr>';
-      // live list
-      const show = $d('lShow').value, term = $d('lSearch').value.trim().toLowerCase();
-      let keys = new Set([...E.keys(), ...B.keys()]);
-      if (show === 'online') keys = new Set([...O].filter(k => !E.has(k)));
-      let rows = [...keys].map(k => { const e = E.get(k), b = B.get(k); return { k, unit: (e || b || {}).unit || unitOfKey(k), e, b, reg: MD.names[k] || (e && e.registeredName) || (b && b.registeredName) || '' }; });
-      if (show === 'noballot') rows = rows.filter(r => r.e && !r.b);
-      if (show === 'noentry') rows = rows.filter(r => r.b && !r.e);
-      if (term) rows = rows.filter(r => (r.unit + ' ' + (r.e ? r.e.fullName : '') + ' ' + r.reg).toLowerCase().includes(term.replace(/-/g, '/')) || r.unit.toLowerCase().replace('/', '-').includes(term));
-      rows.sort((a, b) => byUnit(a.unit, b.unit));
-      MD.listRows = rows;
-      const adm = ROLE === 'admin';
-      $d('lBody').innerHTML = rows.map(r => `<tr>
-          <td><strong>${esc(r.unit)}</strong></td><td>${esc(r.e ? r.e.regNo : '')}</td><td>${esc(r.e ? r.e.srNo : '')}</td>
-          <td>${esc(r.e ? r.e.fullName : '')}</td><td>${esc(nice(r.reg))}${typeTag(r.k)}</td>
-          <td>${r.e && r.reg ? (m => m ? `<span class="mt ${m === 'part' ? 'fam' : m}">${MATCH_SHORT[m]}</span>` : '')(nameMatch(r.e.firstName, r.e.lastName, r.reg)) : ''}</td>
-          <td>${r.e ? esc(tIST(r.e.ts) + ' · ' + shortBy(r.e.by, r.e.byName)) : '<span style="color:#b42318">—</span>'}</td>
-          <td>${r.b ? esc(tIST(r.b.ts) + ' · ' + shortBy(r.b.by, r.b.byName)) : '<span style="color:#e67e22">—</span>'}</td>
-          <td class="adm-only">${O.has(r.k) ? 'Yes' : ''}</td>
-          <td class="adm-only">${adm && r.e ? `<button class="del-btn" onclick="mdDelete('entry','${esc(r.e.id)}','${esc(r.unit)}')">Delete entry</button>` : ''}${adm && r.b ? `<button class="del-btn" onclick="mdDelete('ballot','${esc(r.b.id)}','${esc(r.unit)}')">Delete ballot</button>` : ''}</td></tr>`).join('')
-          || `<tr><td colspan="10">${MD.code ? 'Nothing for this selection.' : 'No meeting active.'}</td></tr>`;
-      $d('lDup').innerHTML = MD.dups.map(x => `<tr><td>${tIST(x.ts)}</td><td>${x.kind === 'ballot' ? 'Ballot' : 'Entry'}</td><td><strong>${esc(x.unit)}</strong></td><td>${esc(x.regNo || '')}</td><td>${esc(x.name || '')}</td><td>${esc(x.reason || '')}</td><td>${esc(shortBy(x.by, x.byName))}</td></tr>`).join('') || '<tr><td colspan="7">None.</td></tr>';
-  }
-
-  // ---- forms ----
-  function showSub(id) { document.querySelectorAll('.sub-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === id)); document.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.id === id)); }
-  document.querySelectorAll('.sub-btn').forEach(b => b.addEventListener('click', () => showSub(b.dataset.sub)));
-  function fillFlatList(bldId, listId) { const b = $d(bldId).value; $d(listId).innerHTML = MD.units.filter(u => u.building === b).map(u => `<option value="${esc(u.flat)}">`).join(''); }
-  const typeTag = k => { const t = MD.types[k]; return t && t !== 'Member' ? `<span class="mtype ${esc(t)}">${t === 'Associate' ? 'Associate member' : t === 'Expired' ? 'Expired member – check' : esc(t)}</span>` : ''; };
-  function regLine(k) { const n = MD.names[k]; return n ? `Registered: <b>${esc(nice(n))}</b>${typeTag(k)}` : (Object.keys(MD.names).length ? 'No registered name for this flat' : 'Registered names not published yet – the admin must press “Publish member names” in Setup'); }
-
-  function refreshEntryInfo() {
-      const box = $d('eInfo'), u = resolveFlat($d('eBld').value, $d('eFlat').value);
-      box.className = 'reginfo';
-      $d('eFull').value = u ? nice(MD.names[flatKeyOf(u.building, u.flat)] || '') : '';
-      renderChips(u && !MD.entries.has(flatKeyOf(u.building, u.flat)) ? MD.names[flatKeyOf(u.building, u.flat)] : '');
-      refreshMatch();
-      if (!$d('eBld').value || !$d('eFlat').value.trim()) { box.textContent = 'Select building and flat.'; return; }
-      if (!u) { box.className = 'reginfo bad'; box.textContent = 'No such flat in this building.'; return; }
-      const k = flatKeyOf(u.building, u.flat), e = MD.entries.get(k);
-      if (e) { box.className = 'reginfo bad'; box.innerHTML = `${esc(u.unit)} is ALREADY ENTERED at ${esc(tIST(e.ts))} (Reg # ${esc(e.regNo)}, ${esc(e.fullName)}) by ${esc(shortBy(e.by, e.byName))}. Duplicate not allowed.`; return; }
-      box.className = 'reginfo ok'; box.innerHTML = `${esc(u.unit)} · ${regLine(k)}`;
-  }
-  function refreshBallotInfo() {
-      const box = $d('bInfo'), u = resolveFlat($d('bBld').value, $d('bFlat').value);
-      box.className = 'reginfo'; $d('bConfirmRow').classList.add('hidden');
-      if (!$d('bBld').value || !$d('bFlat').value.trim()) { box.textContent = 'Select building and flat.'; return; }
-      if (!u) { box.className = 'reginfo bad'; box.textContent = 'No such flat in this building.'; return; }
-      const k = flatKeyOf(u.building, u.flat), b = MD.ballots.get(k), e = MD.entries.get(k);
-      if (b) { box.className = 'reginfo bad'; box.innerHTML = `Ballot for ${esc(u.unit)} was ALREADY GIVEN at ${esc(tIST(b.ts))} by ${esc(shortBy(b.by, b.byName))}. A second ballot is not allowed.`; return; }
-      if (!e) { box.className = 'reginfo'; box.innerHTML = `${esc(u.unit)} · ${regLine(k)}<br><span style="color:#b54708;font-weight:bold">Not in the Entry Register yet.</span>`; $d('bConfirmRow').classList.remove('hidden'); return; }
-      box.className = 'reginfo ok'; box.innerHTML = `${esc(u.unit)} · ${regLine(k)}<br>Entered at ${esc(tIST(e.ts))} – Reg # ${esc(e.regNo)} – ${esc(e.fullName)}`;
-  }
-  ['eBld', 'eFlat'].forEach(id => $d(id).addEventListener('input', () => { if (id === 'eBld') fillFlatList('eBld', 'eFlatList'); refreshEntryInfo(); }));
-  ['bBld', 'bFlat'].forEach(id => $d(id).addEventListener('input', () => { if (id === 'bBld') fillFlatList('bBld', 'bFlatList'); refreshBallotInfo(); }));
-  const cleanName = v => String(v || '').replace(/\s+/g, ' ').trim();
-  const titleWord = v => cleanName(v).toLowerCase().replace(/(^|[\s.'-])([a-z])/g, (m, a, c) => a + c.toUpperCase());
-  ['eFirst', 'eLast'].forEach(id => $d(id).addEventListener('input', refreshMatch));
-  // Enter moves to the next field; on the last field it submits
-  [['eReg', 'eSr'], ['eSr', 'eBld'], ['eBld', 'eFlat'], ['eFlat', 'eFirst'], ['eFirst', 'eLast'], ['eLast', null], ['bBld', 'bFlat'], ['bFlat', null]].forEach(([a, b]) =>
-      $d(a).addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); if (b) $d(b).focus(); else (a === 'eLast' ? submitEntry() : submitBallot()); } }));
-
-  async function logDup(kind, u, reason, extra = {}) {
-      try { await addDoc(collection(db, 'meeting_dup_attempts'), { code: MD.code, kind, flatKey: flatKeyOf(u.building, u.flat), unit: u.unit, regNo: extra.regNo || '', name: extra.name || '',
-            reason: reason.slice(0, 150), by: myPhone(), byName: MD.myName || '', ts: serverTimestamp() }); } catch (e) { console.error('dup log', e); }
-  }
-  const nextNo = v => /^\d+$/.test(v) ? String(+v + 1) : '';
-
-  async function submitEntry() {
-      if (!MD.code) { setMsg('eMsg', 'No meeting is active.'); return; }
-      const reg = $d('eReg').value.trim(), sr = $d('eSr').value.trim();
-      const u = resolveFlat($d('eBld').value, $d('eFlat').value);
-      const fn = titleWord($d('eFirst').value), ln = titleWord($d('eLast').value);
-      if (!reg || !sr) { setMsg('eMsg', 'Enter Reg # and SR #.'); return; }
-      if (!u) { setMsg('eMsg', 'Select a valid building and flat.'); return; }
-      const lettersF = fn.replace(/[^A-Za-z]/g, '').length, lettersL = ln.replace(/[^A-Za-z]/g, '').length;
-      if (!lettersF) { setMsg('eMsg', 'Enter the first name (an initial is fine).'); return; }
-      if (lettersF + lettersL < 3) { setMsg('eMsg', 'The name needs at least 3 letters in total.'); return; }
-      const k = flatKeyOf(u.building, u.flat), full = (fn + ' ' + ln).trim();
-      if (MD.entries.has(k)) { await logDup('entry', u, `Flat already entered (Reg # ${MD.entries.get(k).regNo})`, { regNo: reg, name: full }); setMsg('eMsg', `${u.unit} is already entered – duplicate blocked.`); return; }
-      const used = [...MD.entries.values()].find(x => x.regNo === reg);
-      if (used) { await logDup('entry', u, `Reg # ${reg} already used for ${used.unit}`, { regNo: reg, name: full }); setMsg('eMsg', `Reg # ${reg} is already used for ${used.unit} – duplicate blocked.`); return; }
-      const btn = $d('eSubmit'); btn.disabled = true;
-      try {
-          await setDoc(doc(db, 'meeting_entries', MD.code + '__' + k), { code: MD.code, flatKey: k, building: u.building, flat: u.flat, unit: u.unit, regNo: reg, srNo: sr,
-              firstName: fn, lastName: ln, fullName: full, registeredName: MD.names[k] || '', by: myPhone(), byName: MD.myName || '', ts: serverTimestamp() });
-          setMsg('eMsg', `Saved: ${u.unit} – ${full}`, true);
-          $d('eReg').value = nextNo(reg); $d('eSr').value = nextNo(sr); $d('eFlat').value = ''; $d('eFirst').value = ''; $d('eLast').value = ''; $d('eFull').value = ''; $d('eMatch').textContent = ''; $d('eChips').innerHTML = '';
-          refreshEntryInfo(); $d('eFlat').focus();
-      } catch (e) {
-          console.error(e);
-          let dup = false; try { dup = (await getDoc(doc(db, 'meeting_entries', MD.code + '__' + k))).exists(); } catch (x) {}
-          if (dup) { await logDup('entry', u, 'Entered at the same time by another operator', { regNo: reg, name: full }); setMsg('eMsg', `${u.unit} was just entered by another operator – duplicate blocked.`); }
-          else setMsg('eMsg', 'Not saved: ' + (e.code === 'permission-denied' ? 'not allowed (check meeting code / your operator rights).' : (e.message || e)));
-      } finally { btn.disabled = !MD.code; }
-  }
-
-  async function submitBallot() {
-      if (!MD.code) { setMsg('bMsg', 'No meeting is active.'); return; }
-      const u = resolveFlat($d('bBld').value, $d('bFlat').value);
-      if (!u) { setMsg('bMsg', 'Select a valid building and flat.'); return; }
-      const k = flatKeyOf(u.building, u.flat);
-      if (MD.ballots.has(k)) { await logDup('ballot', u, 'Ballot already given'); setMsg('bMsg', `Ballot for ${u.unit} already given – blocked.`); return; }
-      const entered = MD.entries.has(k);
-      if (!entered && !$d('bConfirm').checked) { setMsg('bMsg', 'Not in the Entry Register – tick the confirmation box first.'); return; }
-      const btn = $d('bSubmit'); btn.disabled = true;
-      try {
-          await setDoc(doc(db, 'meeting_ballots', MD.code + '__' + k), { code: MD.code, flatKey: k, building: u.building, flat: u.flat, unit: u.unit,
-              registeredName: MD.names[k] || '', entered, by: myPhone(), byName: MD.myName || '', ts: serverTimestamp() });
-          setMsg('bMsg', `Ballot recorded: ${u.unit}`, true);
-          $d('bFlat').value = ''; $d('bConfirm').checked = false; refreshBallotInfo(); $d('bFlat').focus();
-      } catch (e) {
-          console.error(e);
-          let dup = false; try { dup = (await getDoc(doc(db, 'meeting_ballots', MD.code + '__' + k))).exists(); } catch (x) {}
-          if (dup) { await logDup('ballot', u, 'Ballot given at the same time by another operator'); setMsg('bMsg', `Ballot for ${u.unit} was just given by another operator – blocked.`); }
-          else setMsg('bMsg', 'Not saved: ' + (e.code === 'permission-denied' ? 'not allowed (check meeting code / your operator rights).' : (e.message || e)));
-      } finally { btn.disabled = !MD.code; }
-  }
-  $d('eSubmit').addEventListener('click', submitEntry);
-  $d('bSubmit').addEventListener('click', submitBallot);
-  $d('lSearch').addEventListener('input', renderDay);
-  $d('lShow').addEventListener('change', renderDay);
-  $d('lExport').addEventListener('click', () => {
-      const rows = MD.listRows || []; if (!rows.length) { alert('Nothing to export.'); return; }
-      downloadCsv(`Meeting_Day_${MD.code.replace(/[^A-Za-z0-9]+/g, '_')}_${today()}.csv`, [['flat', 'reg_no', 'sr_no', 'name_entered', 'registered_name', 'member_type', 'name_match', 'entered_ist', 'entered_by', 'ballot_ist', 'ballot_by', 'joined_online'],
-          ...rows.map(r => [r.unit, r.e ? r.e.regNo : '', r.e ? r.e.srNo : '', r.e ? r.e.fullName : '', nice(r.reg), MD.types[r.k] || '',
-                            r.e && r.reg ? ({ ok: 'Match', part: 'Incomplete', fam: 'Same surname', bad: 'Differs' }[nameMatch(r.e.firstName, r.e.lastName, r.reg)] || '') : '', r.e ? tIST(r.e.ts) : '', r.e ? shortBy(r.e.by, r.e.byName) + ' ' + r.e.by : '',
-                            r.b ? tIST(r.b.ts) : '', r.b ? shortBy(r.b.by, r.b.byName) + ' ' + r.b.by : '', MD.onlineSet.has(r.k) ? 'Yes' : ''])]);
-  });
-
-  window.mdDelete = async function (kind, id, unit) {
-      if (ROLE !== 'admin') return;
-      if (!confirm(`Delete the ${kind === 'entry' ? 'ENTRY' : 'BALLOT'} record for ${unit}? (Use only to correct a wrong entry.)`)) return;
-      try { await deleteDoc(doc(db, kind === 'entry' ? 'meeting_entries' : 'meeting_ballots', id)); } catch (e) { alert('Could not delete: ' + (e.code || e.message)); }
-  };
-
-  // ---- setup (admin) ----
-  $d('sDate').addEventListener('change', () => {
-      const v = $d('sDate').value; if (!v) return;
-      const d = new Date(v + 'T00:00:00'), mon = d.toLocaleString('en-US', { month: 'short' });
-      $d('sCode').value = `Asmita Jyoti - ${String(d.getDate()).padStart(2, '0')}${mon}${d.getFullYear()}`;
-  });
-  $d('sSave').addEventListener('click', async () => {
-      const code = $d('sCode').value.trim().replace(/\s+/g, ' '), online = $d('sOnline').value.trim();
-      if (!code || /[\/]/.test(code)) { setMsg('sMsg', 'Enter a meeting code (no "/").'); return; }
-      if (!confirm(`Set the current meeting to:\n\n${code}\n\nAll operators will start entering into this meeting immediately.`)) return;
-      const btn = $d('sSave'); btn.disabled = true;
-      try {
-          await setDoc(doc(db, 'meeting_config', 'current'), { code, onlineCode: online, updatedAt: serverTimestamp(), by: myPhone() });
-          const note = await publishRoster(code);
-          setMsg('sMsg', 'Current meeting: ' + code + (note ? ' – but member names NOT published: ' + note : ''), !note);
-      } catch (e) { setMsg('sMsg', 'Could not save: ' + (e.code || e.message)); }
-      finally { btn.disabled = false; }
-  });
-  // decrypt only the member names from flats.csv (needs the admins/<your mobile> password record) and share them with operators
-  async function publishRoster(code) {
-      try {
-          const snap = await getDoc(doc(db, 'admins', myPhone()));
-          const sec = snap.exists() ? snap.data() : null;
-          if (!sec || !sec.password) return `no decryption password found. In the Firebase console create collection "admins" → document "${myPhone()}" → field "password" (string) = the flats.csv passphrase.`;
-          const key = await deriveKey(sec.password, sec.salt || ENC_SALT_B64, +(sec.iterations || ENC_ITERATIONS));
-          const rows = parseCsv(await (await fetch(FLATS_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' })).text()), h = rows[0];
-          const iB = h.indexOf('building'), iF = h.indexOf('flat_no'), iN = h.indexOf('member_name'), iA = h.indexOf('associate_member'), iT = h.indexOf('member_type');
-          if (iA < 0 || iT < 0) return 'the website is still serving the OLD flats.csv (no associate_member / member_type columns). Wait 5–10 minutes for GitHub Pages to refresh, then press “Publish member names again”.';
-          const names = {}, types = {};
-          for (const r of rows.slice(1)) {
-              const k = flatKeyOf(r[iB], r[iF]);
-              let n = await decryptCell(key, r[iN]);
-              const a = iA >= 0 && r[iA] ? (await decryptCell(key, r[iA])).trim() : '';
-              // associate / nominee: added in brackets (unless the register name already contains it) → own tap-to-fill button + name match
-              if (a && !n.toUpperCase().replace(/[^A-Z]/g, '').includes(a.toUpperCase().replace(/^(MR|MRS|MS|SMT|SHRI|MISS)\.?\s*/, '').replace(/[^A-Z]/g, '').slice(0, 8))) n = `${n} (${a})`;
-              names[k] = n;
-              if (iT >= 0 && r[iT]) types[k] = r[iT];
-          }
-          await setDoc(doc(db, 'meeting_roster', 'current'), { code: code || MD.code || '', names, types, publishedAt: serverTimestamp(), by: myPhone() });
-          return '';
-      } catch (e) {
-          console.error(e);
-          return e && e.name === 'OperationError' ? 'the stored password does not match flats.csv.' : (e.code || e.message || String(e));
-      }
-  }
-  $d('sPublish').addEventListener('click', async () => {
-      const btn = $d('sPublish'); btn.disabled = true; setMsg('sMsg', 'Publishing member names…', true);
-      const note = await publishRoster(MD.code);
-      setMsg('sMsg', note ? 'Member names NOT published: ' + note : 'Member names published.', !note);
-      btn.disabled = false;
-  });
-  function normPhone(v) { let d = String(v || '').replace(/\D/g, ''); if (d.length === 10) d = '91' + d; return /^91[6-9]\d{9}$/.test(d) ? '+' + d : ''; }
-  $d('stAdd').addEventListener('click', async () => {
-      const ph = normPhone($d('stPhone').value), name = cleanName($d('stName').value), role = $d('stRole').value;
-      if (!ph) { setMsg('stMsg', 'Enter a valid Indian mobile number.'); return; }
-      if (!name) { setMsg('stMsg', 'Enter the operator name.'); return; }
-      try { await setDoc(doc(db, 'meeting_staff', ph), { name, role, addedAt: serverTimestamp(), by: myPhone() }); setMsg('stMsg', `Saved ${ph} (${name}).`, true); $d('stPhone').value = ''; $d('stName').value = ''; }
-      catch (e) { setMsg('stMsg', 'Could not save: ' + (e.code || e.message)); }
-  });
-  window.mdRemoveStaff = async function (ph) {
-      if (!confirm('Remove operator ' + ph + '?')) return;
-      try { await deleteDoc(doc(db, 'meeting_staff', ph)); } catch (e) { alert('Could not remove: ' + (e.code || e.message)); }
-  };
-
-
-  document.getElementById('ctBuild').addEventListener('click', async () => {
-      const btn = document.getElementById('ctBuild'), st = document.getElementById('ctBuildStatus'), log = document.getElementById('ctBuildLog');
-      const approved = ctRecords.filter(r => r.status === 'approved');
-      log.innerHTML = '';
-      if (!approved.length) { st.style.color = '#b42318'; st.textContent = 'No Approved entries – approve some first.'; return; }
-      const user = auth.currentUser; if (!user || !user.phoneNumber) { alert('Please sign in again.'); return; }
-      btn.disabled = true; st.style.color = '#003366'; st.textContent = 'Reading key…';
-      try {
-          const snap = await getDoc(doc(db, 'admins', user.phoneNumber));
-          const sec = snap.exists() ? snap.data() : null;
-          if (!sec || !sec.password) throw new Error(`No decryption password found for ${user.phoneNumber}.`);
-          st.textContent = 'Downloading flats.csv…';
-          const res = await fetch(FLATS_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' });
-          if (!res.ok) throw new Error('Could not download flats.csv (' + res.status + ').');
-          st.textContent = 'Merging & encrypting…';
-          const { csv, changes, used } = await buildUpdatedFlats(await res.text(), sec.password, sec.salt || ENC_SALT_B64, +(sec.iterations || ENC_ITERATIONS), approved);
-          const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-          const a = document.createElement('a'); a.href = url; a.download = 'flats.csv'; document.body.appendChild(a); a.click(); a.remove();
-          setTimeout(() => URL.revokeObjectURL(url), 5000);
-          log.innerHTML = '<b>Changes in the downloaded flats.csv:</b><br>' + changes.map(esc).join('<br>');
-          st.style.color = '#1a7f3c'; st.textContent = `Downloaded flats.csv (${changes.length} flat(s)). Upload it to GitHub: Offer-Calculator/data/flats.csv`;
-          if (used.length && confirm(`flats.csv downloaded.\n\nMark these ${used.length} approved entr${used.length === 1 ? 'y' : 'ies'} as "merged"?\n(Do this once you have uploaded the file to GitHub.)`)) {
-              for (const id of used) await updateDoc(doc(db, 'contact_updates', id), { status: 'merged', reviewedAt: serverTimestamp(), reviewedBy: user.phoneNumber });
-              ctRecords.forEach(r => { if (used.includes(r.id)) r.status = 'merged'; });
-              renderContacts();
-          }
-      } catch (e) {
-          console.error(e);
-          st.style.color = '#b42318';
-          st.textContent = (e && e.name === 'OperationError') ? 'Wrong password – the stored password does not match flats.csv.' : (e.message || 'Failed.');
-      } finally { btn.disabled = false; }
-  });
-
-  document.getElementById('cExportFlats').addEventListener('click', async () => {
-      const btn = document.getElementById('cExportFlats'), st = document.getElementById('cExportStatus');
-      const user = auth.currentUser;
-      if (!user || !user.phoneNumber) { alert('Please sign in again.'); return; }
-      btn.disabled = true; st.style.color = '#003366'; st.textContent = 'Reading key…';
-      try {
-          const snap = await getDoc(doc(db, 'admins', user.phoneNumber));
-          const sec = snap.exists() ? snap.data() : null;
-          if (!sec || !sec.password) throw new Error(`No decryption password found for ${user.phoneNumber} (Firestore: admins/${user.phoneNumber} → password).`);
-          st.textContent = 'Downloading flats.csv…';
-          const res = await fetch(FLATS_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' });
-          if (!res.ok) throw new Error('Could not download flats.csv (' + res.status + ').');
-          const text = await res.text();
-          st.textContent = 'Decrypting…';
-          const { rows, cells } = await decryptFlatsCsv(text, sec.password, sec.salt || ENC_SALT_B64, +(sec.iterations || ENC_ITERATIONS));
-          downloadCsv(`flats_DECRYPTED_${today()}.csv`, rows);
-          st.style.color = '#1a7f3c'; st.textContent = `Done – ${rows.length - 1} units, ${cells} cells decrypted.`;
-      } catch (e) {
-          console.error(e);
-          st.style.color = '#b42318';
-          st.textContent = (e && e.name === 'OperationError') ? 'Wrong password – the stored password does not match flats.csv.'
-                         : (e && e.code === 'permission-denied') ? 'Access denied by Firestore rules for the admins record.'
-                         : (e.message || 'Export failed.');
-      } finally { btn.disabled = false; }
   });
 </script>
+
+<!-- FACE ID CAPTURE ENGINE -->
+<script>
+const FACE_OUT_W = 360;          // stored image width (px)
+const FACE_OUT_H = 480;          // stored image height (px) – 3:4 portrait
+const FACE_JPEG_QUALITY = 0.8;
+const FACE_MAX_BYTES = 700 * 1024; // keep well under Firestore's 1 MiB document limit
+
+// Oval geometry in normalized stage coordinates (matches SVG viewBox 300x400)
+const OVAL = { cx: 0.5, cy: 190 / 400, rx: 105 / 300, ry: 140 / 400 };
+
+const faceState = {
+    stream: null,
+    detector: null,
+    timer: null,
+    aligned: false,
+    pending: null,   // captured but not yet confirmed
+    captured: null   // confirmed: { bytes: Uint8Array, mime, width, height, dataUrl }
+};
+
+window.getFaceCapture = () => faceState.captured;
+
+function isFaceIdTicked() {
+    return document.getElementById('faceIdToggle').checked;
+}
+window.isFaceIdTicked = isFaceIdTicked;
+
+function updateJoinState() {
+    const ticked = isFaceIdTicked();
+    const btn = document.getElementById('joinBtn');
+    const hint = document.getElementById('joinHint');
+    const needFace = ticked && !faceState.captured;
+
+    btn.disabled = needFace;
+    hint.style.display = needFace ? 'block' : 'none';
+
+    // Face ID button is usable only while the box is ticked
+    document.getElementById('faceIdBtn').disabled = !ticked;
+}
+window.updateJoinState = updateJoinState;
+
+function onFaceToggle() {
+    updateJoinState();
+}
+document.addEventListener('DOMContentLoaded', updateJoinState);
+
+function setFaceStatus(text, kind) {
+    const el = document.getElementById('faceStatus');
+    el.textContent = text;
+    el.className = 'face-status' + (kind ? ' ' + kind : '');
+}
+
+function setAligned(isAligned) {
+    faceState.aligned = isAligned;
+    document.getElementById('faceOverlay').classList.toggle('aligned', isAligned);
+    document.getElementById('faceCaptureBtn').disabled = !isAligned;
+}
+
+function showLiveView(live) {
+    document.getElementById('faceVideo').style.display = live ? 'block' : 'none';
+    document.getElementById('facePreview').style.display = live ? 'none' : 'block';
+    // Hide the whole overlay (oval, guide lines, corners, dimming) on the captured preview
+    document.getElementById('faceOverlay').style.display = live ? 'block' : 'none';
+    document.getElementById('faceActionsLive').style.display = live ? 'flex' : 'none';
+    document.getElementById('faceActionsReview').style.display = live ? 'none' : 'flex';
+    document.getElementById('faceTips').style.display = live ? 'block' : 'none';
+}
+
+async function openFaceModal() {
+    document.getElementById('faceModal').classList.add('open');
+    faceState.pending = null;
+    showLiveView(true);
+    setAligned(false);
+    await startFaceCamera();
+}
+
+function closeFaceModal() {
+    stopFaceCamera();
+    faceState.pending = null;
+    document.getElementById('faceModal').classList.remove('open');
+}
+
+async function startFaceCamera() {
+    setFaceStatus('Starting camera…');
+
+    if (!window.isSecureContext) {
+        setFaceStatus('Camera needs a secure (https://) page.', 'err');
+        return;
+    }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setFaceStatus('Camera is not supported on this browser.', 'err');
+        return;
+    }
+
+    try {
+        faceState.stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'user', width: { ideal: 960 }, height: { ideal: 1280 } },
+            audio: false
+        });
+        const video = document.getElementById('faceVideo');
+        video.srcObject = faceState.stream;
+        await video.play();
+
+        // Use the browser's built-in face detector when available (Chrome on Android / macOS / ChromeOS)
+        if ('FaceDetector' in window) {
+            try {
+                faceState.detector = new FaceDetector({ fastMode: true, maxDetectedFaces: 3 });
+            } catch (e) {
+                faceState.detector = null;
+            }
+        }
+
+        if (faceState.detector) {
+            setFaceStatus('Position your face inside the oval');
+            runFaceDetection();
+        } else {
+            // Manual mode – no automatic detection on this browser
+            setFaceStatus('Align your face with the oval, then tap Capture');
+            setAligned(true);
+        }
+    } catch (err) {
+        console.error(err);
+        if (err.name === 'NotAllowedError') {
+            setFaceStatus('Camera permission denied. Please allow camera access and try again.', 'err');
+        } else if (err.name === 'NotFoundError' || err.name === 'OverconstrainedError') {
+            setFaceStatus('No front camera found on this device.', 'err');
+        } else {
+            setFaceStatus('Unable to start camera: ' + err.message, 'err');
+        }
+    }
+}
+
+function stopFaceCamera() {
+    clearTimeout(faceState.timer);
+    faceState.timer = null;
+    if (faceState.stream) {
+        faceState.stream.getTracks().forEach(t => t.stop());
+        faceState.stream = null;
+    }
+    const video = document.getElementById('faceVideo');
+    video.srcObject = null;
+}
+
+// Region of the raw video frame that is visible in the 3:4 stage (object-fit: cover)
+function getCoverCrop(vw, vh) {
+    const target = 3 / 4;
+    if (vw / vh > target) {
+        const sw = vh * target;
+        return { sx: (vw - sw) / 2, sy: 0, sw: sw, sh: vh };
+    }
+    const sh = vw / target;
+    return { sx: 0, sy: (vh - sh) / 2, sw: vw, sh: sh };
+}
+
+async function runFaceDetection() {
+    const video = document.getElementById('faceVideo');
+    if (!faceState.stream || !faceState.detector) return;
+
+    try {
+        if (video.readyState >= 2) {
+            const faces = await faceState.detector.detect(video);
+            evaluateFaces(faces, video);
+        }
+    } catch (e) {
+        // Detector failed at runtime – fall back to manual capture
+        console.warn('Face detection unavailable, switching to manual mode.', e);
+        faceState.detector = null;
+        setFaceStatus('Align your face with the oval, then tap Capture');
+        setAligned(true);
+        return;
+    }
+    faceState.timer = setTimeout(runFaceDetection, 300);
+}
+
+function evaluateFaces(faces, video) {
+    if (!faces.length) {
+        setAligned(false);
+        return setFaceStatus('No face detected – look at the camera');
+    }
+    if (faces.length > 1) {
+        setAligned(false);
+        return setFaceStatus('Only one person in the frame, please');
+    }
+
+    const crop = getCoverCrop(video.videoWidth, video.videoHeight);
+    const b = faces[0].boundingBox;
+    // Normalize to stage coordinates (mirroring does not matter for a centred, symmetric oval)
+    const fx = ((b.x + b.width / 2) - crop.sx) / crop.sw;
+    const fy = ((b.y + b.height / 2) - crop.sy) / crop.sh;
+    const fw = b.width / crop.sw;
+
+    const ovalW = OVAL.rx * 2;
+    const dx = (fx - OVAL.cx) / OVAL.rx;
+    const dy = (fy - OVAL.cy) / OVAL.ry;
+    const offCentre = Math.sqrt(dx * dx + dy * dy);
+
+    if (fw < ovalW * 0.5) {
+        setAligned(false);
+        return setFaceStatus('Move closer to the camera');
+    }
+    if (fw > ovalW * 1.05) {
+        setAligned(false);
+        return setFaceStatus('Move back a little');
+    }
+    if (offCentre > 0.3) {
+        setAligned(false);
+        return setFaceStatus('Centre your face inside the oval');
+    }
+
+    setAligned(true);
+    setFaceStatus('Perfect! Hold still and tap Capture', 'ok');
+}
+
+async function captureFace() {
+    const video = document.getElementById('faceVideo');
+    if (!faceState.stream || video.readyState < 2) return;
+
+    const canvas = document.getElementById('faceCanvas');
+    canvas.width = FACE_OUT_W;
+    canvas.height = FACE_OUT_H;
+    const ctx = canvas.getContext('2d');
+
+    // Crop the area around the oval (keeps 3:4 ratio), stored un-mirrored (true orientation)
+    const c = getCoverCrop(video.videoWidth, video.videoHeight);
+    const sx = c.sx + c.sw * 0.10;
+    const sy = c.sy + c.sh * 0.08;
+    const sw = c.sw * 0.80;
+    const sh = c.sh * 0.80;
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, FACE_OUT_W, FACE_OUT_H);
+
+    let quality = FACE_JPEG_QUALITY;
+    let blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
+    while (blob && blob.size > FACE_MAX_BYTES && quality > 0.4) {
+        quality -= 0.1;
+        blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', quality));
+    }
+    if (!blob) {
+        setFaceStatus('Capture failed, please try again.', 'err');
+        return;
+    }
+
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+
+    faceState.pending = { bytes, mime: 'image/jpeg', width: FACE_OUT_W, height: FACE_OUT_H, dataUrl };
+
+    stopFaceCamera();
+    document.getElementById('facePreview').src = dataUrl;
+    setAligned(true);
+    showLiveView(false);
+    setFaceStatus('Is your full face clearly visible?', 'ok');
+}
+
+async function retakeFace() {
+    faceState.pending = null;
+    showLiveView(true);
+    setAligned(false);
+    await startFaceCamera();
+}
+
+function confirmFace() {
+    if (!faceState.pending) return;
+    faceState.captured = faceState.pending;
+    faceState.pending = null;
+
+    const btn = document.getElementById('faceIdBtn');
+    btn.classList.add('attached');
+    document.getElementById('faceIdBtnIcon').innerHTML =
+        '<img src="' + faceState.captured.dataUrl + '" alt="">';
+    document.getElementById('faceIdBtnText').textContent = 'Face ID attached ✓ (Retake)';
+
+    closeFaceModal();
+    updateJoinState();
+}
+
+// Close popup with Esc key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.getElementById('faceModal').classList.contains('open')) {
+        closeFaceModal();
+    }
+});
+</script>
+
+<script>
+let documentDataList = [];
+
+document.addEventListener('DOMContentLoaded', loadExternalDocuments);
+
+// Monitor main window scrolling patterns to toggle floating arrow visibility parameters
+window.onscroll = function() { trackScrollPosition() };
+
+function trackScrollGroup(element) {
+    const btn = document.getElementById("scrollTopBtn");
+    if (element.scrollTop > 300) {
+        btn.style.display = "flex";
+    } else {
+        btn.style.display = "none";
+    }
+}
+
+function trackScrollPosition() {
+    const btn = document.getElementById("scrollTopBtn");
+    // Check both standard body scrolling and inner-container wrapper flows
+    if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+        btn.style.display = "flex";
+    } else {
+        btn.style.display = "none";
+    }
+}
+
+function scrollToTop() {
+    // Smooth scroll straight back up to global origin zero baseline coordinates
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Also reset responsive internal overflow sections if scrolled separately on mobile viewports
+    document.querySelector('.content-area').scrollTop = 0;
+}
+
+async function loadExternalDocuments() {
+    try {
+        const response = await fetch('documents.json');
+        documentDataList = await response.json();
+
+        const menuContainer = document.getElementById('dynamicSidebarMenu');
+        menuContainer.innerHTML = '';
+
+        documentDataList.forEach((doc, index) => {
+            const listItem = document.createElement('li');
+            listItem.className = 'sidebar-item';
+            listItem.innerText = `${doc.date} | ${doc.title}`;
+            listItem.onclick = () => switchDoc(index, listItem);
+            menuContainer.appendChild(listItem);
+        });
+    } catch (error) {
+        console.error("Failed to load documents mapping index:", error);
+        document.getElementById('welcomeMsg').innerText = "System error loading document directory list.";
+    }
+}
+
+function switchDoc(index, selectedElement) {
+    document.getElementById('welcomeMsg').style.display = 'none';
+
+    const menuItems = document.querySelectorAll('.sidebar-item');
+    menuItems.forEach(item => item.classList.remove('active'));
+    selectedElement.classList.add('active');
+
+    const doc = documentDataList[index];
+    document.getElementById('renderTitle').innerText = `${doc.date} | ${doc.title}`;
+
+    const target = document.getElementById('renderTarget');
+    target.innerHTML = '';
+
+    if (doc.type === "image") {
+        target.innerHTML = `
+            <div class="ad-card" onclick="openModal(this)">
+                <img src="${doc.url}" alt="${doc.title}">
+            </div>`;
+    } else if (doc.type === "pdf") {
+        target.innerHTML = `
+            <a href="${doc.url}" target="_blank" class="mobile-pdf-link-fallback">
+                👉 Click here to Open full PDF Document
+            </a>
+            <div class="pdf-scroll-wrapper">
+                <object class="pdf-object-frame" data="${doc.url}#toolbar=1&navpanes=1" type="application/pdf">
+                    <iframe class="pdf-viewer-frame" src="${doc.url}#toolbar=1&navpanes=1" style="width:100%; height:100%; border:none;"></iframe>
+                </object>
+            </div>`;
+    }
+
+    const container = document.getElementById('activeDocContainer');
+    container.classList.add('active');
+
+    // MOBILE OPTIMIZATION DETECTOR: Runs auto-scroll mechanics safely on phone layouts
+    if (window.innerWidth <= 992) {
+        setTimeout(() => {
+            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150); // Small rendering block delay buffer allows frame context content calculations to settle
+    }
+}
+
+function toggleAttendanceView() {
+    const container = document.getElementById('attendanceContainer');
+    const wrapper = document.getElementById('slideWrapper');
+    const arrow = document.getElementById('formToggleBtn');
+
+    if (container.classList.contains('minimized')) {
+        wrapper.style.display = 'block';
+        setTimeout(() => {
+            container.classList.remove('minimized');
+            arrow.innerHTML = "▲";
+        }, 10);
+    } else {
+        container.classList.add('minimized');
+        arrow.innerHTML = "▼";
+        setTimeout(() => {
+            if (container.classList.contains('minimized')) {
+                wrapper.style.display = 'none';
+            }
+        }, 400);
+    }
+}
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const collapsedToggleBtn = document.getElementById('collapsedToggleBtn');
+    sidebar.classList.toggle('collapsed');
+    if (sidebar.classList.contains('collapsed')) {
+        collapsedToggleBtn.style.display = 'block';
+    } else {
+        collapsedToggleBtn.style.display = 'none';
+    }
+}
+
+function openModal(card){
+    if(card.tagName === 'OBJECT' || card.tagName === 'IFRAME') return;
+    document.getElementById("modalImg").src = card.querySelector("img").src;
+    document.getElementById("imgModal").style.display = "flex";
+}
+
+function closeModal(){
+    document.getElementById("imgModal").style.display = "none";
+}
+
+// Attach explicit listener monitoring context content scroll flow parameters directly
+document.querySelector('.content-area').addEventListener('scroll', function() {
+    trackScrollGroup(this);
+});
+</script>
+
 </body>
 </html>
