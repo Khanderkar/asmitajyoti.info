@@ -80,6 +80,10 @@
         .hidden { display:none !important; }
         h3.mini { color:#003366; margin:16px 0 8px; font-size:1rem; }
         body.staff .adm-only { display:none !important; }
+        .chips { display:flex; flex-wrap:wrap; gap:8px; margin:-2px 0 10px; }
+        .chips:empty { display:none; }
+        .chip { border:1px solid #0099ff; background:#eef6ff; color:#003366; border-radius:18px; padding:7px 14px; font-weight:bold; cursor:pointer; font-size:0.95rem; }
+        .chip:hover { background:#0099ff; color:#fff; }
         .namematch { margin:-2px 0 12px; font-weight:bold; min-height:1.2em; }
         .namematch.ok { color:#1a7f3c; } .namematch.fam { color:#b54708; } .namematch.bad { color:#b42318; }
         .mt { display:inline-block; padding:2px 8px; border-radius:10px; font-size:0.8rem; font-weight:bold; color:#fff; white-space:nowrap; }
@@ -136,7 +140,7 @@
 <div class="dashboard" id="dashboardContainer">
 
     <div class="admin-header">
-        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v29-Oct-2026f</span></h2>
+        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v29-Oct-2026g</span></h2>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
 
@@ -342,11 +346,13 @@
                 </div>
                 <div class="reginfo" id="eInfo">Select building and flat.</div>
                 <div class="fgrid">
-                    <label>First name (min 3)<input id="eFirst" maxlength="40" autocomplete="off"></label>
-                    <label>Last name (min 3)<input id="eLast" maxlength="40" autocomplete="off"></label>
+                    <label>First name / initial<input id="eFirst" name="ajx_f" maxlength="40" autocomplete="one-time-code" spellcheck="false"></label>
+                    <label>Last name / surname<input id="eLast" name="ajx_l" maxlength="40" autocomplete="one-time-code" spellcheck="false"></label>
                     <label class="span2">Full name (as registered in Society records)<input id="eFull" readonly tabindex="-1" placeholder="appears after Building + Flat"></label>
                 </div>
+                <div class="chips" id="eChips"></div>
                 <div class="namematch" id="eMatch"></div>
+                <div class="hint-text" style="margin:-4px 0 10px">At least 3 letters in total; initials are fine (e.g. <b>S</b> Balakrishnan, Tanuja <b>S</b>, a single name like Meena). Tap a registered name above to fill it in.</div>
                 <div class="factions"><button class="tool-btn big" id="eSubmit">Submit entry</button><span class="fmsg" id="eMsg"></span></div>
             </div>
             <h3 class="mini">My last entries</h3>
@@ -1107,20 +1113,61 @@
       return b + '-' + (digitsOf(f) || String(f).trim());
   }
   // ---- typed name vs registered name ----
-  const NSTOP = new Set(['MR','MRS','MS','SMT','SHRI','KUM','KU','DR','MISS','MT','LATE','AND','POA','W','O','D','S']);
-  const ntoks = n => String(n || '').toUpperCase().replace(/\(.*?\)/g, m => ' ' + m.slice(1, -1) + ' ').split(/[^A-Z]+/).filter(t => t.length > 1 && !NSTOP.has(t));
+  const NSTOP = new Set(['MR','MRS','MS','SMT','SHRI','KUM','KU','DR','MISS','MT','LATE','AND','POA','W','O','D','S/O','W/O','D/O']);
+  // same name, different spellings
+  const NVAR = [[/^(MOHD|MOHAMMED|MOHAMMAD|MOHAMED|MOHAMAD|MUHAMMAD|MUHAMMED|MOHMADD|MOHMAD|MD)$/, 'MOHD'], [/^(SHAIKH|SHEIKH|SHAIK|SHEKH|SK)$/, 'SHAIKH'],
+                [/^(SIDDIQUE|SIDDIQUI|SIDDIKI|SIDIQUI)$/, 'SIDDIQUE'], [/^(CHOUDHARY|CHAUDHARY|CHOUDHARI|CHAUDHARI|CHOWDHARY|CHOUDHURY)$/, 'CHOUDHARY'],
+                [/^(KUMAR|KR)$/, 'KUMAR'], [/^(SINGH|SING)$/, 'SINGH'], [/^(KAUR|KOUR)$/, 'KAUR'], [/^(SYED|SAYYAD|SAIYED|SAYED)$/, 'SYED']];
+  const canon = t => { for (const [re, v] of NVAR) if (re.test(t)) return v; return t; };
+  const splitTok = n => String(n || '').toUpperCase().replace(/(?:^|[\s.])(S|W|D)\/O\b/g, ' ').split(/[^A-Z]+/).filter(t => t && !NSTOP.has(t)).map(canon);
+  // registered name → list of persons (joint owners, associated member in brackets …)
+  function persons(reg) {
+      return String(reg || '').toUpperCase().split(/\s*(?:\/|&|\bAND\b|,|\(|\)|-(?=\s*(?:MR|MRS|SMT|MS|MISS)\b))\s*/).map(splitTok).filter(t => t.length);
+  }
   function sim(a, b) {   // similarity 0..1 (Levenshtein)
       if (a === b) return 1; const m = a.length, n = b.length; if (!m || !n) return 0;
       let prev = Array.from({ length: n + 1 }, (_, j) => j);
       for (let i = 1; i <= m; i++) { const cur = [i]; for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; }
       return 1 - prev[n] / Math.max(m, n);
   }
-  const tokIn = (t, list) => list.some(x => x === t || (t.length >= 4 && x.length >= 4 && sim(t, x) >= 0.75) || (x.startsWith(t) && t.length >= 4 && t.length >= 0.7 * x.length));
+  function tokEq(a, b) {
+      if (a === b) return true;
+      if (a.length === 1 || b.length === 1) return a[0] === b[0];                 // initial ↔ name
+      if (a.length >= 4 && b.length >= 4 && sim(a, b) >= 0.75) return true;      // small spelling slips
+      const [s1, l1] = a.length <= b.length ? [a, b] : [b, a];
+      return l1.startsWith(s1) && s1.length >= 4 && s1.length >= 0.7 * l1.length; // short form (KHANDERKAR ↔ KHANDERKER etc.)
+  }
+  const anyEq = (t, P) => P.some(x => tokEq(t, x));
+  // surnames: no initial-matching (an initial "K" must not match surname "Khan"); both one letter is fine (Tanuja S ↔ TANUJA S.)
+  const surEq = (a, b) => (a.length === 1 && b.length === 1) ? a === b : (a.length > 1 && b.length > 1 && tokEq(a, b));
+  // also compare with two neighbouring words joined (AMAR SINGH ↔ AMARSINGH)
+  const withJoins = P => P.concat(P.slice(0, -1).map((t, i) => t + P[i + 1]));
+  // 'ok' = same person · 'fam' = same surname · 'bad' = different
   function nameMatch(first, last, registered) {
-      const R = ntoks(registered); if (!R.length) return '';
-      const f = ntoks(first)[0], l = ntoks(last).slice(-1)[0]; if (!f || !l) return '';
-      const fm = tokIn(f, R), lm = tokIn(l, R);
-      return fm && lm ? 'ok' : (lm ? 'fam' : 'bad');
+      const PS = persons(registered); if (!PS.length) return '';
+      const typed = splitTok(first).concat(splitTok(last)); if (!typed.length) return '';
+      const given = typed[0], sur = typed[typed.length - 1];
+      let fam = false;
+      for (const P of PS) {
+          const pSur = P[P.length - 1], gPart = withJoins(P.length > 1 ? P.slice(0, -1) : P);
+          if (typed.length === 1) { if (given.length > 1 && P.some(x => surEq(given, x))) return P.length === 1 ? 'ok' : 'fam'; continue; }
+          const normal  = anyEq(given, gPart) && (surEq(sur, pSur) || P.slice(0, -1).some(x => x.length > 1 && surEq(sur, x) && x !== P[0]));
+          const swapped = surEq(given, pSur) && anyEq(sur, gPart);            // "Khan Parveen"
+          if (normal || swapped) return 'ok';
+          if (surEq(sur, pSur) || surEq(given, pSur)) fam = true;
+      }
+      return fam ? 'fam' : 'bad';
+  }
+  // tap-to-fill buttons with the registered person(s)
+  function renderChips(reg) {
+      const box = $d('eChips'); box.innerHTML = '';
+      String(reg || '').split(/\s*(?:\/|&|\bAND\b|,|\(|\)|-(?=\s*(?:MR|MRS|SMT|MS|MISS)\b))\s*/i).map(x => x.trim()).filter(x => /[A-Za-z]{2}/.test(x)).forEach(p => {
+          const words = nice(p).replace(/^(Mr|Mrs|Ms|Smt|Shri|Kum|Ku|Dr|Miss|Mt|Late)\.?(\s+|$)/i, '').split(' ').filter(Boolean);
+          if (!words.length || words.join('').replace(/[^A-Za-z]/g, '').length < 2) return;
+          const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = words.join(' ');
+          b.onclick = () => { $d('eFirst').value = words.length > 1 ? words.slice(0, -1).join(' ') : words[0]; $d('eLast').value = words.length > 1 ? words[words.length - 1] : ''; refreshMatch(); $d('eSubmit').focus(); };
+          box.appendChild(b);
+      });
   }
   const MATCH_TXT = { ok: '✓ Matches the registered member', fam: 'Same surname – family member?', bad: '✗ Name differs from the registered member – please check' };
   const MATCH_SHORT = { ok: '✓ Match', fam: 'Family?', bad: '✗ Differs' };
@@ -1249,6 +1296,7 @@
       const box = $d('eInfo'), u = resolveFlat($d('eBld').value, $d('eFlat').value);
       box.className = 'reginfo';
       $d('eFull').value = u ? nice(MD.names[flatKeyOf(u.building, u.flat)] || '') : '';
+      renderChips(u && !MD.entries.has(flatKeyOf(u.building, u.flat)) ? MD.names[flatKeyOf(u.building, u.flat)] : '');
       refreshMatch();
       if (!$d('eBld').value || !$d('eFlat').value.trim()) { box.textContent = 'Select building and flat.'; return; }
       if (!u) { box.className = 'reginfo bad'; box.textContent = 'No such flat in this building.'; return; }
@@ -1288,8 +1336,10 @@
       const fn = titleWord($d('eFirst').value), ln = titleWord($d('eLast').value);
       if (!reg || !sr) { setMsg('eMsg', 'Enter Reg # and SR #.'); return; }
       if (!u) { setMsg('eMsg', 'Select a valid building and flat.'); return; }
-      if (fn.replace(/[^A-Za-z]/g, '').length < 3 || ln.replace(/[^A-Za-z]/g, '').length < 3) { setMsg('eMsg', 'First name and last name need at least 3 letters each.'); return; }
-      const k = flatKeyOf(u.building, u.flat), full = fn + ' ' + ln;
+      const lettersF = fn.replace(/[^A-Za-z]/g, '').length, lettersL = ln.replace(/[^A-Za-z]/g, '').length;
+      if (!lettersF) { setMsg('eMsg', 'Enter the first name (an initial is fine).'); return; }
+      if (lettersF + lettersL < 3) { setMsg('eMsg', 'The name needs at least 3 letters in total.'); return; }
+      const k = flatKeyOf(u.building, u.flat), full = (fn + ' ' + ln).trim();
       if (MD.entries.has(k)) { await logDup('entry', u, `Flat already entered (Reg # ${MD.entries.get(k).regNo})`, { regNo: reg, name: full }); setMsg('eMsg', `${u.unit} is already entered – duplicate blocked.`); return; }
       const used = [...MD.entries.values()].find(x => x.regNo === reg);
       if (used) { await logDup('entry', u, `Reg # ${reg} already used for ${used.unit}`, { regNo: reg, name: full }); setMsg('eMsg', `Reg # ${reg} is already used for ${used.unit} – duplicate blocked.`); return; }
@@ -1298,7 +1348,7 @@
           await setDoc(doc(db, 'meeting_entries', MD.code + '__' + k), { code: MD.code, flatKey: k, building: u.building, flat: u.flat, unit: u.unit, regNo: reg, srNo: sr,
               firstName: fn, lastName: ln, fullName: full, registeredName: MD.names[k] || '', by: myPhone(), byName: MD.myName || '', ts: serverTimestamp() });
           setMsg('eMsg', `Saved: ${u.unit} – ${full}`, true);
-          $d('eReg').value = nextNo(reg); $d('eSr').value = nextNo(sr); $d('eFlat').value = ''; $d('eFirst').value = ''; $d('eLast').value = ''; $d('eFull').value = ''; $d('eMatch').textContent = '';
+          $d('eReg').value = nextNo(reg); $d('eSr').value = nextNo(sr); $d('eFlat').value = ''; $d('eFirst').value = ''; $d('eLast').value = ''; $d('eFull').value = ''; $d('eMatch').textContent = ''; $d('eChips').innerHTML = '';
           refreshEntryInfo(); $d('eFlat').focus();
       } catch (e) {
           console.error(e);
