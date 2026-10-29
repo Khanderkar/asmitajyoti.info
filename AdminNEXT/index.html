@@ -80,6 +80,10 @@
         .hidden { display:none !important; }
         h3.mini { color:#003366; margin:16px 0 8px; font-size:1rem; }
         body.staff .adm-only { display:none !important; }
+        .namematch { margin:-2px 0 12px; font-weight:bold; min-height:1.2em; }
+        .namematch.ok { color:#1a7f3c; } .namematch.fam { color:#b54708; } .namematch.bad { color:#b42318; }
+        .mt { display:inline-block; padding:2px 8px; border-radius:10px; font-size:0.8rem; font-weight:bold; color:#fff; white-space:nowrap; }
+        .mt.ok { background:#00a65a; } .mt.fam { background:#e67e22; } .mt.bad { background:#b42318; }
         .del-btn { border:none; background:#e9eef5; color:#b42318; border-radius:4px; padding:4px 8px; font-weight:bold; cursor:pointer; font-size:0.78rem; margin:1px; }
         .hint-text { font-size: 0.85rem; color: #666; margin: -5px 0 12px; }
         .secure-box { background: #fff8e6; border: 1px solid #f5b94a; border-left: 5px solid #f5b94a; border-radius: 6px; padding: 12px 15px; margin-bottom: 15px; font-size: 0.9rem; }
@@ -132,7 +136,7 @@
 <div class="dashboard" id="dashboardContainer">
 
     <div class="admin-header">
-        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v29-Oct-2026e</span></h2>
+        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v29-Oct-2026f</span></h2>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
 
@@ -340,8 +344,9 @@
                 <div class="fgrid">
                     <label>First name (min 3)<input id="eFirst" maxlength="40" autocomplete="off"></label>
                     <label>Last name (min 3)<input id="eLast" maxlength="40" autocomplete="off"></label>
-                    <label class="span2">Full name<input id="eFull" readonly tabindex="-1"></label>
+                    <label class="span2">Full name (as registered in Society records)<input id="eFull" readonly tabindex="-1" placeholder="appears after Building + Flat"></label>
                 </div>
+                <div class="namematch" id="eMatch"></div>
                 <div class="factions"><button class="tool-btn big" id="eSubmit">Submit entry</button><span class="fmsg" id="eMsg"></span></div>
             </div>
             <h3 class="mini">My last entries</h3>
@@ -372,7 +377,7 @@
                 <span class="spacer"></span>
                 <button class="tool-btn yellow" id="lExport">Export (CSV)</button>
             </div>
-            <div class="table-scroll"><table><thead><tr><th>Flat</th><th>Reg #</th><th>SR #</th><th>Name entered</th><th>Registered name</th><th>Entered (IST · by)</th><th>Ballot (IST · by)</th><th class="adm-only">Online</th><th class="adm-only">Correct</th></tr></thead><tbody id="lBody"></tbody></table></div>
+            <div class="table-scroll"><table><thead><tr><th>Flat</th><th>Reg #</th><th>SR #</th><th>Name entered</th><th>Registered name</th><th>Match</th><th>Entered (IST · by)</th><th>Ballot (IST · by)</th><th class="adm-only">Online</th><th class="adm-only">Correct</th></tr></thead><tbody id="lBody"></tbody></table></div>
             <h3 class="mini">Duplicates blocked</h3>
             <div class="table-scroll"><table><thead><tr><th>Time</th><th>Type</th><th>Flat</th><th>Reg #</th><th>Name typed</th><th>Reason</th><th>By</th></tr></thead><tbody id="lDup"></tbody></table></div>
         </div>
@@ -386,7 +391,8 @@
                     <label class="span2">Meeting code (used for all entries &amp; ballots)<input id="sCode" placeholder="Asmita Jyoti - 01Nov2026"></label>
                     <label class="span2">Online meeting code on the home page (to compare)<input id="sOnline" placeholder="e.g. SGBM-01Nov2026"></label>
                 </div>
-                <div class="factions"><button class="tool-btn big" id="sSave">Set as current meeting</button><span class="fmsg" id="sMsg"></span></div>
+                <div class="factions"><button class="tool-btn big" id="sSave">Set as current meeting</button><button class="tool-btn" id="sPublish">Publish member names again</button><span class="fmsg" id="sMsg"></span></div>
+                <div class="reginfo" id="sRoster" style="margin-top:10px">Member names: checking…</div>
                 <p class="hint-text" style="margin:10px 0 0">Setting the meeting also publishes the member names (only names – no rent / contacts) so operators can see the registered name for each flat.</p>
             </div>
             <div class="form-card">
@@ -1100,6 +1106,30 @@
       if (b === 'Shops/Units') return (/unit/i.test(f) ? 'UNIT-' : 'SH-') + (digitsOf(f) || 0);
       return b + '-' + (digitsOf(f) || String(f).trim());
   }
+  // ---- typed name vs registered name ----
+  const NSTOP = new Set(['MR','MRS','MS','SMT','SHRI','KUM','KU','DR','MISS','MT','LATE','AND','POA','W','O','D','S']);
+  const ntoks = n => String(n || '').toUpperCase().replace(/\(.*?\)/g, m => ' ' + m.slice(1, -1) + ' ').split(/[^A-Z]+/).filter(t => t.length > 1 && !NSTOP.has(t));
+  function sim(a, b) {   // similarity 0..1 (Levenshtein)
+      if (a === b) return 1; const m = a.length, n = b.length; if (!m || !n) return 0;
+      let prev = Array.from({ length: n + 1 }, (_, j) => j);
+      for (let i = 1; i <= m; i++) { const cur = [i]; for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; }
+      return 1 - prev[n] / Math.max(m, n);
+  }
+  const tokIn = (t, list) => list.some(x => x === t || (t.length >= 4 && x.length >= 4 && sim(t, x) >= 0.75) || (x.startsWith(t) && t.length >= 4 && t.length >= 0.7 * x.length));
+  function nameMatch(first, last, registered) {
+      const R = ntoks(registered); if (!R.length) return '';
+      const f = ntoks(first)[0], l = ntoks(last).slice(-1)[0]; if (!f || !l) return '';
+      const fm = tokIn(f, R), lm = tokIn(l, R);
+      return fm && lm ? 'ok' : (lm ? 'fam' : 'bad');
+  }
+  const MATCH_TXT = { ok: '✓ Matches the registered member', fam: 'Same surname – family member?', bad: '✗ Name differs from the registered member – please check' };
+  const MATCH_SHORT = { ok: '✓ Match', fam: 'Family?', bad: '✗ Differs' };
+  function refreshMatch() {
+      const box = $d('eMatch'), u = resolveFlat($d('eBld').value, $d('eFlat').value);
+      const reg = u ? MD.names[flatKeyOf(u.building, u.flat)] : '';
+      const m = reg ? nameMatch($d('eFirst').value, $d('eLast').value, reg) : '';
+      box.className = 'namematch ' + m; box.textContent = m ? MATCH_TXT[m] : '';
+  }
   const nice = n => String(n || '').replace(/\.(?=[A-Za-z])/g, '. ').replace(/\s*\/\s*/g, ' / ').replace(/\s+/g, ' ').trim()
       .toLowerCase().replace(/(^|[\s(/.&-])([a-z])/g, (m, a, c) => a + c.toUpperCase());
   const tIST = ts => ts && ts.toDate ? ts.toDate().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }) : '…';
@@ -1135,7 +1165,13 @@
           setMeetingCode(c.code || '', c.onlineCode || '');
           if (ROLE === 'admin') { if (!$d('sCode').value) $d('sCode').value = c.code || ''; if (!$d('sOnline').value) $d('sOnline').value = c.onlineCode || ''; }
       }, e => console.error('config', e)));
-      MD.base.push(onSnapshot(doc(db, 'meeting_roster', 'current'), sn => { MD.names = sn.exists() ? (sn.data().names || {}) : {}; refreshEntryInfo(); refreshBallotInfo(); renderDay(); },
+      MD.base.push(onSnapshot(doc(db, 'meeting_roster', 'current'), sn => {
+          MD.names = sn.exists() ? (sn.data().names || {}) : {};
+          const n = Object.keys(MD.names).length, x = sn.exists() ? sn.data() : null, rb = $d('sRoster');
+          rb.className = 'reginfo ' + (n ? 'ok' : 'bad');
+          rb.innerHTML = n ? `Member names published: <b>${n}</b> flats/shops${x.publishedAt && x.publishedAt.toDate ? ' on ' + esc(x.publishedAt.toDate().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })) : ''}.`
+                           : 'Member names are NOT published – operators will not see registered names. Press “Publish member names again”.';
+          refreshEntryInfo(); refreshBallotInfo(); renderDay(); },
           e => console.error('roster', e)));
       if (ROLE === 'admin') MD.base.push(onSnapshot(collection(db, 'meeting_staff'), sn => {
           $d('stBody').innerHTML = sn.docs.map(d => { const x = d.data(); return `<tr><td>${esc(d.id)}</td><td>${esc(x.name || '')}</td><td>${esc({ entry: 'Entry Register', ballot: 'Ballot Delivery', both: 'Both' }[x.role] || x.role)}</td>
@@ -1194,11 +1230,12 @@
       $d('lBody').innerHTML = rows.map(r => `<tr>
           <td><strong>${esc(r.unit)}</strong></td><td>${esc(r.e ? r.e.regNo : '')}</td><td>${esc(r.e ? r.e.srNo : '')}</td>
           <td>${esc(r.e ? r.e.fullName : '')}</td><td>${esc(nice(r.reg))}</td>
+          <td>${r.e && r.reg ? (m => m ? `<span class="mt ${m}">${MATCH_SHORT[m]}</span>` : '')(nameMatch(r.e.firstName, r.e.lastName, r.reg)) : ''}</td>
           <td>${r.e ? esc(tIST(r.e.ts) + ' · ' + shortBy(r.e.by, r.e.byName)) : '<span style="color:#b42318">—</span>'}</td>
           <td>${r.b ? esc(tIST(r.b.ts) + ' · ' + shortBy(r.b.by, r.b.byName)) : '<span style="color:#e67e22">—</span>'}</td>
           <td class="adm-only">${O.has(r.k) ? 'Yes' : ''}</td>
           <td class="adm-only">${adm && r.e ? `<button class="del-btn" onclick="mdDelete('entry','${esc(r.e.id)}','${esc(r.unit)}')">Delete entry</button>` : ''}${adm && r.b ? `<button class="del-btn" onclick="mdDelete('ballot','${esc(r.b.id)}','${esc(r.unit)}')">Delete ballot</button>` : ''}</td></tr>`).join('')
-          || `<tr><td colspan="9">${MD.code ? 'Nothing for this selection.' : 'No meeting active.'}</td></tr>`;
+          || `<tr><td colspan="10">${MD.code ? 'Nothing for this selection.' : 'No meeting active.'}</td></tr>`;
       $d('lDup').innerHTML = MD.dups.map(x => `<tr><td>${tIST(x.ts)}</td><td>${x.kind === 'ballot' ? 'Ballot' : 'Entry'}</td><td><strong>${esc(x.unit)}</strong></td><td>${esc(x.regNo || '')}</td><td>${esc(x.name || '')}</td><td>${esc(x.reason || '')}</td><td>${esc(shortBy(x.by, x.byName))}</td></tr>`).join('') || '<tr><td colspan="7">None.</td></tr>';
   }
 
@@ -1206,11 +1243,13 @@
   function showSub(id) { document.querySelectorAll('.sub-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === id)); document.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.id === id)); }
   document.querySelectorAll('.sub-btn').forEach(b => b.addEventListener('click', () => showSub(b.dataset.sub)));
   function fillFlatList(bldId, listId) { const b = $d(bldId).value; $d(listId).innerHTML = MD.units.filter(u => u.building === b).map(u => `<option value="${esc(u.flat)}">`).join(''); }
-  function regLine(k) { const n = MD.names[k]; return n ? `Registered: <b>${esc(nice(n))}</b>` : 'Registered name not available'; }
+  function regLine(k) { const n = MD.names[k]; return n ? `Registered: <b>${esc(nice(n))}</b>` : (Object.keys(MD.names).length ? 'No registered name for this flat' : 'Registered names not published yet – the admin must press “Publish member names” in Setup'); }
 
   function refreshEntryInfo() {
       const box = $d('eInfo'), u = resolveFlat($d('eBld').value, $d('eFlat').value);
       box.className = 'reginfo';
+      $d('eFull').value = u ? nice(MD.names[flatKeyOf(u.building, u.flat)] || '') : '';
+      refreshMatch();
       if (!$d('eBld').value || !$d('eFlat').value.trim()) { box.textContent = 'Select building and flat.'; return; }
       if (!u) { box.className = 'reginfo bad'; box.textContent = 'No such flat in this building.'; return; }
       const k = flatKeyOf(u.building, u.flat), e = MD.entries.get(k);
@@ -1231,7 +1270,7 @@
   ['bBld', 'bFlat'].forEach(id => $d(id).addEventListener('input', () => { if (id === 'bBld') fillFlatList('bBld', 'bFlatList'); refreshBallotInfo(); }));
   const cleanName = v => String(v || '').replace(/\s+/g, ' ').trim();
   const titleWord = v => cleanName(v).toLowerCase().replace(/(^|[\s.'-])([a-z])/g, (m, a, c) => a + c.toUpperCase());
-  ['eFirst', 'eLast'].forEach(id => $d(id).addEventListener('input', () => { $d('eFull').value = [titleWord($d('eFirst').value), titleWord($d('eLast').value)].filter(Boolean).join(' '); }));
+  ['eFirst', 'eLast'].forEach(id => $d(id).addEventListener('input', refreshMatch));
   // Enter moves to the next field; on the last field it submits
   [['eReg', 'eSr'], ['eSr', 'eBld'], ['eBld', 'eFlat'], ['eFlat', 'eFirst'], ['eFirst', 'eLast'], ['eLast', null], ['bBld', 'bFlat'], ['bFlat', null]].forEach(([a, b]) =>
       $d(a).addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); if (b) $d(b).focus(); else (a === 'eLast' ? submitEntry() : submitBallot()); } }));
@@ -1259,7 +1298,7 @@
           await setDoc(doc(db, 'meeting_entries', MD.code + '__' + k), { code: MD.code, flatKey: k, building: u.building, flat: u.flat, unit: u.unit, regNo: reg, srNo: sr,
               firstName: fn, lastName: ln, fullName: full, registeredName: MD.names[k] || '', by: myPhone(), byName: MD.myName || '', ts: serverTimestamp() });
           setMsg('eMsg', `Saved: ${u.unit} – ${full}`, true);
-          $d('eReg').value = nextNo(reg); $d('eSr').value = nextNo(sr); $d('eFlat').value = ''; $d('eFirst').value = ''; $d('eLast').value = ''; $d('eFull').value = '';
+          $d('eReg').value = nextNo(reg); $d('eSr').value = nextNo(sr); $d('eFlat').value = ''; $d('eFirst').value = ''; $d('eLast').value = ''; $d('eFull').value = ''; $d('eMatch').textContent = '';
           refreshEntryInfo(); $d('eFlat').focus();
       } catch (e) {
           console.error(e);
@@ -1296,8 +1335,9 @@
   $d('lShow').addEventListener('change', renderDay);
   $d('lExport').addEventListener('click', () => {
       const rows = MD.listRows || []; if (!rows.length) { alert('Nothing to export.'); return; }
-      downloadCsv(`Meeting_Day_${MD.code.replace(/[^A-Za-z0-9]+/g, '_')}_${today()}.csv`, [['flat', 'reg_no', 'sr_no', 'name_entered', 'registered_name', 'entered_ist', 'entered_by', 'ballot_ist', 'ballot_by', 'joined_online'],
-          ...rows.map(r => [r.unit, r.e ? r.e.regNo : '', r.e ? r.e.srNo : '', r.e ? r.e.fullName : '', nice(r.reg), r.e ? tIST(r.e.ts) : '', r.e ? shortBy(r.e.by, r.e.byName) + ' ' + r.e.by : '',
+      downloadCsv(`Meeting_Day_${MD.code.replace(/[^A-Za-z0-9]+/g, '_')}_${today()}.csv`, [['flat', 'reg_no', 'sr_no', 'name_entered', 'registered_name', 'name_match', 'entered_ist', 'entered_by', 'ballot_ist', 'ballot_by', 'joined_online'],
+          ...rows.map(r => [r.unit, r.e ? r.e.regNo : '', r.e ? r.e.srNo : '', r.e ? r.e.fullName : '', nice(r.reg),
+                            r.e && r.reg ? ({ ok: 'Match', fam: 'Same surname', bad: 'Differs' }[nameMatch(r.e.firstName, r.e.lastName, r.reg)] || '') : '', r.e ? tIST(r.e.ts) : '', r.e ? shortBy(r.e.by, r.e.byName) + ' ' + r.e.by : '',
                             r.b ? tIST(r.b.ts) : '', r.b ? shortBy(r.b.by, r.b.byName) + ' ' + r.b.by : '', MD.onlineSet.has(r.k) ? 'Yes' : ''])]);
   });
 
@@ -1319,21 +1359,34 @@
       if (!confirm(`Set the current meeting to:\n\n${code}\n\nAll operators will start entering into this meeting immediately.`)) return;
       const btn = $d('sSave'); btn.disabled = true;
       try {
-          setMsg('sMsg', 'Publishing member names…', true);
-          let note = '';
-          try {
-              const sec = (await getDoc(doc(db, 'admins', myPhone()))).data();
-              if (!sec || !sec.password) throw new Error('no password record');
-              const key = await deriveKey(sec.password, sec.salt || ENC_SALT_B64, +(sec.iterations || ENC_ITERATIONS));
-              const rows = parseCsv(await (await fetch(FLATS_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' })).text()), h = rows[0];
-              const iB = h.indexOf('building'), iF = h.indexOf('flat_no'), iN = h.indexOf('member_name'), names = {};
-              for (const r of rows.slice(1)) names[flatKeyOf(r[iB], r[iF])] = await decryptCell(key, r[iN]);
-              await setDoc(doc(db, 'meeting_roster', 'current'), { code, names, publishedAt: serverTimestamp(), by: myPhone() });
-          } catch (e) { console.error(e); note = ' (member names NOT published: ' + (e.message || e.code) + ')'; }
           await setDoc(doc(db, 'meeting_config', 'current'), { code, onlineCode: online, updatedAt: serverTimestamp(), by: myPhone() });
-          setMsg('sMsg', 'Current meeting: ' + code + note, !note);
+          const note = await publishRoster(code);
+          setMsg('sMsg', 'Current meeting: ' + code + (note ? ' – but member names NOT published: ' + note : ''), !note);
       } catch (e) { setMsg('sMsg', 'Could not save: ' + (e.code || e.message)); }
       finally { btn.disabled = false; }
+  });
+  // decrypt only the member names from flats.csv (needs the admins/<your mobile> password record) and share them with operators
+  async function publishRoster(code) {
+      try {
+          const snap = await getDoc(doc(db, 'admins', myPhone()));
+          const sec = snap.exists() ? snap.data() : null;
+          if (!sec || !sec.password) return `no decryption password found. In the Firebase console create collection "admins" → document "${myPhone()}" → field "password" (string) = the flats.csv passphrase.`;
+          const key = await deriveKey(sec.password, sec.salt || ENC_SALT_B64, +(sec.iterations || ENC_ITERATIONS));
+          const rows = parseCsv(await (await fetch(FLATS_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' })).text()), h = rows[0];
+          const iB = h.indexOf('building'), iF = h.indexOf('flat_no'), iN = h.indexOf('member_name'), names = {};
+          for (const r of rows.slice(1)) names[flatKeyOf(r[iB], r[iF])] = await decryptCell(key, r[iN]);
+          await setDoc(doc(db, 'meeting_roster', 'current'), { code: code || MD.code || '', names, publishedAt: serverTimestamp(), by: myPhone() });
+          return '';
+      } catch (e) {
+          console.error(e);
+          return e && e.name === 'OperationError' ? 'the stored password does not match flats.csv.' : (e.code || e.message || String(e));
+      }
+  }
+  $d('sPublish').addEventListener('click', async () => {
+      const btn = $d('sPublish'); btn.disabled = true; setMsg('sMsg', 'Publishing member names…', true);
+      const note = await publishRoster(MD.code);
+      setMsg('sMsg', note ? 'Member names NOT published: ' + note : 'Member names published.', !note);
+      btn.disabled = false;
   });
   function normPhone(v) { let d = String(v || '').replace(/\D/g, ''); if (d.length === 10) d = '91' + d; return /^91[6-9]\d{9}$/.test(d) ? '+' + d : ''; }
   $d('stAdd').addEventListener('click', async () => {
