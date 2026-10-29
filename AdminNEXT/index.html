@@ -86,6 +86,10 @@
         .chips:empty { display:none; }
         .chip { border:1px solid #0099ff; background:#eef6ff; color:#003366; border-radius:18px; padding:7px 14px; font-weight:bold; cursor:pointer; font-size:0.95rem; }
         .chip:hover { background:#0099ff; color:#fff; }
+        .chip.assoc { border-color:#8e44ad; background:#f5ecfb; color:#5b2378; }
+        .chip.assoc:hover { background:#8e44ad; color:#fff; }
+        .chip small { font-size:0.7rem; font-weight:normal; opacity:0.85; margin-left:6px; }
+        .assocName { color:#8e44ad; }
         .namematch { margin:-2px 0 12px; font-weight:bold; min-height:1.2em; }
         .namematch.ok { color:#1a7f3c; } .namematch.fam { color:#b54708; } .namematch.bad { color:#b42318; }
         .mt { display:inline-block; padding:2px 8px; border-radius:10px; font-size:0.8rem; font-weight:bold; color:#fff; white-space:nowrap; }
@@ -117,6 +121,37 @@
         .btn-download { background: #ffcc00; color: #000; }
 
         @media (max-width: 760px) { body { padding: 10px; } th, td { padding: 8px; font-size: 0.85rem; } .table-scroll { overflow-x: auto; } }
+        /* muster */
+        .ms-bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:4px 0 10px; }
+        .ms-lg { display:inline-flex; align-items:center; gap:6px; font-size:0.82rem; font-weight:600; background:#fff; border:1px solid #d5dbe3; border-radius:16px; padding:4px 10px; }
+        .ms-sw { width:16px; height:16px; border:1px solid #9aa3ad; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; }
+        .ms-tot { font-size:0.85rem; font-weight:700; background:#003366; color:#fff; border-radius:16px; padding:5px 12px; }
+        .ms-wrap { display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap; }
+        .ms-card { background:#fff; border:1px solid #d5dbe3; border-radius:8px; padding:8px; overflow:auto; max-height:calc(100vh - 150px); }
+        .ms { border-collapse:separate; border-spacing:0; font-size:11px; width:auto; margin:0; box-shadow:none; }
+        .ms th, .ms td { border:0; border-right:1px solid #9aa3ad; border-bottom:1px solid #9aa3ad; padding:0; text-align:center; }
+        .ms tr > *:first-child { border-left:1px solid #9aa3ad; }
+        .ms thead th { position:sticky; background:#003366; color:#fff; z-index:2; }
+        .ms thead tr.h th { top:0; height:26px; font-size:13px; border-top:1px solid #9aa3ad; }
+        .ms thead tr.sm th { background:#f0f2f5; color:#111; height:17px; font-size:11px; }
+        .ms thead tr.sm th.fn { color:#003366; font-size:10px; text-align:right; padding-right:5px; }
+        .ms thead tr.p th { color:#14501f; } .ms thead tr.o th { color:#1f63c2; } .ms thead tr.v th { color:#0b2a5b; } .ms thead tr.pc th { background:#e3ebf5; }
+        .ms th.fn { position:sticky; left:0; background:#f0f2f5; color:#003366; min-width:52px; z-index:1; font-size:11px; }
+        .ms thead th.fn { z-index:3; }
+        .ms thead tr.h th.fn { background:#003366; color:#fff; }
+        .ms td.c { min-width:40px; height:18px; font-weight:700; cursor:pointer; background:#fff; }
+        .ms td.c.na { background:#e6e8ec; cursor:default; }
+        .ms td.c.P { background:#b7e4b0; color:#14501f; } .ms td.c.B { background:#1e7b34; color:#fff; }
+        .ms td.c.O { background:#3b8ff0; color:#fff; } .ms td.c.V { background:#0b2a5b; color:#fff; }
+        .ms td.c.oh { box-shadow:inset 0 -4px 0 #3b8ff0; }
+        .ms td.c.ne { outline:2px solid #e67e22; outline-offset:-3px; }
+        .ms td.c.sel { outline:3px solid #ff9800; outline-offset:-3px; }
+        .ms td.c:not(.na):hover { outline:2px solid #ff9800; outline-offset:-2px; }
+        .ms tr.flb > * { border-top:2px solid #48525e; }
+        .ms .gap { border-left:2px solid #48525e !important; }
+        #msTip { position:fixed; pointer-events:auto; background:#111; color:#fff; font-size:12px; padding:7px 10px; border-radius:6px; display:none; z-index:50; max-width:330px; line-height:1.45; }
+        #msDetail { margin:0 0 10px; }
+        #msTip .x { float:right; cursor:pointer; font-weight:bold; margin-left:12px; font-size:15px; line-height:1; }
     </style>
 </head>
 <body>
@@ -142,7 +177,7 @@
 <div class="dashboard" id="dashboardContainer">
 
     <div class="admin-header">
-        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v29-Oct-2026i</span></h2>
+        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v29-Oct-2026n</span></h2>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
 
@@ -334,6 +369,7 @@
             <button class="sub-btn" data-sub="subEntry">Entry Register</button>
             <button class="sub-btn" data-sub="subBallot">Ballot Delivery</button>
             <button class="sub-btn" data-sub="subList">Live list &amp; duplicates</button>
+            <button class="sub-btn adm-only" data-sub="subMuster">Muster (hall + online)</button>
             <button class="sub-btn adm-only" data-sub="subSetup">Setup (meeting code &amp; staff)</button>
         </div>
 
@@ -390,6 +426,16 @@
             <div class="table-scroll"><table><thead><tr><th>Time</th><th>Type</th><th>Flat</th><th>Reg #</th><th>Name typed</th><th>Reason</th><th>By</th></tr></thead><tbody id="lDup"></tbody></table></div>
         </div>
 
+        <!-- Muster (admin): every flat, hall entries + ballots + online registrations of the SAME meeting code -->
+        <div class="sub-panel adm-only" id="subMuster">
+            <div class="ms-bar" id="msLegend"></div>
+            <div class="ms-wrap"><div class="ms-card" id="msMain"></div><div class="ms-card" id="msShops"></div></div>
+            <div class="hint-text" style="margin-top:8px">Letter = highest stage reached. Blue bottom strip = also joined online. Orange border = ballot given but no hall entry. Grey = flat number not in that building. Click a box to see the flat, member name and both entries (click outside or × to close).</div>
+            <h3 class="mini">Online registrations not matched to a flat</h3>
+            <div class="table-scroll"><table><thead><tr><th>Time</th><th>Building</th><th>Flat</th><th>Name</th></tr></thead><tbody id="msUnmatched"></tbody></table></div>
+        </div>
+        <div id="msTip"></div>
+
         <!-- Setup (admin) -->
         <div class="sub-panel adm-only" id="subSetup">
             <div class="form-card">
@@ -397,7 +443,7 @@
                 <div class="fgrid">
                     <label>Meeting date<input type="date" id="sDate"></label>
                     <label class="span2">Meeting code (used for all entries &amp; ballots)<input id="sCode" placeholder="Asmita Jyoti - 01Nov2026"></label>
-                    <label class="span2">Online meeting code on the home page (to compare)<input id="sOnline" placeholder="e.g. SGBM-01Nov2026"></label>
+                    <label class="span2">Online meeting code (must be the SAME – use this on the home page)<input id="sOnline" readonly tabindex="-1" placeholder="same as the meeting code"></label>
                 </div>
                 <div class="factions"><button class="tool-btn big" id="sSave">Set as current meeting</button><button class="tool-btn" id="sPublish">Publish member names again</button><span class="fmsg" id="sMsg"></span></div>
                 <div class="reginfo" id="sRoster" style="margin-top:10px">Member names: checking…</div>
@@ -1170,12 +1216,18 @@
       return fam ? 'fam' : 'bad';
   }
   // tap-to-fill buttons with the registered person(s)
-  function renderChips(reg) {
+  function renderChips(reg, k) {
       const box = $d('eChips'); box.innerHTML = '';
-      String(reg || '').split(/\s*(?:\/|&|\bAND\b|,|\(|\)|-(?=\s*(?:MR|MRS|SMT|MS|MISS)\b))\s*/i).map(x => x.trim()).filter(x => /[A-Za-z]{2}/.test(x)).forEach(p => {
+      const r = String(reg || ''), main = r.replace(/\([^)]*\)/g, ' / '), asc = [...r.matchAll(/\(([^)]*)\)/g)].map(m => m[1]).join(' / ');
+      const lbl = MD.types[k] === 'Nomination' ? 'Nominee' : 'Associate';
+      addChips(box, main, ''); addChips(box, asc, lbl);
+  }
+  function addChips(box, str, lbl) {
+      String(str || '').split(/\s*(?:\/|&|\bAND\b|,|\(|\)|-(?=\s*(?:MR|MRS|SMT|MS|MISS)\b))\s*/i).map(x => x.trim()).filter(x => /[A-Za-z]{2}/.test(x)).forEach(p => {
           const words = nice(p).replace(/^(Mr|Mrs|Ms|Smt|Shri|Kum|Ku|Dr|Miss|Mt|Late)\.?(\s+|$)/i, '').split(' ').filter(Boolean);
           if (!words.length || words.join('').replace(/[^A-Za-z]/g, '').length < 2) return;
-          const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = words.join(' ');
+          const b = document.createElement('button'); b.type = 'button'; b.className = lbl ? 'chip assoc' : 'chip'; b.textContent = words.join(' ');
+          if (lbl) { const sm = document.createElement('small'); sm.textContent = lbl; b.appendChild(sm); }
           b.onclick = () => { $d('eFirst').value = words.length > 1 ? words.slice(0, -1).join(' ') : words[0]; $d('eLast').value = words.length > 1 ? words[words.length - 1] : ''; refreshMatch(); $d('eSubmit').focus(); };
           box.appendChild(b);
       });
@@ -1220,15 +1272,15 @@
       ['eBld', 'bBld'].forEach(id => { $d(id).innerHTML = '<option value="">Choose…</option>' + blds.map(b => `<option>${esc(b)}</option>`).join(''); });
       MD.base.push(onSnapshot(doc(db, 'meeting_config', 'current'), sn => {
           const c = sn.exists() ? sn.data() : {};
-          setMeetingCode(c.code || '', c.onlineCode || '');
-          if (ROLE === 'admin') { if (!$d('sCode').value) $d('sCode').value = c.code || ''; if (!$d('sOnline').value) $d('sOnline').value = c.onlineCode || ''; }
+          setMeetingCode(c.code || '', c.code || '');   // online code = meeting code
+          if (ROLE === 'admin') { if (!$d('sCode').value) $d('sCode').value = c.code || ''; $d('sOnline').value = $d('sCode').value; }
       }, e => console.error('config', e)));
       MD.base.push(onSnapshot(doc(db, 'meeting_roster', 'current'), sn => {
           MD.names = sn.exists() ? (sn.data().names || {}) : {};
           MD.types = sn.exists() ? (sn.data().types || {}) : {};
           const n = Object.keys(MD.names).length, x = sn.exists() ? sn.data() : null, rb = $d('sRoster');
           rb.className = 'reginfo ' + (n ? 'ok' : 'bad');
-          rb.innerHTML = n ? `Member names published: <b>${n}</b> flats/shops${x.publishedAt && x.publishedAt.toDate ? ' on ' + esc(x.publishedAt.toDate().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })) : ''}.`
+          rb.innerHTML = n ? `Member names published: <b>${n}</b> flats/shops · <b>${Object.values(MD.names).filter(v => / \(/.test(v)).length}</b> with associate/nominee · types: ${Object.keys(MD.types).length ? esc(Object.entries(Object.values(MD.types).reduce((m, t) => (m[t] = (m[t] || 0) + 1, m), {})).map(([t, c]) => t + ' ' + c).join(', ')) : '<b style="color:#b00">none – old roster, publish again</b>'}${x.publishedAt && x.publishedAt.toDate ? ' on ' + esc(x.publishedAt.toDate().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })) : ''}.`
                            : 'Member names are NOT published – operators will not see registered names. Press “Publish member names again”.';
           refreshEntryInfo(); refreshBallotInfo(); renderDay(); },
           e => console.error('roster', e)));
@@ -1243,7 +1295,7 @@
   function setMeetingCode(code, online) {
       if (code === MD.code && online === MD.online) return;
       MD.unsub.forEach(u => { try { u(); } catch (e) {} }); MD.unsub = [];
-      MD.code = code; MD.online = online; MD.entries = new Map(); MD.ballots = new Map(); MD.dups = []; MD.onlineSet = new Set();
+      MD.code = code; MD.online = online; MD.entries = new Map(); MD.ballots = new Map(); MD.dups = []; MD.onlineSet = new Set(); MD.onlineRecs = new Map(); MD.onlineUnmatched = [];
       $d('dCode').textContent = 'Meeting: ' + (code || '–');
       $d('dNoCode').style.display = code ? 'none' : 'block';
       ['eSubmit', 'bSubmit'].forEach(id => $d(id).disabled = !code);
@@ -1253,10 +1305,95 @@
           MD.unsub.push(onSnapshot(q('meeting_ballots'), sn => { MD.ballots = new Map(sn.docs.map(d => [d.data().flatKey, { id: d.id, ...d.data() }])); refreshBallotInfo(); renderDay(); }, e => console.error('ballots', e)));
           MD.unsub.push(onSnapshot(q('meeting_dup_attempts'), sn => { MD.dups = sn.docs.map(d => d.data()).sort((a, b) => (b.ts ? b.ts.seconds : 9e9) - (a.ts ? a.ts.seconds : 9e9)); renderDay(); }, e => console.error('dups', e)));
           if (ROLE === 'admin' && online) MD.unsub.push(onSnapshot(query(collection(db, 'registrations'), where('meetingCode', '==', online)),
-              sn => { MD.onlineSet = new Set(sn.docs.map(d => flatKeyOf(d.data().buildingNumber || '', d.data().flatNumber || ''))); renderDay(); }, e => console.error('online', e)));
+              sn => {
+                  const recs = new Map(), un = [], known = new Set(MD.units.map(u => flatKeyOf(u.building, u.flat)));
+                  sn.docs.forEach(d => { const x = d.data(), k = onlineKey(x.buildingNumber, x.flatNumber), r = { name: x.name || '', ts: x.timestamp, b: x.buildingNumber || '', f: x.flatNumber || '' };
+                      if (known.has(k)) { if (!recs.has(k)) recs.set(k, []); recs.get(k).push(r); } else un.push(r); });
+                  MD.onlineRecs = recs; MD.onlineUnmatched = un; MD.onlineSet = new Set(recs.keys()); renderDay(); }, e => console.error('online', e)));
       }
       renderDay();
   }
+
+  // online registration → flatKey (home page may write "Shop 12", "Unit 3", "D7", "021" …)
+  function onlineKey(b, f) {
+      b = String(b || '').trim(); f = String(f || '').trim();
+      if (/shops?\s*\/\s*units?/i.test(b)) return flatKeyOf('Shops/Units', f || '0');
+      if (/unit/i.test(b + ' ' + f)) return 'UNIT-' + (digitsOf(f) || digitsOf(b) || 0);
+      if (/shop/i.test(b + ' ' + f)) return 'SH-' + (digitsOf(f) || digitsOf(b) || 0);
+      return flatKeyOf(b.toUpperCase().replace(/\s+/g, ''), f);
+  }
+  // ---- MUSTER: buildings across, flat numbers down ----
+  const MS_NAME = { P: 'Present in hall (no ballot yet)', B: 'Ballot given', O: 'Attended online', V: 'Voted' };
+  let MS_SEL = '', MS_XY = [0, 0];
+  function msState(k) {
+      const e = MD.entries.get(k), b = MD.ballots.get(k), o = MD.onlineRecs && MD.onlineRecs.get(k);
+      const s = b ? 'B' : e ? 'P' : o ? 'O' : '';           // V (voted) – logic to come
+      return { s, oh: !!(o && (e || b)), ne: !!(b && !e), e, b, o };
+  }
+  function msGrid(cols, colKeys, rowsOf, label, floorOf, gapAt) {
+      const K = {}, tot = { n: 0, P: 0, B: 0, O: 0, V: 0 };
+      cols.forEach(c => { K[c] = { n: 0, P: 0, B: 0, O: 0, V: 0 }; colKeys[c].forEach(r => { const x = msState(r.k); K[c].n++; if (x.s) K[c][x.s]++; }); for (const z in tot) tot[z] += K[c][z]; });
+      const g = c => gapAt.includes(c) ? ' gap' : '';
+      const sr = (cls, lab, fn) => `<tr class="sm ${cls}"><th class="fn">${lab}</th>` + cols.map(c => `<th class="${g(c)}">${fn(K[c])}</th>`).join('') + '</tr>';
+      let h = '<table class="ms"><thead><tr class="h"><th class="fn">Flat</th>' + cols.map(c => `<th class="${g(c)}">${esc(label(c))}</th>`).join('') + '</tr>' +
+          sr('', 'Flats', k => k.n) + sr('p', 'Present', k => k.P) + sr('b', 'Ballot', k => k.B) + sr('o', 'Online', k => k.O) + sr('v', 'Voted', k => k.V) +
+          sr('pc', '%', k => k.n ? Math.round((k.P + k.B + k.O + k.V) * 100 / k.n) + '%' : '') + '</thead><tbody>';
+      let prev = null;
+      for (const r of rowsOf) {
+          const f = floorOf(r); h += `<tr class="${prev !== null && f !== prev ? 'flb' : ''}"><th class="fn">${r}</th>`; prev = f;
+          for (const c of cols) {
+              const it = colKeys[c].find(x => x.n === r);
+              if (!it) { h += `<td class="c na${g(c)}"></td>`; continue; }
+              const x = msState(it.k);
+              h += `<td class="c ${x.s}${x.oh ? ' oh' : ''}${x.ne ? ' ne' : ''}${MS_SEL === it.k ? ' sel' : ''}${g(c)}" data-k="${esc(it.k)}"></td>`;
+          }
+          h += '</tr>';
+      }
+      return [h + '</tbody></table>', tot];
+  }
+  function renderMuster() {
+      if (!MD.units.length) { $d('msMain').innerHTML = 'Loading flats…'; return; }
+      const blds = BORDER.filter(b => b !== 'Shops/Units' && MD.units.some(u => u.building === b));
+      const CK = {}; blds.forEach(b => CK[b] = MD.units.filter(u => u.building === b).map(u => ({ n: digitsOf(u.flat), k: flatKeyOf(u.building, u.flat) })));
+      const rows = [...new Set(blds.flatMap(b => CK[b].map(x => x.n)))].sort((a, b) => a - b);
+      const [h1, t1] = msGrid(blds, CK, rows, b => b, r => Math.floor(r / 10), ['D1']);
+      const su = MD.units.filter(u => u.building === 'Shops/Units');
+      const SK = { Shops: su.filter(u => !/unit/i.test(u.flat)).map(u => ({ n: digitsOf(u.flat), k: flatKeyOf(u.building, u.flat) })),
+                   Units: su.filter(u => /unit/i.test(u.flat)).map(u => ({ n: digitsOf(u.flat), k: flatKeyOf(u.building, u.flat) })) };
+      const srows = [...new Set(SK.Shops.concat(SK.Units).map(x => x.n))].sort((a, b) => a - b);
+      const [h2, t2] = msGrid(['Shops', 'Units'], SK, srows, b => b, r => Math.floor((r - 1) / 10), []);
+      if (MS_SEL && $d('msTip').style.display === 'block') msPop(MS_SEL, MS_XY[0], MS_XY[1]);
+      const sc = $d('msMain').scrollTop; $d('msMain').innerHTML = h1; $d('msMain').scrollTop = sc; $d('msShops').innerHTML = h2;
+      const T = { n: t1.n + t2.n, P: t1.P + t2.P, B: t1.B + t2.B, O: t1.O + t2.O, V: t1.V + t2.V }, att = T.P + T.B + T.O + T.V;
+      const sw = (bg, fg, l, t) => `<span class="ms-lg"><span class="ms-sw" style="background:${bg}"></span>${t}</span>`;
+      $d('msLegend').innerHTML = sw('#b7e4b0', '#14501f', 'P', 'In person present') + sw('#1e7b34', '#fff', 'B', 'Ballot assigned') + sw('#3b8ff0', '#fff', 'O', 'Attended online') +
+          sw('#0b2a5b', '#fff', 'V', 'Voted <span style="font-weight:normal;color:#888">(logic to come)</span>') + sw('#fff', '#000', '', 'Not yet') +
+          `<span class="ms-tot">${esc(MD.code || 'No meeting')} · Total ${T.n} · Attended ${att} (${T.n ? Math.round(att * 100 / T.n) : 0}%) · Present ${T.P} · Ballot ${T.B} · Online ${T.O} · Voted ${T.V} · Online + hall ${[...MD.onlineSet].filter(k => MD.entries.has(k) || MD.ballots.has(k)).length}</span>`;
+      $d('msUnmatched').innerHTML = (MD.onlineUnmatched || []).map(r => `<tr><td>${tIST(r.ts)}</td><td>${esc(r.b)}</td><td>${esc(r.f)}</td><td>${esc(r.name)}</td></tr>`).join('') || '<tr><td colspan="4">None.</td></tr>';
+  }
+  function msInfo(k) {
+      const x = msState(k), reg = MD.names[k] || '', u = unitOfKey(k);
+      const mm = (n1, n2) => { const m = reg ? nameMatch(n1, n2, reg) : ''; return m ? ` <span class="mt ${m === 'part' ? 'fam' : m}">${MATCH_SHORT[m]}</span>` : ''; };
+      let h = `<span style="font-size:1.1em"><b>${esc(String(u).replace('/', '-'))} | ${esc(nice(reg) || 'no registered name')}</b></span>${typeTag(k)}<br>Status: ${x.s ? MS_NAME[x.s] : 'Not yet'}${x.oh ? ' + joined online' : ''}${x.ne ? ' <span style="color:#e67e22">(ballot without hall entry)</span>' : ''}`;
+      h += `<br>Hall entry: ${x.e ? `<b>${esc(x.e.fullName)}</b>${mm(x.e.firstName, x.e.lastName)} · Reg ${esc(x.e.regNo)} · SR ${esc(x.e.srNo)} · ${tIST(x.e.ts)} · ${esc(shortBy(x.e.by, x.e.byName))}` : '—'}`;
+      h += `<br>Ballot: ${x.b ? `${tIST(x.b.ts)} · ${esc(shortBy(x.b.by, x.b.byName))}` : '—'}`;
+      h += `<br>Online: ${x.o ? x.o.map(r => `<b>${esc(r.name)}</b>${mm(r.name, '')} · ${tIST(r.ts)}`).join('<br>&nbsp;&nbsp;') : '—'}`;
+      return h;
+  }
+  function msPop(k, cx, cy) {
+      const tip = $d('msTip'); tip.innerHTML = `<span class="x" onclick="msClose()">×</span>` + msInfo(k); tip.style.display = 'block';
+      tip.style.left = Math.max(8, Math.min(cx + 14, innerWidth - tip.offsetWidth - 8)) + 'px';
+      tip.style.top = Math.max(8, Math.min(cy + 14, innerHeight - tip.offsetHeight - 8)) + 'px';
+  }
+  window.msClose = () => { MS_SEL = ''; $d('msTip').style.display = 'none'; document.querySelectorAll('.ms td.c.sel').forEach(t => t.classList.remove('sel')); };
+  document.addEventListener('click', e => { if (MS_SEL && !e.target.closest('#msTip') && !e.target.closest('.ms td.c[data-k]')) msClose(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && MS_SEL) msClose(); });
+  ['msMain', 'msShops'].forEach(id => {
+      $d(id).addEventListener('click', e => { const t = e.target.closest('td.c[data-k]'); if (!t) return;
+          document.querySelectorAll('.ms td.c.sel').forEach(x => x.classList.remove('sel')); t.classList.add('sel');
+          MS_SEL = t.dataset.k; MS_XY = [e.clientX, e.clientY]; msPop(MS_SEL, e.clientX, e.clientY); });
+      $d(id).addEventListener('scroll', () => { if (MS_SEL) msClose(); });
+  });
 
   function unitOfKey(k) { const u = MD.units.find(x => flatKeyOf(x.building, x.flat) === k); return u ? u.unit : k; }
 
@@ -1295,21 +1432,22 @@
           <td class="adm-only">${O.has(r.k) ? 'Yes' : ''}</td>
           <td class="adm-only">${adm && r.e ? `<button class="del-btn" onclick="mdDelete('entry','${esc(r.e.id)}','${esc(r.unit)}')">Delete entry</button>` : ''}${adm && r.b ? `<button class="del-btn" onclick="mdDelete('ballot','${esc(r.b.id)}','${esc(r.unit)}')">Delete ballot</button>` : ''}</td></tr>`).join('')
           || `<tr><td colspan="10">${MD.code ? 'Nothing for this selection.' : 'No meeting active.'}</td></tr>`;
+      if ($d('subMuster').classList.contains('active')) renderMuster();
       $d('lDup').innerHTML = MD.dups.map(x => `<tr><td>${tIST(x.ts)}</td><td>${x.kind === 'ballot' ? 'Ballot' : 'Entry'}</td><td><strong>${esc(x.unit)}</strong></td><td>${esc(x.regNo || '')}</td><td>${esc(x.name || '')}</td><td>${esc(x.reason || '')}</td><td>${esc(shortBy(x.by, x.byName))}</td></tr>`).join('') || '<tr><td colspan="7">None.</td></tr>';
   }
 
   // ---- forms ----
-  function showSub(id) { document.querySelectorAll('.sub-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === id)); document.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.id === id)); }
+  function showSub(id) { document.querySelectorAll('.sub-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === id)); document.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.id === id)); if (id === 'subMuster') renderMuster(); }
   document.querySelectorAll('.sub-btn').forEach(b => b.addEventListener('click', () => showSub(b.dataset.sub)));
   function fillFlatList(bldId, listId) { const b = $d(bldId).value; $d(listId).innerHTML = MD.units.filter(u => u.building === b).map(u => `<option value="${esc(u.flat)}">`).join(''); }
   const typeTag = k => { const t = MD.types[k]; return t && t !== 'Member' ? `<span class="mtype ${esc(t)}">${t === 'Associate' ? 'Associate member' : t === 'Expired' ? 'Expired member – check' : esc(t)}</span>` : ''; };
-  function regLine(k) { const n = MD.names[k]; return n ? `Registered: <b>${esc(nice(n))}</b>${typeTag(k)}` : (Object.keys(MD.names).length ? 'No registered name for this flat' : 'Registered names not published yet – the admin must press “Publish member names” in Setup'); }
+  function regLine(k) { const n = MD.names[k]; return n ? `Registered: <b>${esc(nice(n)).replace(/\(([^)]*)\)/g, '<span class="assocName">($1)</span>')}</b>${typeTag(k)}` : (Object.keys(MD.names).length ? 'No registered name for this flat' : 'Registered names not published yet – the admin must press “Publish member names” in Setup'); }
 
   function refreshEntryInfo() {
       const box = $d('eInfo'), u = resolveFlat($d('eBld').value, $d('eFlat').value);
       box.className = 'reginfo';
       $d('eFull').value = u ? nice(MD.names[flatKeyOf(u.building, u.flat)] || '') : '';
-      renderChips(u && !MD.entries.has(flatKeyOf(u.building, u.flat)) ? MD.names[flatKeyOf(u.building, u.flat)] : '');
+      renderChips(u && !MD.entries.has(flatKeyOf(u.building, u.flat)) ? MD.names[flatKeyOf(u.building, u.flat)] : '', u ? flatKeyOf(u.building, u.flat) : '');
       refreshMatch();
       if (!$d('eBld').value || !$d('eFlat').value.trim()) { box.textContent = 'Select building and flat.'; return; }
       if (!u) { box.className = 'reginfo bad'; box.textContent = 'No such flat in this building.'; return; }
@@ -1414,10 +1552,10 @@
   $d('sDate').addEventListener('change', () => {
       const v = $d('sDate').value; if (!v) return;
       const d = new Date(v + 'T00:00:00'), mon = d.toLocaleString('en-US', { month: 'short' });
-      $d('sCode').value = `Asmita Jyoti - ${String(d.getDate()).padStart(2, '0')}${mon}${d.getFullYear()}`;
+      $d('sCode').value = `Asmita Jyoti - ${String(d.getDate()).padStart(2, '0')}${mon}${d.getFullYear()}`; $d('sOnline').value = $d('sCode').value;
   });
   $d('sSave').addEventListener('click', async () => {
-      const code = $d('sCode').value.trim().replace(/\s+/g, ' '), online = $d('sOnline').value.trim();
+      const code = $d('sCode').value.trim().replace(/\s+/g, ' '), online = code;   // online registrations are joined on the SAME code
       if (!code || /[\/]/.test(code)) { setMsg('sMsg', 'Enter a meeting code (no "/").'); return; }
       if (!confirm(`Set the current meeting to:\n\n${code}\n\nAll operators will start entering into this meeting immediately.`)) return;
       const btn = $d('sSave'); btn.disabled = true;
@@ -1437,6 +1575,7 @@
           const key = await deriveKey(sec.password, sec.salt || ENC_SALT_B64, +(sec.iterations || ENC_ITERATIONS));
           const rows = parseCsv(await (await fetch(FLATS_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' })).text()), h = rows[0];
           const iB = h.indexOf('building'), iF = h.indexOf('flat_no'), iN = h.indexOf('member_name'), iA = h.indexOf('associate_member'), iT = h.indexOf('member_type');
+          if (iA < 0 || iT < 0) return 'the website is still serving the OLD flats.csv (no associate_member / member_type columns). Wait 5–10 minutes for GitHub Pages to refresh, then press “Publish member names again”.';
           const names = {}, types = {};
           for (const r of rows.slice(1)) {
               const k = flatKeyOf(r[iB], r[iF]);
