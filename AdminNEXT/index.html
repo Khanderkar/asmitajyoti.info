@@ -80,6 +80,8 @@
         .hidden { display:none !important; }
         h3.mini { color:#003366; margin:16px 0 8px; font-size:1rem; }
         body.staff .adm-only { display:none !important; }
+        .mtype { display:inline-block; margin-left:8px; padding:1px 9px; border-radius:10px; font-size:0.78rem; font-weight:bold; color:#fff; background:#8e44ad; vertical-align:middle; }
+        .mtype.Nomination { background:#0099ff; } .mtype.Expired { background:#b42318; }
         .chips { display:flex; flex-wrap:wrap; gap:8px; margin:-2px 0 10px; }
         .chips:empty { display:none; }
         .chip { border:1px solid #0099ff; background:#eef6ff; color:#003366; border-radius:18px; padding:7px 14px; font-weight:bold; cursor:pointer; font-size:0.95rem; }
@@ -140,7 +142,7 @@
 <div class="dashboard" id="dashboardContainer">
 
     <div class="admin-header">
-        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v29-Oct-2026g</span></h2>
+        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v29-Oct-2026i</span></h2>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
 
@@ -1103,7 +1105,7 @@
   //             meeting_staff/<+91…> {name, role} · meeting_entries/<code>__<flatKey> · meeting_ballots/<code>__<flatKey>
   //             meeting_dup_attempts (refused duplicates)
   // =====================================================================
-  const MD = { code: '', online: '', entries: new Map(), ballots: new Map(), dups: [], onlineSet: new Set(), names: {}, units: [],
+  const MD = { code: '', online: '', entries: new Map(), ballots: new Map(), dups: [], onlineSet: new Set(), names: {}, types: {}, units: [],
                myName: '', unsub: [], base: [] };
   const $d = id => document.getElementById(id);
   const myPhone = () => (auth.currentUser && auth.currentUser.phoneNumber) || '';
@@ -1142,12 +1144,16 @@
   const surEq = (a, b) => (a.length === 1 && b.length === 1) ? a === b : (a.length > 1 && b.length > 1 && tokEq(a, b));
   // also compare with two neighbouring words joined (AMAR SINGH ↔ AMARSINGH)
   const withJoins = P => P.concat(P.slice(0, -1).map((t, i) => t + P[i + 1]));
-  // 'ok' = same person · 'fam' = same surname · 'bad' = different
+  // typed word is the start of a registered word (KHAND… → KHANDERKAR): incomplete, not "different"
+  const prefEq = (a, b) => a.length >= 3 && b.length > a.length && b.startsWith(a);
+  let LAST_HINT = '';
+  // 'ok' = same person · 'part' = looks incomplete · 'fam' = same surname · 'bad' = different
   function nameMatch(first, last, registered) {
+      LAST_HINT = '';
       const PS = persons(registered); if (!PS.length) return '';
       const typed = splitTok(first).concat(splitTok(last)); if (!typed.length) return '';
       const given = typed[0], sur = typed[typed.length - 1];
-      let fam = false;
+      let fam = false, part = '';
       for (const P of PS) {
           const pSur = P[P.length - 1], gPart = withJoins(P.length > 1 ? P.slice(0, -1) : P);
           if (typed.length === 1) { if (given.length > 1 && P.some(x => surEq(given, x))) return P.length === 1 ? 'ok' : 'fam'; continue; }
@@ -1155,7 +1161,12 @@
           const swapped = surEq(given, pSur) && anyEq(sur, gPart);            // "Khan Parveen"
           if (normal || swapped) return 'ok';
           if (surEq(sur, pSur) || surEq(given, pSur)) fam = true;
+          // incomplete: first name fits (or is the start of one) and the surname is the start of the registered surname, or the other way round
+          const givenFit = anyEq(given, gPart) || gPart.some(x => prefEq(given, x));
+          if (!part && givenFit && (prefEq(sur, pSur) || surEq(sur, pSur))) part = nice(pSur);
+          if (!part && typed.length > 1 && anyEq(sur, [pSur]) && gPart.some(x => prefEq(given, x))) part = nice(gPart.find(x => prefEq(given, x)));
       }
+      if (part) { LAST_HINT = part; return 'part'; }
       return fam ? 'fam' : 'bad';
   }
   // tap-to-fill buttons with the registered person(s)
@@ -1169,13 +1180,13 @@
           box.appendChild(b);
       });
   }
-  const MATCH_TXT = { ok: '✓ Matches the registered member', fam: 'Same surname – family member?', bad: '✗ Name differs from the registered member – please check' };
-  const MATCH_SHORT = { ok: '✓ Match', fam: 'Family?', bad: '✗ Differs' };
+  const MATCH_TXT = { ok: '✓ Matches the registered member', part: 'Looks incomplete – did you mean', fam: 'Same surname – family member?', bad: '✗ Name differs from the registered member – please check' };
+  const MATCH_SHORT = { ok: '✓ Match', part: 'Incomplete?', fam: 'Family?', bad: '✗ Differs' };
   function refreshMatch() {
       const box = $d('eMatch'), u = resolveFlat($d('eBld').value, $d('eFlat').value);
       const reg = u ? MD.names[flatKeyOf(u.building, u.flat)] : '';
       const m = reg ? nameMatch($d('eFirst').value, $d('eLast').value, reg) : '';
-      box.className = 'namematch ' + m; box.textContent = m ? MATCH_TXT[m] : '';
+      box.className = 'namematch ' + (m === 'part' ? 'fam' : m); box.textContent = m ? (m === 'part' ? `${MATCH_TXT.part} “${LAST_HINT}”?` : MATCH_TXT[m]) : '';
   }
   const nice = n => String(n || '').replace(/\.(?=[A-Za-z])/g, '. ').replace(/\s*\/\s*/g, ' / ').replace(/\s+/g, ' ').trim()
       .toLowerCase().replace(/(^|[\s(/.&-])([a-z])/g, (m, a, c) => a + c.toUpperCase());
@@ -1214,6 +1225,7 @@
       }, e => console.error('config', e)));
       MD.base.push(onSnapshot(doc(db, 'meeting_roster', 'current'), sn => {
           MD.names = sn.exists() ? (sn.data().names || {}) : {};
+          MD.types = sn.exists() ? (sn.data().types || {}) : {};
           const n = Object.keys(MD.names).length, x = sn.exists() ? sn.data() : null, rb = $d('sRoster');
           rb.className = 'reginfo ' + (n ? 'ok' : 'bad');
           rb.innerHTML = n ? `Member names published: <b>${n}</b> flats/shops${x.publishedAt && x.publishedAt.toDate ? ' on ' + esc(x.publishedAt.toDate().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })) : ''}.`
@@ -1276,8 +1288,8 @@
       const adm = ROLE === 'admin';
       $d('lBody').innerHTML = rows.map(r => `<tr>
           <td><strong>${esc(r.unit)}</strong></td><td>${esc(r.e ? r.e.regNo : '')}</td><td>${esc(r.e ? r.e.srNo : '')}</td>
-          <td>${esc(r.e ? r.e.fullName : '')}</td><td>${esc(nice(r.reg))}</td>
-          <td>${r.e && r.reg ? (m => m ? `<span class="mt ${m}">${MATCH_SHORT[m]}</span>` : '')(nameMatch(r.e.firstName, r.e.lastName, r.reg)) : ''}</td>
+          <td>${esc(r.e ? r.e.fullName : '')}</td><td>${esc(nice(r.reg))}${typeTag(r.k)}</td>
+          <td>${r.e && r.reg ? (m => m ? `<span class="mt ${m === 'part' ? 'fam' : m}">${MATCH_SHORT[m]}</span>` : '')(nameMatch(r.e.firstName, r.e.lastName, r.reg)) : ''}</td>
           <td>${r.e ? esc(tIST(r.e.ts) + ' · ' + shortBy(r.e.by, r.e.byName)) : '<span style="color:#b42318">—</span>'}</td>
           <td>${r.b ? esc(tIST(r.b.ts) + ' · ' + shortBy(r.b.by, r.b.byName)) : '<span style="color:#e67e22">—</span>'}</td>
           <td class="adm-only">${O.has(r.k) ? 'Yes' : ''}</td>
@@ -1290,7 +1302,8 @@
   function showSub(id) { document.querySelectorAll('.sub-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === id)); document.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.id === id)); }
   document.querySelectorAll('.sub-btn').forEach(b => b.addEventListener('click', () => showSub(b.dataset.sub)));
   function fillFlatList(bldId, listId) { const b = $d(bldId).value; $d(listId).innerHTML = MD.units.filter(u => u.building === b).map(u => `<option value="${esc(u.flat)}">`).join(''); }
-  function regLine(k) { const n = MD.names[k]; return n ? `Registered: <b>${esc(nice(n))}</b>` : (Object.keys(MD.names).length ? 'No registered name for this flat' : 'Registered names not published yet – the admin must press “Publish member names” in Setup'); }
+  const typeTag = k => { const t = MD.types[k]; return t && t !== 'Member' ? `<span class="mtype ${esc(t)}">${t === 'Associate' ? 'Associate member' : t === 'Expired' ? 'Expired member – check' : esc(t)}</span>` : ''; };
+  function regLine(k) { const n = MD.names[k]; return n ? `Registered: <b>${esc(nice(n))}</b>${typeTag(k)}` : (Object.keys(MD.names).length ? 'No registered name for this flat' : 'Registered names not published yet – the admin must press “Publish member names” in Setup'); }
 
   function refreshEntryInfo() {
       const box = $d('eInfo'), u = resolveFlat($d('eBld').value, $d('eFlat').value);
@@ -1385,9 +1398,9 @@
   $d('lShow').addEventListener('change', renderDay);
   $d('lExport').addEventListener('click', () => {
       const rows = MD.listRows || []; if (!rows.length) { alert('Nothing to export.'); return; }
-      downloadCsv(`Meeting_Day_${MD.code.replace(/[^A-Za-z0-9]+/g, '_')}_${today()}.csv`, [['flat', 'reg_no', 'sr_no', 'name_entered', 'registered_name', 'name_match', 'entered_ist', 'entered_by', 'ballot_ist', 'ballot_by', 'joined_online'],
-          ...rows.map(r => [r.unit, r.e ? r.e.regNo : '', r.e ? r.e.srNo : '', r.e ? r.e.fullName : '', nice(r.reg),
-                            r.e && r.reg ? ({ ok: 'Match', fam: 'Same surname', bad: 'Differs' }[nameMatch(r.e.firstName, r.e.lastName, r.reg)] || '') : '', r.e ? tIST(r.e.ts) : '', r.e ? shortBy(r.e.by, r.e.byName) + ' ' + r.e.by : '',
+      downloadCsv(`Meeting_Day_${MD.code.replace(/[^A-Za-z0-9]+/g, '_')}_${today()}.csv`, [['flat', 'reg_no', 'sr_no', 'name_entered', 'registered_name', 'member_type', 'name_match', 'entered_ist', 'entered_by', 'ballot_ist', 'ballot_by', 'joined_online'],
+          ...rows.map(r => [r.unit, r.e ? r.e.regNo : '', r.e ? r.e.srNo : '', r.e ? r.e.fullName : '', nice(r.reg), MD.types[r.k] || '',
+                            r.e && r.reg ? ({ ok: 'Match', part: 'Incomplete', fam: 'Same surname', bad: 'Differs' }[nameMatch(r.e.firstName, r.e.lastName, r.reg)] || '') : '', r.e ? tIST(r.e.ts) : '', r.e ? shortBy(r.e.by, r.e.byName) + ' ' + r.e.by : '',
                             r.b ? tIST(r.b.ts) : '', r.b ? shortBy(r.b.by, r.b.byName) + ' ' + r.b.by : '', MD.onlineSet.has(r.k) ? 'Yes' : ''])]);
   });
 
@@ -1423,9 +1436,18 @@
           if (!sec || !sec.password) return `no decryption password found. In the Firebase console create collection "admins" → document "${myPhone()}" → field "password" (string) = the flats.csv passphrase.`;
           const key = await deriveKey(sec.password, sec.salt || ENC_SALT_B64, +(sec.iterations || ENC_ITERATIONS));
           const rows = parseCsv(await (await fetch(FLATS_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' })).text()), h = rows[0];
-          const iB = h.indexOf('building'), iF = h.indexOf('flat_no'), iN = h.indexOf('member_name'), names = {};
-          for (const r of rows.slice(1)) names[flatKeyOf(r[iB], r[iF])] = await decryptCell(key, r[iN]);
-          await setDoc(doc(db, 'meeting_roster', 'current'), { code: code || MD.code || '', names, publishedAt: serverTimestamp(), by: myPhone() });
+          const iB = h.indexOf('building'), iF = h.indexOf('flat_no'), iN = h.indexOf('member_name'), iA = h.indexOf('associate_member'), iT = h.indexOf('member_type');
+          const names = {}, types = {};
+          for (const r of rows.slice(1)) {
+              const k = flatKeyOf(r[iB], r[iF]);
+              let n = await decryptCell(key, r[iN]);
+              const a = iA >= 0 && r[iA] ? (await decryptCell(key, r[iA])).trim() : '';
+              // associate / nominee: added in brackets (unless the register name already contains it) → own tap-to-fill button + name match
+              if (a && !n.toUpperCase().replace(/[^A-Z]/g, '').includes(a.toUpperCase().replace(/^(MR|MRS|MS|SMT|SHRI|MISS)\.?\s*/, '').replace(/[^A-Z]/g, '').slice(0, 8))) n = `${n} (${a})`;
+              names[k] = n;
+              if (iT >= 0 && r[iT]) types[k] = r[iT];
+          }
+          await setDoc(doc(db, 'meeting_roster', 'current'), { code: code || MD.code || '', names, types, publishedAt: serverTimestamp(), by: myPhone() });
           return '';
       } catch (e) {
           console.error(e);
