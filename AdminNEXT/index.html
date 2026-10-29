@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asmita Jyoti - Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; color: #333; margin: 0; padding: 20px; }
+        .admin-header { background: #003366; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); gap: 12px; flex-wrap: wrap; }
+        .header-left-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .meeting-dropdown-selector { padding: 10px 15px; font-size: 1rem; font-weight: bold; border-radius: 4px; border: 2px solid #ffcc00; background: #fff; color: #003366; cursor: pointer; outline: none; }
+
+        /* COUNTER BADGES DESIGN */
+        .count-badge { background: #ffcc00; color: #000; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .unique-badge { background: #00cc66; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .flat-badge { background: #0099ff; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .face-badge { background: #8e44ad; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .print-badge { background: #e67e22; color: #fff; font-size: 1rem; font-weight: bold; padding: 8px 14px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+        .login-box { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; box-sizing: border-box; }
+        .login-box button { background: #003366; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 1rem; margin-top: 10px; }
+        .dashboard { display: none; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
+        th { background: #ffcc00; color: black; }
+        tr:hover { background: #f9f9f9; }
+        .logout-btn { background: #ff3333; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        #recaptcha-container { margin: 15px 0; display: flex; justify-content: center; }
+
+        /* --- TABS --- */
+        .tabs { display: flex; gap: 6px; margin: -10px 0 20px; flex-wrap: wrap; }
+        .tab-btn { background: #e9eef5; color: #003366; border: 2px solid #003366; padding: 10px 18px; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; }
+        .tab-btn.active { background: #003366; color: #fff; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* --- CALCULATOR TAB --- */
+        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 15px; background: #fff; padding: 12px 15px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .toolbar select, .toolbar input { padding: 9px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; }
+        .toolbar label { font-weight: bold; font-size: 0.9rem; color: #003366; }
+        .tool-btn { background: #003366; color: #fff; border: none; padding: 9px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+        .tool-btn.yellow { background: #ffcc00; color: #000; }
+        .tool-btn.red { background: #b42318; }
+        .tool-btn:disabled { opacity: 0.5; cursor: wait; }
+        .spacer { flex: 1; }
+        .ev { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; color: #fff; }
+        .ev-open { background: #7f8c8d; } .ev-view { background: #0099ff; } .ev-print { background: #e67e22; } .ev-pdf { background: #8e44ad; }
+        .vid { font-family: monospace; font-size: 0.85rem; color: #555; }
+        .st { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; color: #fff; }
+        .st-pending { background: #e67e22; } .st-approved { background: #00a65a; } .st-merged { background: #0099ff; } .st-rejected { background: #999; }
+        .act-btn { border: none; border-radius: 4px; padding: 5px 10px; font-weight: bold; cursor: pointer; font-size: 0.8rem; margin: 2px; }
+        .act-ok { background: #00a65a; color: #fff; } .act-no { background: #e9eef5; color: #b42318; } .act-undo { background: #e9eef5; color: #003366; }
+        .tab-count { background: #e67e22; color: #fff; border-radius: 10px; padding: 1px 7px; font-size: 0.8rem; margin-left: 4px; }
+        .tab-count:empty { display: none; }
+        /* --- MEETING DAY --- */
+        .noaccess { display:none; background:#fde2e2; color:#b42318; border:1px solid #f5b5b5; border-radius:8px; padding:16px; font-weight:bold; margin-bottom:16px; }
+        .code-pill { background:#fff; color:#003366; font-weight:bold; padding:8px 14px; border-radius:20px; }
+        .day-warn { display:none; background:#fff8e6; border:1px solid #f5b94a; border-radius:6px; padding:10px 14px; margin-bottom:12px; font-weight:bold; }
+        .subtabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+        .sub-btn { background:#fff; color:#003366; border:2px solid #0099ff; padding:9px 16px; border-radius:6px; font-weight:bold; font-size:0.95rem; cursor:pointer; }
+        .sub-btn.active { background:#0099ff; color:#fff; }
+        .sub-panel { display:none; } .sub-panel.active { display:block; }
+        .form-card { background:#fff; border-radius:8px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:14px; }
+        .fgrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-bottom:10px; }
+        .fgrid label { display:flex; flex-direction:column; gap:5px; font-weight:bold; font-size:0.9rem; color:#003366; }
+        .fgrid input, .fgrid select { padding:11px 12px; border:1px solid #bbb; border-radius:6px; font-size:1.05rem; font-family:inherit; }
+        .fgrid input[readonly] { background:#f1f3f6; font-weight:bold; }
+        .fgrid .span2 { grid-column: span 2; }
+        @media (max-width:560px){ .fgrid .span2 { grid-column: auto; } }
+        .reginfo { background:#eef4fb; border-left:5px solid #0099ff; border-radius:6px; padding:10px 14px; margin:2px 0 12px; font-size:1rem; }
+        .reginfo.bad { background:#fde2e2; border-left-color:#b42318; color:#b42318; font-weight:bold; }
+        .reginfo.ok { background:#e6f6ec; border-left-color:#00a65a; }
+        .factions { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+        .tool-btn.big { padding:12px 26px; font-size:1.05rem; }
+        .fmsg { font-weight:bold; }
+        .fmsg.ok { color:#1a7f3c; } .fmsg.err { color:#b42318; }
+        .bconfirm { display:flex; gap:10px; align-items:flex-start; background:#fff8e6; border-radius:6px; padding:10px; margin-bottom:10px; font-weight:bold; }
+        .bconfirm input { width:20px; height:20px; flex:none; }
+        .hidden { display:none !important; }
+        h3.mini { color:#003366; margin:16px 0 8px; font-size:1rem; }
+        body.staff .adm-only { display:none !important; }
+        .del-btn { border:none; background:#e9eef5; color:#b42318; border-radius:4px; padding:4px 8px; font-weight:bold; cursor:pointer; font-size:0.78rem; margin:1px; }
+        .hint-text { font-size: 0.85rem; color: #666; margin: -5px 0 12px; }
+        .secure-box { background: #fff8e6; border: 1px solid #f5b94a; border-left: 5px solid #f5b94a; border-radius: 6px; padding: 12px 15px; margin-bottom: 15px; font-size: 0.9rem; }
+
+        /* --- FACE ID COLUMN --- */
+        .view-photo-btn { display: inline-flex; align-items: center; gap: 8px; background: #003366; color: #fff; border: none; padding: 4px 12px 4px 4px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.85rem; white-space: nowrap; }
+        .view-photo-btn:hover { background: #00509e; }
+        .view-photo-btn img { width: 30px; height: 36px; object-fit: cover; border-radius: 50% / 45%; border: 2px solid #ffcc00; background: #ddd; }
+        .no-photo { color: #999; font-size: 0.85rem; font-style: italic; white-space: nowrap; }
+
+        /* --- PHOTO POPUP --- */
+        .photo-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
+        .photo-modal.open { display: flex; }
+        .photo-card { background: #fff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); width: 100%; max-width: 400px; max-height: 95vh; overflow-y: auto; position: relative; }
+        .photo-card-header { background: #003366; color: #fff; padding: 12px 45px 12px 16px; font-weight: bold; border-radius: 8px 8px 0 0; }
+        .photo-close { position: absolute; top: 6px; right: 12px; background: transparent; border: none; color: #fff; font-size: 28px; cursor: pointer; line-height: 1; }
+        .photo-card-body { padding: 16px; text-align: center; }
+        .photo-card-body img { height: min(52vh, 440px); max-width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 6px; border: 3px solid #ffcc00; background: #eee; }
+        .photo-meta { text-align: left; font-size: 0.9rem; margin: 12px 0; line-height: 1.7; }
+        .photo-meta span { color: #666; display: inline-block; min-width: 95px; }
+        .photo-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .photo-actions button, .photo-actions a { padding: 9px 18px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; cursor: pointer; text-decoration: none; border: none; }
+        .btn-nav { background: #e9eef5; color: #003366; }
+        .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-download { background: #ffcc00; color: #000; }
+
+        @media (max-width: 760px) { body { padding: 10px; } th, td { padding: 8px; font-size: 0.85rem; } .table-scroll { overflow-x: auto; } }
+    </style>
+</head>
+<body>
+
+<!-- PHONE AUTH INTERFACE -->
+<div class="login-box" id="authContainer">
+    <h2>Admin Mobile OTP Login</h2>
+
+    <div id="phone-step">
+        <input type="tel" id="adminPhone" placeholder="Mobile with country code (e.g. +919821334896)">
+        <div id="recaptcha-container"></div>
+        <button id="sendOtpBtn">Send Verification Code</button>
+    </div>
+
+    <div id="otp-step" style="display: none;">
+        <p style="color: #666; font-size: 0.9rem;">Enter the 6-digit code sent to your mobile device.</p>
+        <input type="text" id="otpCode" placeholder="Enter 6-digit OTP" maxLength="6">
+        <button id="verifyOtpBtn">Verify & Login</button>
+    </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboardContainer">
+
+    <div class="admin-header">
+        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v29-Oct-2026e</span></h2>
+        <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="meetingTab">Online meeting data</button>
+        <button class="tab-btn" data-tab="calcTab">Offer calculator access</button>
+        <button class="tab-btn" data-tab="contactTab">Contact updates <span class="tab-count" id="ctPendingTab"></span></button>
+        <button class="tab-btn" data-tab="dayTab">Meeting day (live)</button>
+    </div>
+    <div class="noaccess" id="noAccess">This mobile number is not authorised for this page. Please ask the Managing Committee to add it as meeting staff, then sign in again.</div>
+
+    <!-- ===== TAB 1: ONLINE MEETING DATA (unchanged) ===== -->
+    <div class="tab-panel active" id="meetingTab">
+        <div class="admin-header" style="background:#00509e;">
+            <div class="header-left-group">
+                <h2 style="margin:0;">Online meeting data</h2>
+
+                <!-- FILTER DROP-DOWN SELECTOR -->
+                <select class="meeting-dropdown-selector" id="meetingFilter" onchange="filterTableByMeeting()">
+                    <option value="" disabled selected>Loading Meetings...</option>
+                </select>
+
+                <span class="count-badge" id="meetingCountLabel">Total: 0</span>
+                <span class="unique-badge" id="meetingUniqueCountLabel">Unique: 0</span>
+                <span class="flat-badge" id="meetingUniqueFlatLabel">Unique Flats: 0</span>
+                <span class="face-badge" id="meetingFaceLabel">Face ID: 0</span>
+            </div>
+        </div>
+
+        <div class="table-scroll">
+        <table id="reportsTable">
+            <thead>
+                <tr>
+                    <th>Submission Timestamp</th>
+                    <th>Meeting Code</th>
+                    <th>Full Name</th>
+                    <th>Building / Flat</th>
+                    <th>Registered Mobile</th>
+                    <th>Registered Email</th>
+                    <th>Face ID</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+        </div>
+    </div>
+
+    <!-- ===== TAB 2: OFFER CALCULATOR ACCESS ===== -->
+    <div class="tab-panel" id="calcTab">
+        <div class="admin-header" style="background:#00509e;">
+            <div class="header-left-group">
+                <h2 style="margin:0;">Offer calculator access</h2>
+                <span class="count-badge" id="cEvents">Events: 0</span>
+                <span class="unique-badge" id="cVisitors">Visitors: 0</span>
+                <span class="flat-badge" id="cFlats" title="Different flats for which Submit / Update was pressed">Unique flats: 0</span>
+                <span class="print-badge" id="cPrints">Prints: 0</span>
+                <span class="face-badge" id="cPdfs">PDFs: 0</span>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <label for="cPeriod">Period</label>
+            <select id="cPeriod">
+                <option value="all">All time</option>
+                <option value="today">Today</option>
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+            </select>
+            <label for="cEvent">Event</label>
+            <select id="cEvent">
+                <option value="">All events</option>
+                <option value="open">Page opened</option>
+                <option value="view">Flat viewed</option>
+                <option value="print">Printed</option>
+                <option value="pdf">PDF exported</option>
+                <option value="__flats">▸ Flat-wise summary</option>
+                <option value="__unseen">▸ Flats not viewed yet</option>
+            </select>
+            <label for="cSearch">Flat</label>
+            <input id="cSearch" placeholder="e.g. D7/21 or D7" size="14">
+            <span class="spacer"></span>
+            <button class="tool-btn" id="cRefresh">Refresh</button>
+            <button class="tool-btn yellow" id="cExportLog">Export log (CSV)</button>
+        </div>
+
+        <div class="secure-box">
+            <b>Member data (decrypted)</b> – downloads <i>flats.csv</i> with member name, rent, permanent address, mobile and email in readable form.
+            The key is read from the protected admin record of your mobile number. Keep the downloaded file private and never upload it to GitHub.
+            <div style="margin-top:10px;"><button class="tool-btn red" id="cExportFlats">Export decrypted flats.csv</button> <span id="cExportStatus" style="margin-left:8px;font-weight:bold;"></span></div>
+        </div>
+
+        <p class="hint-text">Members are not asked to sign in, so each browser gets an anonymous visitor ID. "Flat viewed" = the member pressed Submit / Update for that flat.
+            "Rented" shows only whether the rent box was ticked – the amount is never recorded.</p>
+
+        <div class="table-scroll">
+        <table>
+            <thead id="cHead">
+                <tr>
+                    <th>Time (IST)</th>
+                    <th>Event</th>
+                    <th>Building / Flat</th>
+                    <th>Language</th>
+                    <th>Style</th>
+                    <th>Rented</th>
+                    <th>Device</th>
+                    <th>Visitor ID</th>
+                </tr>
+            </thead>
+            <tbody id="cBody"><tr><td colspan="8">Open this tab to load the log.</td></tr></tbody>
+        </table>
+        </div>
+    </div>
+
+    <!-- ===== TAB 3: CONTACT UPDATES (mobile / email sent by members from the calculator) ===== -->
+    <div class="tab-panel" id="contactTab">
+        <div class="admin-header" style="background:#00509e;">
+            <div class="header-left-group">
+                <h2 style="margin:0;">Contact updates</h2>
+                <span class="count-badge" id="ctTotal">Total: 0</span>
+                <span class="print-badge" id="ctPending">Pending: 0</span>
+                <span class="unique-badge" id="ctApproved">Approved: 0</span>
+                <span class="flat-badge" id="ctMerged">Merged: 0</span>
+                <span class="face-badge" id="ctRejected">Rejected: 0</span>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <label for="ctStatus">Status</label>
+            <select id="ctStatus">
+                <option value="">All</option>
+                <option value="pending" selected>Pending</option>
+                <option value="approved">Approved</option>
+                <option value="merged">Merged</option>
+                <option value="rejected">Rejected</option>
+            </select>
+            <label for="ctSearch">Flat</label>
+            <input id="ctSearch" placeholder="e.g. D7/21 or D7" size="14">
+            <span class="spacer"></span>
+            <button class="tool-btn" id="ctRefresh">Refresh</button>
+            <button class="tool-btn yellow" id="ctExport">Export (CSV)</button>
+        </div>
+
+        <div class="secure-box">
+            <b>Update flats.csv</b> – builds a new, encrypted <i>flats.csv</i> with all <b>Approved</b> details added (newest entry per flat; an existing number / email is kept as the second one).
+            Upload the downloaded file to GitHub as <i>Offer-Calculator/data/flats.csv</i>. The calculator then stops asking those flats.
+            <div style="margin-top:10px;"><button class="tool-btn red" id="ctBuild">Download updated flats.csv</button> <span id="ctBuildStatus" style="margin-left:8px;font-weight:bold;"></span></div>
+            <div id="ctBuildLog" style="margin-top:8px;font-size:0.85rem;"></div>
+        </div>
+
+        <p class="hint-text">Members who enter details are not verified – please check (e.g. call the number) before approving. "Was missing" shows what flats.csv lacked when the member submitted.</p>
+
+        <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>Time (IST)</th>
+                    <th>Building / Flat</th>
+                    <th>Name given</th>
+                    <th>Mobile</th>
+                    <th>Email</th>
+                    <th>Was missing</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="ctBody"><tr><td colspan="8">Open this tab to load the entries.</td></tr></tbody>
+        </table>
+        </div>
+    </div>
+
+    <!-- ===== TAB 4: MEETING DAY – physical entry register + ballot delivery (live) ===== -->
+    <div class="tab-panel" id="dayTab">
+        <div class="admin-header" style="background:#00509e;">
+            <div class="header-left-group">
+                <h2 style="margin:0;">Meeting day</h2>
+                <span class="code-pill" id="dCode">Meeting: –</span>
+                <span class="unique-badge" id="dPresent" title="Different flats entered in the Entry Register">Present: 0 flats</span>
+                <span class="flat-badge" id="dBallots">Ballots given: 0</span>
+                <span class="print-badge" id="dNoBallot" title="Entered but no ballot yet">Present, no ballot: 0</span>
+                <span class="face-badge" id="dBallotNoEntry" title="Ballot given but flat not in the Entry Register">Ballot, not entered: 0</span>
+                <span class="count-badge" id="dDup" title="Duplicate entries / ballots that were refused">Duplicates blocked: 0</span>
+                <span class="count-badge adm-only" id="dOnline" title="Flats that joined online with the online meeting code">Joined online: 0</span>
+                <span class="count-badge adm-only" id="dBoth" title="Flats present in the hall AND joined online">Online + hall: 0</span>
+            </div>
+        </div>
+        <div class="day-warn" id="dNoCode">No meeting is active yet. The Managing Committee sets it in <b>Setup</b>.</div>
+
+        <div class="subtabs">
+            <button class="sub-btn" data-sub="subEntry">Entry Register</button>
+            <button class="sub-btn" data-sub="subBallot">Ballot Delivery</button>
+            <button class="sub-btn" data-sub="subList">Live list &amp; duplicates</button>
+            <button class="sub-btn adm-only" data-sub="subSetup">Setup (meeting code &amp; staff)</button>
+        </div>
+
+        <!-- Entry Register -->
+        <div class="sub-panel" id="subEntry">
+            <div class="form-card">
+                <div class="fgrid">
+                    <label>Reg #<input id="eReg" inputmode="numeric" maxlength="12" autocomplete="off"></label>
+                    <label>SR #<input id="eSr" inputmode="numeric" maxlength="12" autocomplete="off"></label>
+                    <label>Building #<select id="eBld"></select></label>
+                    <label>Flat #<input id="eFlat" list="eFlatList" autocomplete="off" placeholder="e.g. 21"><datalist id="eFlatList"></datalist></label>
+                </div>
+                <div class="reginfo" id="eInfo">Select building and flat.</div>
+                <div class="fgrid">
+                    <label>First name (min 3)<input id="eFirst" maxlength="40" autocomplete="off"></label>
+                    <label>Last name (min 3)<input id="eLast" maxlength="40" autocomplete="off"></label>
+                    <label class="span2">Full name<input id="eFull" readonly tabindex="-1"></label>
+                </div>
+                <div class="factions"><button class="tool-btn big" id="eSubmit">Submit entry</button><span class="fmsg" id="eMsg"></span></div>
+            </div>
+            <h3 class="mini">My last entries</h3>
+            <div class="table-scroll"><table><thead><tr><th>Time</th><th>Flat</th><th>Reg #</th><th>SR #</th><th>Name</th></tr></thead><tbody id="eMine"></tbody></table></div>
+        </div>
+
+        <!-- Ballot Delivery -->
+        <div class="sub-panel" id="subBallot">
+            <div class="form-card">
+                <div class="fgrid">
+                    <label>Building #<select id="bBld"></select></label>
+                    <label>Flat #<input id="bFlat" list="bFlatList" autocomplete="off" placeholder="e.g. 21"><datalist id="bFlatList"></datalist></label>
+                </div>
+                <div class="reginfo" id="bInfo">Select building and flat.</div>
+                <label class="bconfirm hidden" id="bConfirmRow"><input type="checkbox" id="bConfirm"> This flat is not in the Entry Register yet – the member is present and I confirm the ballot hand-over.</label>
+                <div class="factions"><button class="tool-btn big" id="bSubmit">Record ballot given</button><span class="fmsg" id="bMsg"></span></div>
+            </div>
+            <h3 class="mini">My last ballots</h3>
+            <div class="table-scroll"><table><thead><tr><th>Time</th><th>Flat</th><th>Registered name</th></tr></thead><tbody id="bMine"></tbody></table></div>
+        </div>
+
+        <!-- Live list -->
+        <div class="sub-panel" id="subList">
+            <div class="toolbar">
+                <label for="lSearch">Flat / name</label><input id="lSearch" placeholder="e.g. D7/21 or Sharma" size="18">
+                <label for="lShow">Show</label>
+                <select id="lShow"><option value="all">All flats with activity</option><option value="noballot">Present, no ballot</option><option value="noentry">Ballot, not entered</option><option value="online">Online only (not in hall)</option></select>
+                <span class="spacer"></span>
+                <button class="tool-btn yellow" id="lExport">Export (CSV)</button>
+            </div>
+            <div class="table-scroll"><table><thead><tr><th>Flat</th><th>Reg #</th><th>SR #</th><th>Name entered</th><th>Registered name</th><th>Entered (IST · by)</th><th>Ballot (IST · by)</th><th class="adm-only">Online</th><th class="adm-only">Correct</th></tr></thead><tbody id="lBody"></tbody></table></div>
+            <h3 class="mini">Duplicates blocked</h3>
+            <div class="table-scroll"><table><thead><tr><th>Time</th><th>Type</th><th>Flat</th><th>Reg #</th><th>Name typed</th><th>Reason</th><th>By</th></tr></thead><tbody id="lDup"></tbody></table></div>
+        </div>
+
+        <!-- Setup (admin) -->
+        <div class="sub-panel adm-only" id="subSetup">
+            <div class="form-card">
+                <h3 class="mini" style="margin-top:0">Meeting code</h3>
+                <div class="fgrid">
+                    <label>Meeting date<input type="date" id="sDate"></label>
+                    <label class="span2">Meeting code (used for all entries &amp; ballots)<input id="sCode" placeholder="Asmita Jyoti - 01Nov2026"></label>
+                    <label class="span2">Online meeting code on the home page (to compare)<input id="sOnline" placeholder="e.g. SGBM-01Nov2026"></label>
+                </div>
+                <div class="factions"><button class="tool-btn big" id="sSave">Set as current meeting</button><span class="fmsg" id="sMsg"></span></div>
+                <p class="hint-text" style="margin:10px 0 0">Setting the meeting also publishes the member names (only names – no rent / contacts) so operators can see the registered name for each flat.</p>
+            </div>
+            <div class="form-card">
+                <h3 class="mini" style="margin-top:0">Meeting staff (data-entry operators)</h3>
+                <div class="fgrid">
+                    <label>Mobile (+91…)<input id="stPhone" inputmode="tel" placeholder="+9198XXXXXXXX"></label>
+                    <label>Name<input id="stName" maxlength="40"></label>
+                    <label>Allowed<select id="stRole"><option value="entry">Entry Register</option><option value="ballot">Ballot Delivery</option><option value="both">Both</option></select></label>
+                </div>
+                <div class="factions"><button class="tool-btn" id="stAdd">Add / update operator</button><span class="fmsg" id="stMsg"></span></div>
+                <div class="table-scroll" style="margin-top:10px"><table><thead><tr><th>Mobile</th><th>Name</th><th>Allowed</th><th></th></tr></thead><tbody id="stBody"></tbody></table></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FACE PHOTO POPUP -->
+<div class="photo-modal" id="photoModal" onclick="if(event.target === this) closePhoto()">
+    <div class="photo-card">
+        <div class="photo-card-header" id="photoTitle">Face ID</div>
+        <button class="photo-close" onclick="closePhoto()" aria-label="Close">×</button>
+        <div class="photo-card-body">
+            <img id="photoImg" alt="Member face photo">
+            <div class="photo-meta" id="photoMeta"></div>
+            <div class="photo-actions">
+                <button class="btn-nav" id="photoPrev" onclick="stepPhoto(-1)">◀ Prev</button>
+                <a class="btn-download" id="photoDownload" download="face.jpg">Download</a>
+                <button class="btn-nav" id="photoNext" onclick="stepPhoto(1)">Next ▶</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, collection, query, orderBy, getDocs, limit, startAfter, doc, getDoc, updateDoc, serverTimestamp, setDoc, deleteDoc, addDoc, onSnapshot, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA0g27F_5V_DYb0MvgRic4UVvc6TTgTBfY",
+    authDomain: "asmitajyoti-sgbm.firebaseapp.com",
+    projectId: "asmitajyoti-sgbm",
+    storageBucket: "asmitajyoti-sgbm.firebasestorage.app",
+    messagingSenderId: "85179629629",
+    appId: "1:85179629629:web:81718858a1d21aba752a54",
+    measurementId: "G-D107TNSPL1"
+  };
+
+  // ---- Offer calculator settings ----
+  const FLATS_CSV_URL = "/Offer-Calculator/data/flats.csv";   // encrypted member file on the website
+  const ENC_SALT_B64 = "uxvtoV8bzv+Oi4BvERzJxw==";            // PBKDF2 salt used when flats.csv was encrypted (not secret)
+  const ENC_ITERATIONS = 600000;                             // PBKDF2-SHA256 iterations
+  const CALC_LOG_LIMIT = 50000;                              // newest N log entries loaded (read in batches)
+  const CALC_PAGE = 5000;                                    // Firestore allows max 10,000 per query
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const COLS = 7;
+  let confirmationResultGlobal = null;
+  let allMasterRecords = [];
+  let photoRecords = [];     // records with a photo in the current filtered view
+  let photoIndex = -1;
+
+  // Escape user-entered text before putting it into the table
+  function esc(v) {
+      return String(v ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  }
+
+  // Convert Firestore binary (Bytes) into an image URL
+  function faceToDataUrl(data) {
+      const b = data.faceImage;
+      if (!b) return null;
+      try {
+          const base64 = typeof b.toBase64 === 'function' ? b.toBase64() : null;
+          if (!base64) return null;
+          return `data:${data.faceImageType || 'image/jpeg'};base64,${base64}`;
+      } catch (e) {
+          console.warn('Unable to read face image for', data.name, e);
+          return null;
+      }
+  }
+
+  // Master admin numbers (UI only – the real protection is in the Firestore rules)
+  const ADMIN_PHONES = ['+919821334896'];
+  let ROLE = null;   // 'admin' | 'entry' | 'ballot' | 'both'
+
+  onAuthStateChanged(auth, async (user) => {
+      if (user) {
+          document.getElementById('authContainer').style.display = 'none';
+          document.getElementById('dashboardContainer').style.display = 'block';
+          const phone = user.phoneNumber || '';
+          if (ADMIN_PHONES.includes(phone)) {
+              ROLE = 'admin';
+              document.body.classList.remove('staff');
+              document.getElementById('noAccess').style.display = 'none';
+              document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('hidden'));
+              fetchMasterData();
+              calcLoaded = false; ctLoaded = false;
+              fetchContacts();
+              if (document.getElementById('calcTab').classList.contains('active')) fetchCalcLog();
+              startMeetingDay(null);
+          } else {
+              // Meeting staff (data-entry operators): only the Meeting day tab
+              document.body.classList.add('staff');
+              let st = null;
+              try { const sn = await getDoc(doc(db, 'meeting_staff', phone)); st = sn.exists() ? sn.data() : null; } catch (e) { st = null; }
+              document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('hidden', b.dataset.tab !== 'dayTab' || !st));
+              document.querySelectorAll('.tab-panel').forEach(pn => pn.classList.toggle('active', !!st && pn.id === 'dayTab'));
+              document.getElementById('noAccess').style.display = st ? 'none' : 'block';
+              if (!st) return;
+              ROLE = st.role || 'entry';
+              startMeetingDay(st);
+          }
+      } else {
+          stopMeetingDay();
+          ROLE = null;
+          document.getElementById('authContainer').style.display = 'block';
+          document.getElementById('dashboardContainer').style.display = 'none';
+          resetAuthUI();
+      }
+  });
+
+  function resetAuthUI() {
+      document.getElementById('phone-step').style.display = 'block';
+      document.getElementById('otp-step').style.display = 'none';
+      document.getElementById('adminPhone').value = '';
+      document.getElementById('otpCode').value = '';
+  }
+
+  function initRecaptcha() {
+      if (!window.recaptchaVerifier) {
+          window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+              'size': 'invisible'
+          });
+      }
+  }
+
+  document.getElementById('sendOtpBtn').addEventListener('click', async () => {
+      const phoneNumber = document.getElementById('adminPhone').value.trim();
+      if(!phoneNumber.startsWith('+')) {
+          alert("Please specify country code (e.g. +91) before your number.");
+          return;
+      }
+      initRecaptcha();
+      try {
+          confirmationResultGlobal = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
+          document.getElementById('phone-step').style.display = 'none';
+          document.getElementById('otp-step').style.display = 'block';
+      } catch (error) {
+          console.error(error);
+          alert("SMS Dispatch Failure: " + error.message);
+      }
+  });
+
+  document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
+      const code = document.getElementById('otpCode').value.trim();
+      try {
+          await confirmationResultGlobal.confirm(code);
+      } catch (error) {
+          alert("Invalid OTP Code. Access Denied.");
+      }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+      closePhoto();
+      calcRecords = []; calcLoaded = false;
+      document.getElementById('cBody').innerHTML = '<tr><td colspan="8">Open this tab to load the log.</td></tr>';
+      signOut(auth);
+  });
+
+  // ---- TABS ----
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === btn.dataset.tab));
+      if (btn.dataset.tab === 'calcTab' && !calcLoaded) fetchCalcLog();
+      if (btn.dataset.tab === 'contactTab' && !ctLoaded) fetchContacts();
+  }));
+
+  // =====================================================================
+  //  TAB 1 – ONLINE MEETING DATA (same logic as before)
+  // =====================================================================
+  async function fetchMasterData() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = `<tr><td colspan="${COLS}">Fetching database logs...</td></tr>`;
+
+      try {
+          const q = query(collection(db, "registrations"), orderBy("timestamp", "desc"));
+          const querySnapshot = await getDocs(q);
+          allMasterRecords = [];
+
+          if(querySnapshot.empty) {
+              tbody.innerHTML = `<tr><td colspan="${COLS}">No registration entries found.</td></tr>`;
+              document.getElementById('meetingCountLabel').innerText = "Total: 0";
+              document.getElementById('meetingUniqueCountLabel').innerText = "Unique: 0";
+              document.getElementById('meetingUniqueFlatLabel').innerText = "Unique Flats: 0";
+              document.getElementById('meetingFaceLabel').innerText = "Face ID: 0";
+              return;
+          }
+
+          const uniqueMeetingCodes = new Set();
+
+          querySnapshot.forEach((d) => {
+              const data = d.data();
+              const dateObj = data.timestamp ? data.timestamp.toDate() : new Date();
+              const formattedTime = dateObj.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+              const record = {
+                  id: d.id,
+                  meetingCode: data.meetingCode || 'N/A',
+                  timestamp: formattedTime,
+                  name: data.name || '',
+                  flatInfo: `${data.buildingNumber || ''} - ${data.flatNumber || ''}`,
+                  mobile: data.mobileNumber || '',
+                  email: data.emailAddress || '',
+                  facePhoto: faceToDataUrl(data)
+              };
+
+              allMasterRecords.push(record);
+              uniqueMeetingCodes.add(record.meetingCode);
+          });
+
+          const dropdown = document.getElementById('meetingFilter');
+          dropdown.innerHTML = '';
+
+          uniqueMeetingCodes.forEach(code => {
+              const opt = document.createElement('option');
+              opt.value = code;
+              opt.innerText = code;
+              dropdown.appendChild(opt);
+          });
+
+          if(allMasterRecords.length > 0) {
+              const latestMeetingCode = allMasterRecords[0].meetingCode;
+              dropdown.value = latestMeetingCode;
+              renderFilteredTable(latestMeetingCode);
+          }
+
+      } catch (error) {
+          console.error(error);
+          tbody.innerHTML = `<tr><td colspan="${COLS}" style="color:red;">Access Denied: Rules validation parameter error.<br><small style="color:#666;">Signed in as: ${esc((auth.currentUser && auth.currentUser.phoneNumber) || '')} · error: ${esc((error && error.code) || '')} ${esc((error && error.message) || '')}</small></td></tr>`;
+      }
+  }
+
+  window.filterTableByMeeting = function() {
+      const selectedMeeting = document.getElementById('meetingFilter').value;
+      renderFilteredTable(selectedMeeting);
+  };
+
+  function renderFilteredTable(filterCode) {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      const filtered = allMasterRecords.filter(r => r.meetingCode === filterCode);
+      photoRecords = filtered.filter(r => r.facePhoto);
+
+      const uniqueSubmissionsSet = new Set();
+      const uniqueFlatsSet = new Set();
+
+      filtered.forEach(r => {
+          const normalizedRowKey = `${r.name.trim().toLowerCase()}|${r.flatInfo.trim().toLowerCase()}|${r.mobile.trim().toLowerCase()}|${r.email.trim().toLowerCase()}`;
+          uniqueSubmissionsSet.add(normalizedRowKey);
+          const normalizedFlatKey = r.flatInfo.trim().toLowerCase();
+          uniqueFlatsSet.add(normalizedFlatKey);
+      });
+
+      document.getElementById('meetingCountLabel').innerText = `Total: ${filtered.length}`;
+      document.getElementById('meetingUniqueCountLabel').innerText = `Unique: ${uniqueSubmissionsSet.size}`;
+      document.getElementById('meetingUniqueFlatLabel').innerText = `Unique Flats: ${uniqueFlatsSet.size}`;
+      document.getElementById('meetingFaceLabel').innerText = `Face ID: ${photoRecords.length}`;
+
+      if(filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="${COLS}">No logs for this meeting code.</td></tr>`;
+          return;
+      }
+
+      let html = '';
+      filtered.forEach(r => {
+          const faceCell = r.facePhoto
+              ? `<button class="view-photo-btn" onclick="viewPhoto('${r.id}')" title="View Face ID">
+                     <img src="${r.facePhoto}" alt=""> View Photo
+                 </button>`
+              : `<span class="no-photo">Not attached</span>`;
+
+          html += `<tr>
+              <td>${esc(r.timestamp)}</td>
+              <td><span style="background:#003366;color:#fff;padding:2px 6px;border-radius:3px;font-size:0.85rem;">${esc(r.meetingCode)}</span></td>
+              <td><strong>${esc(r.name)}</strong></td>
+              <td>${esc(r.flatInfo)}</td>
+              <td>${esc(r.mobile)}</td>
+              <td>${esc(r.email)}</td>
+              <td>${faceCell}</td>
+          </tr>`;
+      });
+      tbody.innerHTML = html;
+  }
+
+  // --- PHOTO POPUP ---
+  function showPhotoAt(i) {
+      const r = photoRecords[i];
+      if (!r) return;
+      photoIndex = i;
+
+      document.getElementById('photoTitle').textContent = `Face ID – ${r.name}`;
+      document.getElementById('photoImg').src = r.facePhoto;
+      document.getElementById('photoMeta').innerHTML = `
+          <div><span>Name:</span> <strong>${esc(r.name)}</strong></div>
+          <div><span>Building/Flat:</span> ${esc(r.flatInfo)}</div>
+          <div><span>Mobile:</span> ${esc(r.mobile)}</div>
+          <div><span>Submitted:</span> ${esc(r.timestamp)}</div>
+          <div><span>Photo:</span> ${i + 1} of ${photoRecords.length}</div>`;
+
+      const dl = document.getElementById('photoDownload');
+      dl.href = r.facePhoto;
+      dl.download = `FaceID_${r.flatInfo}_${r.name}`.replace(/[^a-z0-9_-]+/gi, '_') + '.jpg';
+
+      document.getElementById('photoPrev').disabled = i <= 0;
+      document.getElementById('photoNext').disabled = i >= photoRecords.length - 1;
+      document.getElementById('photoModal').classList.add('open');
+  }
+
+  window.viewPhoto = function(id) {
+      const i = photoRecords.findIndex(r => r.id === id);
+      if (i >= 0) showPhotoAt(i);
+  };
+
+  window.stepPhoto = function(delta) {
+      showPhotoAt(photoIndex + delta);
+  };
+
+  function closePhoto() {
+      document.getElementById('photoModal').classList.remove('open');
+      document.getElementById('photoImg').removeAttribute('src');
+      photoIndex = -1;
+  }
+  window.closePhoto = closePhoto;
+
+  document.addEventListener('keydown', (e) => {
+      if (!document.getElementById('photoModal').classList.contains('open')) return;
+      if (e.key === 'Escape') closePhoto();
+      if (e.key === 'ArrowLeft' && photoIndex > 0) showPhotoAt(photoIndex - 1);
+      if (e.key === 'ArrowRight' && photoIndex < photoRecords.length - 1) showPhotoAt(photoIndex + 1);
+  });
+
+  // =====================================================================
+  //  TAB 2 – OFFER CALCULATOR ACCESS
+  // =====================================================================
+  const LANG_NAMES = { en:'English', hi:'Hindi', mr:'Marathi', gu:'Gujarati', bn:'Bengali', pa:'Punjabi', ur:'Urdu',
+                       or:'Odia', ta:'Tamil', te:'Telugu', kn:'Kannada', ml:'Malayalam' };
+  const EVENT_NAMES = { open:'Page opened', view:'Flat viewed', print:'Printed', pdf:'PDF exported' };
+  let calcRecords = [];
+  let calcFiltered = [];
+  let calcLoaded = false;
+
+  async function fetchCalcLog() {
+      const tbody = document.getElementById('cBody');
+      tbody.innerHTML = '<tr><td colspan="8">Fetching calculator log...</td></tr>';
+      try {
+          calcRecords = [];
+          const docs = [];
+          let last = null;
+          while (docs.length < CALC_LOG_LIMIT) {
+              const parts = [collection(db, "calculator_access"), orderBy("ts", "desc")];
+              if (last) parts.push(startAfter(last));
+              parts.push(limit(Math.min(CALC_PAGE, CALC_LOG_LIMIT - docs.length)));
+              const page = await getDocs(query(...parts));
+              page.forEach(d => docs.push(d));
+              if (page.size < CALC_PAGE) break;
+              last = page.docs[page.docs.length - 1];
+              tbody.innerHTML = `<tr><td colspan="8">Fetching calculator log... ${docs.length} entries</td></tr>`;
+          }
+          docs.forEach(d => {
+              const x = d.data();
+              const t = x.ts ? x.ts.toDate() : (x.clientTime ? new Date(x.clientTime) : null);
+              calcRecords.push({
+                  date: t,
+                  time: t ? t.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : '',
+                  event: x.event || '',
+                  building: x.building || '',
+                  flat: x.flat || '',
+                  unit: x.unit || (x.building ? `${x.building}/${x.flat}` : ''),
+                  lang: x.lang || '',
+                  style: x.style || '',
+                  rented: !!x.rented,
+                  device: x.device || '',
+                  visitor: x.visitor || '',
+                  session: x.session || '',
+                  screen: x.screen || '',
+                  ref: x.ref || '',
+                  ua: x.ua || ''
+              });
+          });
+          calcLoaded = true;
+          loadAllUnits().then(renderCalc).catch(() => {});
+          renderCalc();
+      } catch (error) {
+          console.error(error);
+          const who = (auth.currentUser && auth.currentUser.phoneNumber) || 'not signed in';
+          const why = error && error.code === 'permission-denied'
+              ? `Firestore rules do not allow ${esc(who)} to read <b>calculator_access</b>. Publish the new rules (with this number in isAdmin()) and press Refresh.`
+              : `Could not load the log: ${esc((error && (error.code || error.message)) || error)}`;
+          tbody.innerHTML = `<tr><td colspan="8" style="color:red;">${why}<br><small style="color:#666;">Signed in as: ${esc(who)} · error: ${esc((error && error.code) || '')} ${esc((error && error.message) || '')}</small></td></tr>`;
+      }
+  }
+
+  const LOG_HEAD = ['Time (IST)', 'Event', 'Building / Flat', 'Language', 'Style', 'Rented', 'Device', 'Visitor ID'];
+  const BORDER = ['A1','A2','B1','C1','D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','E1','Shops/Units'];
+  let ALL_UNITS = null, calcView = 'log', calcSummary = [];
+  async function loadAllUnits() {   // every unit from the public flats.csv (plain columns only) – for "not viewed yet"
+      if (ALL_UNITS) return ALL_UNITS;
+      const rows = parseCsv(await (await fetch(FLATS_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' })).text());
+      const h = rows[0], iB = h.indexOf('building'), iF = h.indexOf('flat_no'), iT = h.indexOf('unit_type');
+      ALL_UNITS = rows.slice(1).map(r => ({ building: r[iB], flat: r[iF], type: r[iT] || '',
+          unit: r[iB] === 'Shops/Units' ? r[iF] : r[iB] + '/' + r[iF] }));
+      return ALL_UNITS;
+  }
+  const unitKey = u => { const [b, f] = String(u).split('/'); const bi = BORDER.indexOf(b); return [bi < 0 ? 99 : bi, parseInt((f || u).replace(/\D/g, '')) || 0, u]; };
+  const byUnit = (a, b) => { const x = unitKey(a), y = unitKey(b); return x[0] - y[0] || x[1] - y[1] || String(x[2]).localeCompare(y[2]); };
+  function setHead(cols) { document.getElementById('cHead').innerHTML = '<tr>' + cols.map(c => `<th>${esc(c)}</th>`).join('') + '</tr>'; }
+
+  function renderCalc() {
+      const period = document.getElementById('cPeriod').value;
+      const evSel = document.getElementById('cEvent').value;
+      calcView = evSel === '__flats' ? 'flats' : evSel === '__unseen' ? 'unseen' : 'log';
+      const ev = calcView === 'log' ? evSel : '';
+      const term = document.getElementById('cSearch').value.trim().toLowerCase().replace(/[-\s]+/g, '/');
+
+      let since = null;
+      if (period === 'today') { since = new Date(); since.setHours(0, 0, 0, 0); }
+      else if (period !== 'all') { since = new Date(Date.now() - (+period) * 86400000); }
+
+      calcFiltered = calcRecords.filter(r =>
+          (!since || (r.date && r.date >= since)) &&
+          (!ev || r.event === ev) &&
+          (!term || r.unit.toLowerCase().replace(/[-\s]+/g, '/').includes(term)));
+
+      const inPeriod = calcRecords.filter(r => !since || (r.date && r.date >= since));
+      document.getElementById('cEvents').innerText = `Events: ${calcFiltered.length}`;
+      document.getElementById('cVisitors').innerText = `Visitors: ${new Set(inPeriod.map(r => r.visitor).filter(Boolean)).size}`;
+      const uniq = e => new Set(inPeriod.filter(r => r.event === e && r.unit).map(r => r.unit)).size;
+      const totalUnits = ALL_UNITS ? ALL_UNITS.length : 875;
+      document.getElementById('cFlats').innerText = `Unique flats: ${uniq('view')} / ${totalUnits}`;
+      document.getElementById('cPrints').innerText = `Prints: ${inPeriod.filter(r => r.event === 'print').length} · ${uniq('print')} flats`;
+      document.getElementById('cPdfs').innerText = `PDFs: ${inPeriod.filter(r => r.event === 'pdf').length} · ${uniq('pdf')} flats`;
+
+      const tbody = document.getElementById('cBody');
+      if (calcView !== 'log') {
+          // ---- per flat: views / prints / PDFs / visitors / languages / first & last time ----
+          const map = new Map();
+          inPeriod.filter(r => r.unit && r.event !== 'open' && (!term || r.unit.toLowerCase().replace(/[-\s]+/g, '/').includes(term))).forEach(r => {
+              let x = map.get(r.unit);
+              if (!x) map.set(r.unit, x = { unit: r.unit, view: 0, print: 0, pdf: 0, vis: new Set(), langs: new Set(), first: r.date, last: r.date, firstT: r.time, lastT: r.time });
+              x[r.event] = (x[r.event] || 0) + 1; if (r.visitor) x.vis.add(r.visitor); if (r.lang) x.langs.add(LANG_NAMES[r.lang] || r.lang);
+              if (r.date && r.date < x.first) { x.first = r.date; x.firstT = r.time; }
+              if (r.date && r.date > x.last) { x.last = r.date; x.lastT = r.time; }
+          });
+          if (calcView === 'flats') {
+              calcSummary = [...map.values()].sort((a, b) => byUnit(a.unit, b.unit));
+              setHead(['Building / Flat', 'Views', 'Prints', 'PDFs', 'Visitors', 'Languages', 'First seen (IST)', 'Last seen (IST)']);
+              calcFiltered = calcSummary;
+              tbody.innerHTML = calcSummary.length ? calcSummary.map(x => `<tr><td><strong>${esc(x.unit)}</strong></td><td>${x.view}</td><td>${x.print || ''}</td><td>${x.pdf || ''}</td>
+                  <td>${x.vis.size}</td><td>${esc([...x.langs].join(', '))}</td><td>${esc(x.firstT)}</td><td>${esc(x.lastT)}</td></tr>`).join('')
+                  + `<tr><td colspan="8"><b>${calcSummary.length} flats</b> for this selection.</td></tr>`
+                  : '<tr><td colspan="8">No flats for this selection.</td></tr>';
+          } else {
+              setHead(['Building / Flat', 'Type', '', '', '', '', '', '']);
+              tbody.innerHTML = '<tr><td colspan="8">Loading the list of all flats…</td></tr>';
+              loadAllUnits().then(all => {
+                  if (calcView !== 'unseen') return;
+                  calcSummary = all.filter(u => !map.has(u.unit) && (!term || u.unit.toLowerCase().includes(term))).sort((a, b) => byUnit(a.unit, b.unit));
+                  calcFiltered = calcSummary;
+                  const byB = {}; calcSummary.forEach(u => byB[u.building] = (byB[u.building] || 0) + 1);
+                  setHead(['Building / Flat', 'Type', 'Building', 'Not viewed in this building', '', '', '', '']);
+                  tbody.innerHTML = `<tr><td colspan="8"><b>${calcSummary.length} of ${all.length} units</b> have not been viewed in this period – by building: ${esc(Object.entries(byB).sort((a, b) => byUnit(a[0] + '/0', b[0] + '/0')).map(([b, n]) => b + ' ' + n).join(' · '))}</td></tr>`
+                      + calcSummary.map(u => `<tr><td><strong>${esc(u.unit)}</strong></td><td>${esc(u.type)}</td><td>${esc(u.building)}</td><td>${byB[u.building]}</td><td></td><td></td><td></td><td></td></tr>`).join('');
+                  document.getElementById('cFlats').innerText = `Unique flats: ${uniq('view')} / ${all.length}`;
+              }).catch(e => { tbody.innerHTML = `<tr><td colspan="8" style="color:red;">Could not read flats.csv: ${esc(e.message)}</td></tr>`; });
+          }
+          document.getElementById('cEvents').innerText = `Events: ${inPeriod.length}`;
+          return;
+      }
+      setHead(LOG_HEAD);
+      if (!calcFiltered.length) { tbody.innerHTML = '<tr><td colspan="8">No calculator activity for this selection.</td></tr>'; return; }
+      tbody.innerHTML = calcFiltered.slice(0, 2000).map(r => `<tr>
+          <td>${esc(r.time)}</td>
+          <td><span class="ev ev-${esc(r.event)}">${esc(EVENT_NAMES[r.event] || r.event)}</span></td>
+          <td><strong>${esc(r.unit || '—')}</strong></td>
+          <td>${esc(LANG_NAMES[r.lang] || r.lang)}</td>
+          <td>${esc(r.style === 'graphics' ? 'Graphics' : r.style === 'text' ? 'Text' : r.style)}</td>
+          <td>${r.rented ? 'Yes' : ''}</td>
+          <td>${esc(r.device)}</td>
+          <td class="vid" title="${esc(r.visitor)}">${esc(r.visitor.slice(0, 8))}</td>
+      </tr>`).join('') + (calcFiltered.length > 2000 ? `<tr><td colspan="8">Showing the newest 2,000 of ${calcFiltered.length} – use Export log (CSV) for all.</td></tr>` : '');
+  }
+
+  ['cPeriod', 'cEvent'].forEach(id => document.getElementById(id).addEventListener('change', renderCalc));
+  document.getElementById('cSearch').addEventListener('input', renderCalc);
+  document.getElementById('cRefresh').addEventListener('click', fetchCalcLog);
+
+  // ---- CSV helpers ----
+  function csvCell(v) { v = String(v ?? ''); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  function downloadCsv(name, rows) {
+      const text = '﻿' + rows.map(r => r.map(csvCell).join(',')).join('\r\n');   // BOM so Excel shows Indian scripts correctly
+      const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
+      const a = document.createElement('a'); a.href = url; a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+  const today = () => new Date().toISOString().slice(0, 10);
+
+  document.getElementById('cExportLog').addEventListener('click', () => {
+      if (!calcFiltered.length) { alert('Nothing to export for this selection.'); return; }
+      if (calcView === 'flats') {
+          downloadCsv(`Offer_Calculator_Flatwise_${today()}.csv`, [['unit', 'views', 'prints', 'pdfs', 'visitors', 'languages', 'first_seen_ist', 'last_seen_ist'],
+              ...calcSummary.map(x => [x.unit, x.view, x.print, x.pdf, x.vis.size, [...x.langs].join(' / '), x.firstT, x.lastT])]);
+          return;
+      }
+      if (calcView === 'unseen') {
+          downloadCsv(`Offer_Calculator_Not_Viewed_${today()}.csv`, [['unit', 'building', 'flat', 'type'], ...calcSummary.map(u => [u.unit, u.building, u.flat, u.type])]);
+          return;
+      }
+      downloadCsv(`Offer_Calculator_Access_${today()}.csv`, [
+          ['time_ist', 'event', 'building', 'flat', 'unit', 'language', 'style', 'rented_ticked', 'device', 'visitor_id', 'session_id', 'screen', 'referrer', 'user_agent'],
+          ...calcFiltered.map(r => [r.time, EVENT_NAMES[r.event] || r.event, r.building, r.flat, r.unit, LANG_NAMES[r.lang] || r.lang, r.style,
+                                    r.rented ? 'Yes' : 'No', r.device, r.visitor, r.session, r.screen, r.ref, r.ua])]);
+  });
+
+  // ---- Decrypted flats.csv export ----
+  // flats.csv cells: "ENC1:" + base64(12-byte IV | AES-256-GCM ciphertext | 16-byte tag), plaintext padded with spaces.
+  // Key = PBKDF2-SHA256(password, salt, 600000 iterations). The password is stored in Firestore: admins/<your mobile> → field "password".
+  function parseCsv(text) {
+      const rows = []; let row = [], cell = '', q = false;
+      text = text.replace(/^﻿/, '');
+      for (let i = 0; i < text.length; i++) {
+          const c = text[i];
+          if (q) {
+              if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; }
+              else cell += c;
+          } else if (c === '"') q = true;
+          else if (c === ',') { row.push(cell); cell = ''; }
+          else if (c === '\n' || c === '\r') {
+              if (c === '\r' && text[i + 1] === '\n') i++;
+              row.push(cell); cell = ''; rows.push(row); row = [];
+          } else cell += c;
+      }
+      if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+      return rows.filter(r => r.length > 1 || r[0] !== '');
+  }
+  const b64ToBytes = b => Uint8Array.from(atob(b), c => c.charCodeAt(0));
+
+  async function deriveKey(password, saltB64, iterations) {
+      const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+      return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64ToBytes(saltB64), iterations, hash: 'SHA-256' },
+                                     base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  }
+
+  async function decryptCell(key, cell) {
+      if (!cell.startsWith('ENC1:')) return cell;
+      const raw = b64ToBytes(cell.slice(5));
+      const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: raw.slice(0, 12) }, key, raw.slice(12));
+      return new TextDecoder().decode(pt).replace(/ +$/, '');
+  }
+
+  async function decryptFlatsCsv(csvText, password, saltB64, iterations) {
+      const key = await deriveKey(password, saltB64, iterations);
+      const rows = parseCsv(csvText);
+      let n = 0;
+      for (let r = 1; r < rows.length; r++)
+          for (let c = 0; c < rows[r].length; c++)
+              if (rows[r][c].startsWith('ENC1:')) { rows[r][c] = await decryptCell(key, rows[r][c]); n++; }
+      return { rows, cells: n };
+  }
+  window._decryptFlatsCsv = decryptFlatsCsv;   // (used for testing)
+
+  // =====================================================================
+  //  TAB 3 – CONTACT UPDATES
+  // =====================================================================
+  const PAD = { member_name: 64, monthly_rent: 16, permanent_address: 256, mobile: 32, email: 96 };   // fixed plaintext lengths (bytes)
+  let ctRecords = [], ctFiltered = [], ctLoaded = false;
+  const normUnit = u => String(u || '').toLowerCase().replace(/[-\s]+/g, '/');
+
+  async function fetchContacts() {
+      const tbody = document.getElementById('ctBody');
+      tbody.innerHTML = '<tr><td colspan="8">Fetching contact updates...</td></tr>';
+      try {
+          const snap = await getDocs(query(collection(db, 'contact_updates'), orderBy('ts', 'desc'), limit(5000)));
+          ctRecords = [];
+          snap.forEach(d => {
+              const x = d.data(); const t = x.ts ? x.ts.toDate() : null;
+              ctRecords.push({ id: d.id, date: t, time: t ? t.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : '',
+                  building: x.building || '', flat: x.flat || '', unit: x.unit || '', name: x.name || '', mobile: x.mobile || '',
+                  email: x.email || '', missing: x.missing || '', mode: x.mode || '', lang: x.lang || '', status: x.status || 'pending',
+                  reviewedBy: x.reviewedBy || '' });
+          });
+          ctLoaded = true;
+          renderContacts();
+      } catch (error) {
+          console.error(error);
+          tbody.innerHTML = `<tr><td colspan="8" style="color:red;">Could not load contact updates: ${esc(error.code || error.message)} – publish the contact_updates rule.</td></tr>`;
+      }
+  }
+
+  function renderContacts() {
+      const st = document.getElementById('ctStatus').value;
+      const term = normUnit(document.getElementById('ctSearch').value.trim());
+      const count = s => ctRecords.filter(r => r.status === s).length;
+      document.getElementById('ctTotal').innerText = `Total: ${ctRecords.length}`;
+      document.getElementById('ctPending').innerText = `Pending: ${count('pending')}`;
+      document.getElementById('ctApproved').innerText = `Approved: ${count('approved')}`;
+      document.getElementById('ctMerged').innerText = `Merged: ${count('merged')}`;
+      document.getElementById('ctRejected').innerText = `Rejected: ${count('rejected')}`;
+      document.getElementById('ctPendingTab').innerText = count('pending') || '';
+      ctFiltered = ctRecords.filter(r => (!st || r.status === st) && (!term || normUnit(r.unit).includes(term)));
+      const tbody = document.getElementById('ctBody');
+      if (!ctFiltered.length) { tbody.innerHTML = '<tr><td colspan="8">No entries for this selection.</td></tr>'; return; }
+      tbody.innerHTML = ctFiltered.map(r => {
+          const act = r.status === 'pending'
+              ? `<button class="act-btn act-ok" onclick="setContactStatus('${r.id}','approved')">Approve</button><button class="act-btn act-no" onclick="setContactStatus('${r.id}','rejected')">Reject</button>`
+              : r.status === 'merged' ? '' : `<button class="act-btn act-undo" onclick="setContactStatus('${r.id}','pending')">Undo</button>`;
+          return `<tr>
+              <td>${esc(r.time)}</td>
+              <td><strong>${esc(r.unit)}</strong></td>
+              <td>${esc(r.name)}</td>
+              <td>${esc(r.mobile)}</td>
+              <td>${esc(r.email)}</td>
+              <td>${esc(r.mode === 'update' ? '(update)' : r.missing.replace(',', ' + '))}</td>
+              <td><span class="st st-${esc(r.status)}">${esc(r.status)}</span></td>
+              <td>${act}</td>
+          </tr>`; }).join('');
+  }
+
+  window.setContactStatus = async function (id, status) {
+      try {
+          await updateDoc(doc(db, 'contact_updates', id), { status, reviewedAt: serverTimestamp(), reviewedBy: (auth.currentUser && auth.currentUser.phoneNumber) || '' });
+          const r = ctRecords.find(x => x.id === id); if (r) r.status = status;
+          renderContacts();
+      } catch (e) { console.error(e); alert('Could not update: ' + (e.code || e.message)); }
+  };
+
+  document.getElementById('ctStatus').addEventListener('change', renderContacts);
+  document.getElementById('ctSearch').addEventListener('input', renderContacts);
+  document.getElementById('ctRefresh').addEventListener('click', fetchContacts);
+  document.getElementById('ctExport').addEventListener('click', () => {
+      if (!ctFiltered.length) { alert('Nothing to export for this selection.'); return; }
+      downloadCsv(`Contact_Updates_${today()}.csv`, [
+          ['time_ist', 'building', 'flat', 'unit', 'name_given', 'mobile', 'email', 'was_missing', 'type', 'language', 'status', 'reviewed_by'],
+          ...ctFiltered.map(r => [r.time, r.building, r.flat, r.unit, r.name, r.mobile, r.email, r.missing, r.mode, r.lang, r.status, r.reviewedBy])]);
+  });
+
+  // ---- build updated flats.csv ----
+  const bytesToB64 = u8 => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
+  async function encryptCell(key, value, col) {
+      const enc = new TextEncoder().encode(value);
+      const n = PAD[col]; if (enc.length > n) throw new Error(`${col} value too long (${enc.length} > ${n} bytes)`);
+      const pt = new Uint8Array(n); pt.fill(0x20); pt.set(enc);
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, pt));
+      const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12);
+      return 'ENC1:' + bytesToB64(out);
+  }
+  function rowsToCsv(rows) { return '\uFEFF' + rows.map(r => r.map(csvCell).join(',')).join('\r\n') + '\r\n'; }   // same format as the original file
+  function mergeList(existing, value, sep, maxBytes) {
+      const list = existing.split(sep.trim()).map(x => x.trim()).filter(Boolean);
+      if (list.some(x => x.toLowerCase() === value.toLowerCase())) return existing;
+      const both = [value, ...list].slice(0, 2).join(sep);
+      return new TextEncoder().encode(both).length <= maxBytes ? both : value;
+  }
+
+  async function buildUpdatedFlats(csvText, password, saltB64, iterations, approved) {
+      const key = await deriveKey(password, saltB64, iterations);
+      const rows = parseCsv(csvText); const h = rows[0];
+      const ix = c => { const i = h.indexOf(c); if (i < 0) throw new Error('flats.csv has no column ' + c); return i; };
+      const iB = ix('building'), iF = ix('flat_no'), iM = ix('mobile'), iE = ix('email'), iHM = ix('has_mobile'), iHE = ix('has_email');
+      const latest = new Map();   // newest approved entry per flat (records are newest first)
+      approved.forEach(r => { const k = r.building + '|' + r.flat; if (!latest.has(k)) latest.set(k, r); });
+      const changes = [], used = [];
+      for (const [k, r] of latest) {
+          const row = rows.find((x, i) => i > 0 && (x[iB] + '|' + x[iF]) === k);
+          if (!row) { changes.push(`${r.unit}: flat not found in flats.csv – skipped`); continue; }
+          const curM = await decryptCell(key, row[iM]), curE = await decryptCell(key, row[iE]);
+          let newM = curM, newE = curE;
+          if (r.mobile) newM = mergeList(curM, r.mobile, ' / ', PAD.mobile);
+          if (r.email) newE = mergeList(curE, r.email, '; ', PAD.email);
+          if (newM !== curM) row[iM] = await encryptCell(key, newM, 'mobile');
+          if (newE !== curE) row[iE] = await encryptCell(key, newE, 'email');
+          row[iHM] = newM.trim() ? 'Y' : 'N'; row[iHE] = newE.trim() ? 'Y' : 'N';
+          const dropped = (cur, nw, sep) => cur.split(sep).map(x => x.trim()).filter(x => x && !nw.split(sep).map(y => y.trim()).includes(x));
+          const dM = newM !== curM ? dropped(curM, newM, '/') : [], dE = newE !== curE ? dropped(curE, newE, ';') : [];
+          const parts = [newM !== curM ? `mobile → ${newM}` : '', newE !== curE ? `email → ${newE}` : '',
+                         dM.length ? `removed old mobile ${dM.join(', ')}` : '', dE.length ? `removed old email ${dE.join(', ')}` : ''].filter(Boolean);
+          changes.push(parts.length ? `${r.unit}: ${parts.join('; ')}` : `${r.unit}: no change (already on file)`);
+          approved.filter(x => x.building + '|' + x.flat === k).forEach(x => used.push(x.id));
+      }
+      return { csv: rowsToCsv(rows), changes, used };
+  }
+  window._buildUpdatedFlats = buildUpdatedFlats;   // (used for testing)
+
+  // =====================================================================
+  //  TAB 4 – MEETING DAY: Entry Register + Ballot Delivery (live, duplicates blocked by Firestore rules)
+  //  Firestore: meeting_config/current {code, onlineCode} · meeting_roster/current {names:{flatKey:name}}
+  //             meeting_staff/<+91…> {name, role} · meeting_entries/<code>__<flatKey> · meeting_ballots/<code>__<flatKey>
+  //             meeting_dup_attempts (refused duplicates)
+  // =====================================================================
+  const MD = { code: '', online: '', entries: new Map(), ballots: new Map(), dups: [], onlineSet: new Set(), names: {}, units: [],
+               myName: '', unsub: [], base: [] };
+  const $d = id => document.getElementById(id);
+  const myPhone = () => (auth.currentUser && auth.currentUser.phoneNumber) || '';
+  const digitsOf = v => parseInt(String(v || '').replace(/\D/g, ''), 10);
+  function flatKeyOf(b, f) {
+      if (b === 'Shops/Units') return (/unit/i.test(f) ? 'UNIT-' : 'SH-') + (digitsOf(f) || 0);
+      return b + '-' + (digitsOf(f) || String(f).trim());
+  }
+  const nice = n => String(n || '').replace(/\.(?=[A-Za-z])/g, '. ').replace(/\s*\/\s*/g, ' / ').replace(/\s+/g, ' ').trim()
+      .toLowerCase().replace(/(^|[\s(/.&-])([a-z])/g, (m, a, c) => a + c.toUpperCase());
+  const tIST = ts => ts && ts.toDate ? ts.toDate().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }) : '…';
+  const shortBy = (ph, nm) => nm ? nm : (ph ? '…' + ph.slice(-4) : '');
+  function setMsg(id, text, ok) { const m = $d(id); m.textContent = text; m.className = 'fmsg ' + (ok ? 'ok' : 'err'); }
+
+  function resolveFlat(b, txt) {
+      txt = String(txt || '').trim(); if (!b || !txt) return null;
+      const list = MD.units.filter(u => u.building === b);
+      const ex = list.find(u => u.flat.toLowerCase() === txt.toLowerCase()); if (ex) return ex;
+      const n = digitsOf(txt); if (!n && n !== 0) return null;
+      if (b === 'Shops/Units') { const wantUnit = /^u/i.test(txt); return list.find(u => digitsOf(u.flat) === n && /unit/i.test(u.flat) === wantUnit) || null; }
+      return list.find(u => digitsOf(u.flat) === n) || null;
+  }
+
+  async function startMeetingDay(staffDoc) {
+      stopMeetingDay();
+      MD.myName = staffDoc ? (staffDoc.name || '') : 'Admin';
+      $d('subEntry').parentElement.querySelectorAll('.sub-btn').forEach(b => {
+          const s = b.dataset.sub;
+          const hide = (s === 'subSetup' && ROLE !== 'admin') || (s === 'subEntry' && ROLE === 'ballot') || (s === 'subBallot' && ROLE === 'entry');
+          b.classList.toggle('hidden', hide);
+      });
+      const first = [...document.querySelectorAll('.sub-btn')].find(b => !b.classList.contains('hidden'));
+      showSub(first ? first.dataset.sub : 'subList');
+      try {
+          MD.units = await loadAllUnits();
+      } catch (e) { MD.units = []; }
+      const blds = BORDER.filter(b => MD.units.some(u => u.building === b));
+      ['eBld', 'bBld'].forEach(id => { $d(id).innerHTML = '<option value="">Choose…</option>' + blds.map(b => `<option>${esc(b)}</option>`).join(''); });
+      MD.base.push(onSnapshot(doc(db, 'meeting_config', 'current'), sn => {
+          const c = sn.exists() ? sn.data() : {};
+          setMeetingCode(c.code || '', c.onlineCode || '');
+          if (ROLE === 'admin') { if (!$d('sCode').value) $d('sCode').value = c.code || ''; if (!$d('sOnline').value) $d('sOnline').value = c.onlineCode || ''; }
+      }, e => console.error('config', e)));
+      MD.base.push(onSnapshot(doc(db, 'meeting_roster', 'current'), sn => { MD.names = sn.exists() ? (sn.data().names || {}) : {}; refreshEntryInfo(); refreshBallotInfo(); renderDay(); },
+          e => console.error('roster', e)));
+      if (ROLE === 'admin') MD.base.push(onSnapshot(collection(db, 'meeting_staff'), sn => {
+          $d('stBody').innerHTML = sn.docs.map(d => { const x = d.data(); return `<tr><td>${esc(d.id)}</td><td>${esc(x.name || '')}</td><td>${esc({ entry: 'Entry Register', ballot: 'Ballot Delivery', both: 'Both' }[x.role] || x.role)}</td>
+              <td><button class="del-btn" onclick="mdRemoveStaff('${esc(d.id)}')">Remove</button></td></tr>`; }).join('') || '<tr><td colspan="4">No operators yet.</td></tr>';
+      }, e => console.error('staff', e)));
+  }
+
+  function stopMeetingDay() { MD.unsub.concat(MD.base).forEach(u => { try { u(); } catch (e) {} }); MD.unsub = []; MD.base = []; MD.code = null; MD.online = null; }
+
+  function setMeetingCode(code, online) {
+      if (code === MD.code && online === MD.online) return;
+      MD.unsub.forEach(u => { try { u(); } catch (e) {} }); MD.unsub = [];
+      MD.code = code; MD.online = online; MD.entries = new Map(); MD.ballots = new Map(); MD.dups = []; MD.onlineSet = new Set();
+      $d('dCode').textContent = 'Meeting: ' + (code || '–');
+      $d('dNoCode').style.display = code ? 'none' : 'block';
+      ['eSubmit', 'bSubmit'].forEach(id => $d(id).disabled = !code);
+      if (code) {
+          const q = c => query(collection(db, c), where('code', '==', code));
+          MD.unsub.push(onSnapshot(q('meeting_entries'), sn => { MD.entries = new Map(sn.docs.map(d => [d.data().flatKey, { id: d.id, ...d.data() }])); refreshEntryInfo(); refreshBallotInfo(); renderDay(); }, e => console.error('entries', e)));
+          MD.unsub.push(onSnapshot(q('meeting_ballots'), sn => { MD.ballots = new Map(sn.docs.map(d => [d.data().flatKey, { id: d.id, ...d.data() }])); refreshBallotInfo(); renderDay(); }, e => console.error('ballots', e)));
+          MD.unsub.push(onSnapshot(q('meeting_dup_attempts'), sn => { MD.dups = sn.docs.map(d => d.data()).sort((a, b) => (b.ts ? b.ts.seconds : 9e9) - (a.ts ? a.ts.seconds : 9e9)); renderDay(); }, e => console.error('dups', e)));
+          if (ROLE === 'admin' && online) MD.unsub.push(onSnapshot(query(collection(db, 'registrations'), where('meetingCode', '==', online)),
+              sn => { MD.onlineSet = new Set(sn.docs.map(d => flatKeyOf(d.data().buildingNumber || '', d.data().flatNumber || ''))); renderDay(); }, e => console.error('online', e)));
+      }
+      renderDay();
+  }
+
+  function unitOfKey(k) { const u = MD.units.find(x => flatKeyOf(x.building, x.flat) === k); return u ? u.unit : k; }
+
+  function renderDay() {
+      const E = MD.entries, B = MD.ballots, O = MD.onlineSet;
+      const present = E.size, noBallot = [...E.keys()].filter(k => !B.has(k)).length, ballotNoEntry = [...B.keys()].filter(k => !E.has(k)).length;
+      $d('dPresent').textContent = `Present: ${present} flats`;
+      $d('dBallots').textContent = `Ballots given: ${B.size}`;
+      $d('dNoBallot').textContent = `Present, no ballot: ${noBallot}`;
+      $d('dBallotNoEntry').textContent = `Ballot, not entered: ${ballotNoEntry}`;
+      $d('dDup').textContent = `Duplicates blocked: ${MD.dups.length}`;
+      $d('dOnline').textContent = `Joined online: ${O.size}`;
+      $d('dBoth').textContent = `Online + hall: ${[...E.keys()].filter(k => O.has(k)).length}`;
+      // my recent entries / ballots
+      const me = myPhone();
+      const mine = (M) => [...M.values()].filter(x => x.by === me).sort((a, b) => (b.ts ? b.ts.seconds : 9e9) - (a.ts ? a.ts.seconds : 9e9)).slice(0, 8);
+      $d('eMine').innerHTML = mine(E).map(x => `<tr><td>${tIST(x.ts)}</td><td><strong>${esc(x.unit)}</strong></td><td>${esc(x.regNo)}</td><td>${esc(x.srNo)}</td><td>${esc(x.fullName)}</td></tr>`).join('') || '<tr><td colspan="5">None yet.</td></tr>';
+      $d('bMine').innerHTML = mine(B).map(x => `<tr><td>${tIST(x.ts)}</td><td><strong>${esc(x.unit)}</strong></td><td>${esc(nice(x.registeredName))}</td></tr>`).join('') || '<tr><td colspan="3">None yet.</td></tr>';
+      // live list
+      const show = $d('lShow').value, term = $d('lSearch').value.trim().toLowerCase();
+      let keys = new Set([...E.keys(), ...B.keys()]);
+      if (show === 'online') keys = new Set([...O].filter(k => !E.has(k)));
+      let rows = [...keys].map(k => { const e = E.get(k), b = B.get(k); return { k, unit: (e || b || {}).unit || unitOfKey(k), e, b, reg: MD.names[k] || (e && e.registeredName) || (b && b.registeredName) || '' }; });
+      if (show === 'noballot') rows = rows.filter(r => r.e && !r.b);
+      if (show === 'noentry') rows = rows.filter(r => r.b && !r.e);
+      if (term) rows = rows.filter(r => (r.unit + ' ' + (r.e ? r.e.fullName : '') + ' ' + r.reg).toLowerCase().includes(term.replace(/-/g, '/')) || r.unit.toLowerCase().replace('/', '-').includes(term));
+      rows.sort((a, b) => byUnit(a.unit, b.unit));
+      MD.listRows = rows;
+      const adm = ROLE === 'admin';
+      $d('lBody').innerHTML = rows.map(r => `<tr>
+          <td><strong>${esc(r.unit)}</strong></td><td>${esc(r.e ? r.e.regNo : '')}</td><td>${esc(r.e ? r.e.srNo : '')}</td>
+          <td>${esc(r.e ? r.e.fullName : '')}</td><td>${esc(nice(r.reg))}</td>
+          <td>${r.e ? esc(tIST(r.e.ts) + ' · ' + shortBy(r.e.by, r.e.byName)) : '<span style="color:#b42318">—</span>'}</td>
+          <td>${r.b ? esc(tIST(r.b.ts) + ' · ' + shortBy(r.b.by, r.b.byName)) : '<span style="color:#e67e22">—</span>'}</td>
+          <td class="adm-only">${O.has(r.k) ? 'Yes' : ''}</td>
+          <td class="adm-only">${adm && r.e ? `<button class="del-btn" onclick="mdDelete('entry','${esc(r.e.id)}','${esc(r.unit)}')">Delete entry</button>` : ''}${adm && r.b ? `<button class="del-btn" onclick="mdDelete('ballot','${esc(r.b.id)}','${esc(r.unit)}')">Delete ballot</button>` : ''}</td></tr>`).join('')
+          || `<tr><td colspan="9">${MD.code ? 'Nothing for this selection.' : 'No meeting active.'}</td></tr>`;
+      $d('lDup').innerHTML = MD.dups.map(x => `<tr><td>${tIST(x.ts)}</td><td>${x.kind === 'ballot' ? 'Ballot' : 'Entry'}</td><td><strong>${esc(x.unit)}</strong></td><td>${esc(x.regNo || '')}</td><td>${esc(x.name || '')}</td><td>${esc(x.reason || '')}</td><td>${esc(shortBy(x.by, x.byName))}</td></tr>`).join('') || '<tr><td colspan="7">None.</td></tr>';
+  }
+
+  // ---- forms ----
+  function showSub(id) { document.querySelectorAll('.sub-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === id)); document.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.id === id)); }
+  document.querySelectorAll('.sub-btn').forEach(b => b.addEventListener('click', () => showSub(b.dataset.sub)));
+  function fillFlatList(bldId, listId) { const b = $d(bldId).value; $d(listId).innerHTML = MD.units.filter(u => u.building === b).map(u => `<option value="${esc(u.flat)}">`).join(''); }
+  function regLine(k) { const n = MD.names[k]; return n ? `Registered: <b>${esc(nice(n))}</b>` : 'Registered name not available'; }
+
+  function refreshEntryInfo() {
+      const box = $d('eInfo'), u = resolveFlat($d('eBld').value, $d('eFlat').value);
+      box.className = 'reginfo';
+      if (!$d('eBld').value || !$d('eFlat').value.trim()) { box.textContent = 'Select building and flat.'; return; }
+      if (!u) { box.className = 'reginfo bad'; box.textContent = 'No such flat in this building.'; return; }
+      const k = flatKeyOf(u.building, u.flat), e = MD.entries.get(k);
+      if (e) { box.className = 'reginfo bad'; box.innerHTML = `${esc(u.unit)} is ALREADY ENTERED at ${esc(tIST(e.ts))} (Reg # ${esc(e.regNo)}, ${esc(e.fullName)}) by ${esc(shortBy(e.by, e.byName))}. Duplicate not allowed.`; return; }
+      box.className = 'reginfo ok'; box.innerHTML = `${esc(u.unit)} · ${regLine(k)}`;
+  }
+  function refreshBallotInfo() {
+      const box = $d('bInfo'), u = resolveFlat($d('bBld').value, $d('bFlat').value);
+      box.className = 'reginfo'; $d('bConfirmRow').classList.add('hidden');
+      if (!$d('bBld').value || !$d('bFlat').value.trim()) { box.textContent = 'Select building and flat.'; return; }
+      if (!u) { box.className = 'reginfo bad'; box.textContent = 'No such flat in this building.'; return; }
+      const k = flatKeyOf(u.building, u.flat), b = MD.ballots.get(k), e = MD.entries.get(k);
+      if (b) { box.className = 'reginfo bad'; box.innerHTML = `Ballot for ${esc(u.unit)} was ALREADY GIVEN at ${esc(tIST(b.ts))} by ${esc(shortBy(b.by, b.byName))}. A second ballot is not allowed.`; return; }
+      if (!e) { box.className = 'reginfo'; box.innerHTML = `${esc(u.unit)} · ${regLine(k)}<br><span style="color:#b54708;font-weight:bold">Not in the Entry Register yet.</span>`; $d('bConfirmRow').classList.remove('hidden'); return; }
+      box.className = 'reginfo ok'; box.innerHTML = `${esc(u.unit)} · ${regLine(k)}<br>Entered at ${esc(tIST(e.ts))} – Reg # ${esc(e.regNo)} – ${esc(e.fullName)}`;
+  }
+  ['eBld', 'eFlat'].forEach(id => $d(id).addEventListener('input', () => { if (id === 'eBld') fillFlatList('eBld', 'eFlatList'); refreshEntryInfo(); }));
+  ['bBld', 'bFlat'].forEach(id => $d(id).addEventListener('input', () => { if (id === 'bBld') fillFlatList('bBld', 'bFlatList'); refreshBallotInfo(); }));
+  const cleanName = v => String(v || '').replace(/\s+/g, ' ').trim();
+  const titleWord = v => cleanName(v).toLowerCase().replace(/(^|[\s.'-])([a-z])/g, (m, a, c) => a + c.toUpperCase());
+  ['eFirst', 'eLast'].forEach(id => $d(id).addEventListener('input', () => { $d('eFull').value = [titleWord($d('eFirst').value), titleWord($d('eLast').value)].filter(Boolean).join(' '); }));
+  // Enter moves to the next field; on the last field it submits
+  [['eReg', 'eSr'], ['eSr', 'eBld'], ['eBld', 'eFlat'], ['eFlat', 'eFirst'], ['eFirst', 'eLast'], ['eLast', null], ['bBld', 'bFlat'], ['bFlat', null]].forEach(([a, b]) =>
+      $d(a).addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); if (b) $d(b).focus(); else (a === 'eLast' ? submitEntry() : submitBallot()); } }));
+
+  async function logDup(kind, u, reason, extra = {}) {
+      try { await addDoc(collection(db, 'meeting_dup_attempts'), { code: MD.code, kind, flatKey: flatKeyOf(u.building, u.flat), unit: u.unit, regNo: extra.regNo || '', name: extra.name || '',
+            reason: reason.slice(0, 150), by: myPhone(), byName: MD.myName || '', ts: serverTimestamp() }); } catch (e) { console.error('dup log', e); }
+  }
+  const nextNo = v => /^\d+$/.test(v) ? String(+v + 1) : '';
+
+  async function submitEntry() {
+      if (!MD.code) { setMsg('eMsg', 'No meeting is active.'); return; }
+      const reg = $d('eReg').value.trim(), sr = $d('eSr').value.trim();
+      const u = resolveFlat($d('eBld').value, $d('eFlat').value);
+      const fn = titleWord($d('eFirst').value), ln = titleWord($d('eLast').value);
+      if (!reg || !sr) { setMsg('eMsg', 'Enter Reg # and SR #.'); return; }
+      if (!u) { setMsg('eMsg', 'Select a valid building and flat.'); return; }
+      if (fn.replace(/[^A-Za-z]/g, '').length < 3 || ln.replace(/[^A-Za-z]/g, '').length < 3) { setMsg('eMsg', 'First name and last name need at least 3 letters each.'); return; }
+      const k = flatKeyOf(u.building, u.flat), full = fn + ' ' + ln;
+      if (MD.entries.has(k)) { await logDup('entry', u, `Flat already entered (Reg # ${MD.entries.get(k).regNo})`, { regNo: reg, name: full }); setMsg('eMsg', `${u.unit} is already entered – duplicate blocked.`); return; }
+      const used = [...MD.entries.values()].find(x => x.regNo === reg);
+      if (used) { await logDup('entry', u, `Reg # ${reg} already used for ${used.unit}`, { regNo: reg, name: full }); setMsg('eMsg', `Reg # ${reg} is already used for ${used.unit} – duplicate blocked.`); return; }
+      const btn = $d('eSubmit'); btn.disabled = true;
+      try {
+          await setDoc(doc(db, 'meeting_entries', MD.code + '__' + k), { code: MD.code, flatKey: k, building: u.building, flat: u.flat, unit: u.unit, regNo: reg, srNo: sr,
+              firstName: fn, lastName: ln, fullName: full, registeredName: MD.names[k] || '', by: myPhone(), byName: MD.myName || '', ts: serverTimestamp() });
+          setMsg('eMsg', `Saved: ${u.unit} – ${full}`, true);
+          $d('eReg').value = nextNo(reg); $d('eSr').value = nextNo(sr); $d('eFlat').value = ''; $d('eFirst').value = ''; $d('eLast').value = ''; $d('eFull').value = '';
+          refreshEntryInfo(); $d('eFlat').focus();
+      } catch (e) {
+          console.error(e);
+          let dup = false; try { dup = (await getDoc(doc(db, 'meeting_entries', MD.code + '__' + k))).exists(); } catch (x) {}
+          if (dup) { await logDup('entry', u, 'Entered at the same time by another operator', { regNo: reg, name: full }); setMsg('eMsg', `${u.unit} was just entered by another operator – duplicate blocked.`); }
+          else setMsg('eMsg', 'Not saved: ' + (e.code === 'permission-denied' ? 'not allowed (check meeting code / your operator rights).' : (e.message || e)));
+      } finally { btn.disabled = !MD.code; }
+  }
+
+  async function submitBallot() {
+      if (!MD.code) { setMsg('bMsg', 'No meeting is active.'); return; }
+      const u = resolveFlat($d('bBld').value, $d('bFlat').value);
+      if (!u) { setMsg('bMsg', 'Select a valid building and flat.'); return; }
+      const k = flatKeyOf(u.building, u.flat);
+      if (MD.ballots.has(k)) { await logDup('ballot', u, 'Ballot already given'); setMsg('bMsg', `Ballot for ${u.unit} already given – blocked.`); return; }
+      const entered = MD.entries.has(k);
+      if (!entered && !$d('bConfirm').checked) { setMsg('bMsg', 'Not in the Entry Register – tick the confirmation box first.'); return; }
+      const btn = $d('bSubmit'); btn.disabled = true;
+      try {
+          await setDoc(doc(db, 'meeting_ballots', MD.code + '__' + k), { code: MD.code, flatKey: k, building: u.building, flat: u.flat, unit: u.unit,
+              registeredName: MD.names[k] || '', entered, by: myPhone(), byName: MD.myName || '', ts: serverTimestamp() });
+          setMsg('bMsg', `Ballot recorded: ${u.unit}`, true);
+          $d('bFlat').value = ''; $d('bConfirm').checked = false; refreshBallotInfo(); $d('bFlat').focus();
+      } catch (e) {
+          console.error(e);
+          let dup = false; try { dup = (await getDoc(doc(db, 'meeting_ballots', MD.code + '__' + k))).exists(); } catch (x) {}
+          if (dup) { await logDup('ballot', u, 'Ballot given at the same time by another operator'); setMsg('bMsg', `Ballot for ${u.unit} was just given by another operator – blocked.`); }
+          else setMsg('bMsg', 'Not saved: ' + (e.code === 'permission-denied' ? 'not allowed (check meeting code / your operator rights).' : (e.message || e)));
+      } finally { btn.disabled = !MD.code; }
+  }
+  $d('eSubmit').addEventListener('click', submitEntry);
+  $d('bSubmit').addEventListener('click', submitBallot);
+  $d('lSearch').addEventListener('input', renderDay);
+  $d('lShow').addEventListener('change', renderDay);
+  $d('lExport').addEventListener('click', () => {
+      const rows = MD.listRows || []; if (!rows.length) { alert('Nothing to export.'); return; }
+      downloadCsv(`Meeting_Day_${MD.code.replace(/[^A-Za-z0-9]+/g, '_')}_${today()}.csv`, [['flat', 'reg_no', 'sr_no', 'name_entered', 'registered_name', 'entered_ist', 'entered_by', 'ballot_ist', 'ballot_by', 'joined_online'],
+          ...rows.map(r => [r.unit, r.e ? r.e.regNo : '', r.e ? r.e.srNo : '', r.e ? r.e.fullName : '', nice(r.reg), r.e ? tIST(r.e.ts) : '', r.e ? shortBy(r.e.by, r.e.byName) + ' ' + r.e.by : '',
+                            r.b ? tIST(r.b.ts) : '', r.b ? shortBy(r.b.by, r.b.byName) + ' ' + r.b.by : '', MD.onlineSet.has(r.k) ? 'Yes' : ''])]);
+  });
+
+  window.mdDelete = async function (kind, id, unit) {
+      if (ROLE !== 'admin') return;
+      if (!confirm(`Delete the ${kind === 'entry' ? 'ENTRY' : 'BALLOT'} record for ${unit}? (Use only to correct a wrong entry.)`)) return;
+      try { await deleteDoc(doc(db, kind === 'entry' ? 'meeting_entries' : 'meeting_ballots', id)); } catch (e) { alert('Could not delete: ' + (e.code || e.message)); }
+  };
+
+  // ---- setup (admin) ----
+  $d('sDate').addEventListener('change', () => {
+      const v = $d('sDate').value; if (!v) return;
+      const d = new Date(v + 'T00:00:00'), mon = d.toLocaleString('en-US', { month: 'short' });
+      $d('sCode').value = `Asmita Jyoti - ${String(d.getDate()).padStart(2, '0')}${mon}${d.getFullYear()}`;
+  });
+  $d('sSave').addEventListener('click', async () => {
+      const code = $d('sCode').value.trim().replace(/\s+/g, ' '), online = $d('sOnline').value.trim();
+      if (!code || /[\/]/.test(code)) { setMsg('sMsg', 'Enter a meeting code (no "/").'); return; }
+      if (!confirm(`Set the current meeting to:\n\n${code}\n\nAll operators will start entering into this meeting immediately.`)) return;
+      const btn = $d('sSave'); btn.disabled = true;
+      try {
+          setMsg('sMsg', 'Publishing member names…', true);
+          let note = '';
+          try {
+              const sec = (await getDoc(doc(db, 'admins', myPhone()))).data();
+              if (!sec || !sec.password) throw new Error('no password record');
+              const key = await deriveKey(sec.password, sec.salt || ENC_SALT_B64, +(sec.iterations || ENC_ITERATIONS));
+              const rows = parseCsv(await (await fetch(FLATS_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' })).text()), h = rows[0];
+              const iB = h.indexOf('building'), iF = h.indexOf('flat_no'), iN = h.indexOf('member_name'), names = {};
+              for (const r of rows.slice(1)) names[flatKeyOf(r[iB], r[iF])] = await decryptCell(key, r[iN]);
+              await setDoc(doc(db, 'meeting_roster', 'current'), { code, names, publishedAt: serverTimestamp(), by: myPhone() });
+          } catch (e) { console.error(e); note = ' (member names NOT published: ' + (e.message || e.code) + ')'; }
+          await setDoc(doc(db, 'meeting_config', 'current'), { code, onlineCode: online, updatedAt: serverTimestamp(), by: myPhone() });
+          setMsg('sMsg', 'Current meeting: ' + code + note, !note);
+      } catch (e) { setMsg('sMsg', 'Could not save: ' + (e.code || e.message)); }
+      finally { btn.disabled = false; }
+  });
+  function normPhone(v) { let d = String(v || '').replace(/\D/g, ''); if (d.length === 10) d = '91' + d; return /^91[6-9]\d{9}$/.test(d) ? '+' + d : ''; }
+  $d('stAdd').addEventListener('click', async () => {
+      const ph = normPhone($d('stPhone').value), name = cleanName($d('stName').value), role = $d('stRole').value;
+      if (!ph) { setMsg('stMsg', 'Enter a valid Indian mobile number.'); return; }
+      if (!name) { setMsg('stMsg', 'Enter the operator name.'); return; }
+      try { await setDoc(doc(db, 'meeting_staff', ph), { name, role, addedAt: serverTimestamp(), by: myPhone() }); setMsg('stMsg', `Saved ${ph} (${name}).`, true); $d('stPhone').value = ''; $d('stName').value = ''; }
+      catch (e) { setMsg('stMsg', 'Could not save: ' + (e.code || e.message)); }
+  });
+  window.mdRemoveStaff = async function (ph) {
+      if (!confirm('Remove operator ' + ph + '?')) return;
+      try { await deleteDoc(doc(db, 'meeting_staff', ph)); } catch (e) { alert('Could not remove: ' + (e.code || e.message)); }
+  };
+
+
+  document.getElementById('ctBuild').addEventListener('click', async () => {
+      const btn = document.getElementById('ctBuild'), st = document.getElementById('ctBuildStatus'), log = document.getElementById('ctBuildLog');
+      const approved = ctRecords.filter(r => r.status === 'approved');
+      log.innerHTML = '';
+      if (!approved.length) { st.style.color = '#b42318'; st.textContent = 'No Approved entries – approve some first.'; return; }
+      const user = auth.currentUser; if (!user || !user.phoneNumber) { alert('Please sign in again.'); return; }
+      btn.disabled = true; st.style.color = '#003366'; st.textContent = 'Reading key…';
+      try {
+          const snap = await getDoc(doc(db, 'admins', user.phoneNumber));
+          const sec = snap.exists() ? snap.data() : null;
+          if (!sec || !sec.password) throw new Error(`No decryption password found for ${user.phoneNumber}.`);
+          st.textContent = 'Downloading flats.csv…';
+          const res = await fetch(FLATS_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' });
+          if (!res.ok) throw new Error('Could not download flats.csv (' + res.status + ').');
+          st.textContent = 'Merging & encrypting…';
+          const { csv, changes, used } = await buildUpdatedFlats(await res.text(), sec.password, sec.salt || ENC_SALT_B64, +(sec.iterations || ENC_ITERATIONS), approved);
+          const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+          const a = document.createElement('a'); a.href = url; a.download = 'flats.csv'; document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 5000);
+          log.innerHTML = '<b>Changes in the downloaded flats.csv:</b><br>' + changes.map(esc).join('<br>');
+          st.style.color = '#1a7f3c'; st.textContent = `Downloaded flats.csv (${changes.length} flat(s)). Upload it to GitHub: Offer-Calculator/data/flats.csv`;
+          if (used.length && confirm(`flats.csv downloaded.\n\nMark these ${used.length} approved entr${used.length === 1 ? 'y' : 'ies'} as "merged"?\n(Do this once you have uploaded the file to GitHub.)`)) {
+              for (const id of used) await updateDoc(doc(db, 'contact_updates', id), { status: 'merged', reviewedAt: serverTimestamp(), reviewedBy: user.phoneNumber });
+              ctRecords.forEach(r => { if (used.includes(r.id)) r.status = 'merged'; });
+              renderContacts();
+          }
+      } catch (e) {
+          console.error(e);
+          st.style.color = '#b42318';
+          st.textContent = (e && e.name === 'OperationError') ? 'Wrong password – the stored password does not match flats.csv.' : (e.message || 'Failed.');
+      } finally { btn.disabled = false; }
+  });
+
+  document.getElementById('cExportFlats').addEventListener('click', async () => {
+      const btn = document.getElementById('cExportFlats'), st = document.getElementById('cExportStatus');
+      const user = auth.currentUser;
+      if (!user || !user.phoneNumber) { alert('Please sign in again.'); return; }
+      btn.disabled = true; st.style.color = '#003366'; st.textContent = 'Reading key…';
+      try {
+          const snap = await getDoc(doc(db, 'admins', user.phoneNumber));
+          const sec = snap.exists() ? snap.data() : null;
+          if (!sec || !sec.password) throw new Error(`No decryption password found for ${user.phoneNumber} (Firestore: admins/${user.phoneNumber} → password).`);
+          st.textContent = 'Downloading flats.csv…';
+          const res = await fetch(FLATS_CSV_URL + '?t=' + Date.now(), { cache: 'no-store' });
+          if (!res.ok) throw new Error('Could not download flats.csv (' + res.status + ').');
+          const text = await res.text();
+          st.textContent = 'Decrypting…';
+          const { rows, cells } = await decryptFlatsCsv(text, sec.password, sec.salt || ENC_SALT_B64, +(sec.iterations || ENC_ITERATIONS));
+          downloadCsv(`flats_DECRYPTED_${today()}.csv`, rows);
+          st.style.color = '#1a7f3c'; st.textContent = `Done – ${rows.length - 1} units, ${cells} cells decrypted.`;
+      } catch (e) {
+          console.error(e);
+          st.style.color = '#b42318';
+          st.textContent = (e && e.name === 'OperationError') ? 'Wrong password – the stored password does not match flats.csv.'
+                         : (e && e.code === 'permission-denied') ? 'Access denied by Firestore rules for the admins record.'
+                         : (e.message || 'Export failed.');
+      } finally { btn.disabled = false; }
+  });
+</script>
+</body>
+</html>
