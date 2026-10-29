@@ -151,6 +151,30 @@
         .ms .gap { border-left:2px solid #48525e !important; }
         #msTip { position:fixed; pointer-events:auto; background:#111; color:#fff; font-size:12px; padding:7px 10px; border-radius:6px; display:none; z-index:50; max-width:330px; line-height:1.45; }
         #msDetail { margin:0 0 10px; }
+        .rights { border:1px solid #d5dbe3; border-radius:8px; padding:10px 12px; margin-bottom:10px; background:#fafbfc; }
+        .rights .rt { font-size:0.8rem; font-weight:bold; color:#003366; margin:0 0 6px; }
+        .rights .cks { display:flex; flex-wrap:wrap; gap:6px 14px; margin-bottom:8px; }
+        .rights label.ck { display:inline-flex; align-items:center; gap:6px; font-weight:600; font-size:0.85rem; color:#111; cursor:pointer; margin:0; }
+        .rights label.ck input { width:17px; height:17px; margin:0; }
+        .rights .cks.bl label.ck { min-width:120px; font-weight:normal; }
+        .ms-tools { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:0 0 8px; }
+        .ms-tools select { padding:6px 8px; font-size:0.95rem; }
+        #msFollow { margin-top:4px; }
+        .msl td { padding:7px 8px; font-size:0.95rem; }
+        .msl tr { cursor:pointer; } .msl tr:hover td { background:#fff6e0; }
+        .msl td.sw { width:26px; padding:0; border-left:8px solid transparent; }
+        .msl tr.P td.sw { background:#b7e4b0; } .msl tr.B td.sw { background:#1e7b34; } .msl tr.O td.sw { background:#3b8ff0; } .msl tr.V td.sw { background:#0b2a5b; }
+        .msl tr.oh td.sw { box-shadow:inset 0 -5px 0 #3b8ff0; }
+        .msl tr.todo td { font-weight:bold; }
+        .msl tr.sep td { background:#eef2f7; color:#003366; font-weight:bold; font-size:0.85rem; cursor:default; }
+        .fu { margin-top:8px; padding-top:8px; border-top:1px solid #444; }
+        .fu .fb { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+        .fu button { border:0; border-radius:16px; padding:7px 12px; font-weight:bold; font-size:0.85rem; cursor:pointer; color:#fff; }
+        .fu button.online { background:#3b8ff0; } .fu button.inperson { background:#1e7b34; } .fu button.not { background:#b42318; }
+        .fu button.cur { outline:3px solid #ffcc00; }
+        .fu button:disabled { opacity:.5; cursor:wait; }
+        .futag { display:inline-block; margin-left:6px; padding:1px 8px; border-radius:10px; font-size:0.75rem; font-weight:bold; color:#fff; }
+        .futag.online { background:#3b8ff0; } .futag.inperson { background:#1e7b34; } .futag.not { background:#b42318; }
         #msTip .x { float:right; cursor:pointer; font-weight:bold; margin-left:12px; font-size:15px; line-height:1; }
     </style>
 </head>
@@ -177,7 +201,7 @@
 <div class="dashboard" id="dashboardContainer">
 
     <div class="admin-header">
-        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v29-Oct-2026o</span></h2>
+        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v29-Oct-2026r</span></h2>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
 
@@ -428,8 +452,14 @@
 
         <!-- Muster (admin): every flat, hall entries + ballots + online registrations of the SAME meeting code -->
         <div class="sub-panel" id="subMuster">
+            <div class="ms-tools"><label for="msBld" style="font-weight:bold;color:#003366">Building</label><select id="msBld"></select>
+                <span id="msSortBox" class="hidden"><label for="msSort" style="font-weight:bold;color:#003366">Sort</label>
+                <select id="msSort"><option value="todo">Not attended first</option><option value="flat">Flat number</option></select></span>
+                <button class="tool-btn yellow adm-only" id="msFuExport">Export follow-ups (CSV)</button></div>
             <div class="ms-bar" id="msLegend"></div>
             <div class="ms-wrap"><div class="ms-card" id="msMain"></div><div class="ms-card" id="msShops"></div></div>
+            <div id="msFollow" class="hidden">
+                <div class="table-scroll"><table class="msl"><thead><tr><th></th><th>Flat</th><th>Member</th><th>Status</th></tr></thead><tbody id="msFollowBody"></tbody></table></div></div>
             <div class="hint-text" style="margin-top:8px">Letter = highest stage reached. Blue bottom strip = also joined online. Orange border = ballot given but no hall entry. Grey = flat number not in that building. Click a box to see the flat, member name and both entries (click outside or × to close).</div>
             <h3 class="mini">Online registrations not matched to a flat</h3>
             <div class="table-scroll"><table><thead><tr><th>Time</th><th>Building</th><th>Flat</th><th>Name</th></tr></thead><tbody id="msUnmatched"></tbody></table></div>
@@ -454,13 +484,19 @@
                 <div class="fgrid">
                     <label>Mobile (+91…)<input id="stPhone" inputmode="tel" placeholder="+9198XXXXXXXX"></label>
                     <label>Name<input id="stName" maxlength="40"></label>
-                    <label>Allowed<select id="stRole">
-                        <option value="entry|0">Entry Register</option><option value="ballot|0">Ballot Delivery</option><option value="both|0">Entry + Ballot</option>
-                        <option value="none|1">Muster (hall + online) only</option><option value="entry|1">Entry Register + Muster</option>
-                        <option value="ballot|1">Ballot Delivery + Muster</option><option value="both|1">All (Entry + Ballot + Muster)</option></select></label>
+                </div>
+                <div class="rights">
+                    <div class="rt">Meeting-site rights</div>
+                    <div class="cks">
+                        <label class="ck"><input type="checkbox" id="rEntry"> Entry Register</label>
+                        <label class="ck"><input type="checkbox" id="rBallot"> Ballot Delivery</label>
+                        <label class="ck"><input type="checkbox" id="rMuster"> Muster – all buildings (hall + online)</label>
+                    </div>
+                    <div class="rt">Field supporters – read-only live muster of their building(s) <label class="ck" style="margin-left:10px;font-weight:normal"><input type="checkbox" id="rViewAll"> tick all</label></div>
+                    <div class="cks bl" id="rView"></div>
                 </div>
                 <div class="factions"><button class="tool-btn" id="stAdd">Add / update operator</button><button class="tool-btn hidden" id="stCancel" style="background:#888">Cancel edit</button><span class="fmsg" id="stMsg"></span></div>
-                <p class="hint-text" style="margin:6px 0 0">Muster rights also let the operator see the online sign-ins (name, mobile, e-mail, photo) of the <b>current meeting only</b> – give it only to trusted people.
+                <p class="hint-text" style="margin:6px 0 0">Muster and ReadOnly rights also let the person see the online sign-ins (name, mobile, e-mail, photo) of the <b>current meeting only</b> (ReadOnly: only their buildings) – give them only to trusted people.
                 The login code (fixed OTP) is set in Firebase → Authentication → Sign-in method → Phone → Phone numbers for testing; it can't be changed from here.</p>
                 <div class="table-scroll" style="margin-top:10px"><table><thead><tr><th>Mobile</th><th>Name</th><th>Allowed</th><th></th></tr></thead><tbody id="stBody"></tbody></table></div>
             </div>
@@ -1156,10 +1192,11 @@
   //             meeting_staff/<+91…> {name, role} · meeting_entries/<code>__<flatKey> · meeting_ballots/<code>__<flatKey>
   //             meeting_dup_attempts (refused duplicates)
   // =====================================================================
-  const MD = { muster: false, code: '', online: '', entries: new Map(), ballots: new Map(), dups: [], onlineSet: new Set(), names: {}, types: {}, units: [],
+  const MD = { follow: new Map(), followAll: [], muster: false, view: [], code: '', online: '', entries: new Map(), ballots: new Map(), dups: [], onlineSet: new Set(), names: {}, types: {}, units: [],
                myName: '', unsub: [], base: [] };
   const $d = id => document.getElementById(id);
   const myPhone = () => (auth.currentUser && auth.currentUser.phoneNumber) || '';
+  const myUid = () => (auth.currentUser && auth.currentUser.uid) || '';
   const digitsOf = v => parseInt(String(v || '').replace(/\D/g, ''), 10);
   function flatKeyOf(b, f) {
       if (b === 'Shops/Units') return (/unit/i.test(f) ? 'UNIT-' : 'SH-') + (digitsOf(f) || 0);
@@ -1264,14 +1301,16 @@
       stopMeetingDay();
       MD.myName = staffDoc ? (staffDoc.name || '') : 'Admin';
       MD.muster = ROLE === 'admin' || !!(staffDoc && staffDoc.muster);
+      MD.view = MD.muster ? BORDER.slice() : ((staffDoc && staffDoc.view) || []).filter(b => BORDER.includes(b));
       $d('subEntry').parentElement.querySelectorAll('.sub-btn').forEach(b => {
           const s = b.dataset.sub;
           const hide = (s === 'subSetup' && ROLE !== 'admin') || (s === 'subEntry' && !['admin', 'entry', 'both'].includes(ROLE)) ||
-                       (s === 'subBallot' && !['admin', 'ballot', 'both'].includes(ROLE)) || (s === 'subMuster' && !MD.muster);
+                       (s === 'subBallot' && !['admin', 'ballot', 'both'].includes(ROLE)) || (s === 'subMuster' && !MD.view.length) || (s === 'subList' && ROLE === 'none');
           b.classList.toggle('hidden', hide);
       });
       const first = [...document.querySelectorAll('.sub-btn')].find(b => !b.classList.contains('hidden'));
-      showSub(first ? first.dataset.sub : 'subList');
+      showSub(first ? first.dataset.sub : 'subMuster');
+      $d('msBld').innerHTML = (MD.view.length > 1 ? '<option value="">All my buildings</option>' : '') + MD.view.map(b => `<option>${esc(b)}</option>`).join('');
       try {
           MD.units = await loadAllUnits();
       } catch (e) { MD.units = []; }
@@ -1303,7 +1342,7 @@
   function setMeetingCode(code, online) {
       if (code === MD.code && online === MD.online) return;
       MD.unsub.forEach(u => { try { u(); } catch (e) {} }); MD.unsub = [];
-      MD.code = code; MD.online = online; MD.entries = new Map(); MD.ballots = new Map(); MD.dups = []; MD.onlineSet = new Set(); MD.onlineRecs = new Map(); MD.onlineUnmatched = [];
+      MD.code = code; MD.online = online; MD.entries = new Map(); MD.ballots = new Map(); MD.dups = []; MD.follow = new Map(); MD.followAll = []; MD.onlineSet = new Set(); MD.onlineRecs = new Map(); MD.onlineUnmatched = [];
       $d('dCode').textContent = 'Meeting: ' + (code || '–');
       $d('dNoCode').style.display = code ? 'none' : 'block';
       ['eSubmit', 'bSubmit'].forEach(id => $d(id).disabled = !code);
@@ -1311,8 +1350,13 @@
           const q = c => query(collection(db, c), where('code', '==', code));
           MD.unsub.push(onSnapshot(q('meeting_entries'), sn => { MD.entries = new Map(sn.docs.map(d => [d.data().flatKey, { id: d.id, ...d.data() }])); refreshEntryInfo(); refreshBallotInfo(); renderDay(); }, e => console.error('entries', e)));
           MD.unsub.push(onSnapshot(q('meeting_ballots'), sn => { MD.ballots = new Map(sn.docs.map(d => [d.data().flatKey, { id: d.id, ...d.data() }])); refreshBallotInfo(); renderDay(); }, e => console.error('ballots', e)));
+          MD.unsub.push(onSnapshot(q('meeting_followups'), sn => {
+              const tsv = r => r.ts && r.ts.seconds ? r.ts.seconds : 9e9;
+              MD.followAll = sn.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => tsv(a) - tsv(b));
+              MD.follow = new Map(); MD.followAll.forEach(r => MD.follow.set(r.flatKey, r)); renderDay(); }, e => console.error('followups', e)));
           MD.unsub.push(onSnapshot(q('meeting_dup_attempts'), sn => { MD.dups = sn.docs.map(d => d.data()).sort((a, b) => (b.ts ? b.ts.seconds : 9e9) - (a.ts ? a.ts.seconds : 9e9)); renderDay(); }, e => console.error('dups', e)));
-          if ((ROLE === 'admin' || MD.muster) && online) MD.unsub.push(onSnapshot(query(collection(db, 'registrations'), where('meetingCode', '==', online)),
+          if ((MD.muster || MD.view.length) && online) MD.unsub.push(onSnapshot(MD.muster ? query(collection(db, 'registrations'), where('meetingCode', '==', online))
+                                                                       : query(collection(db, 'registrations'), where('meetingCode', '==', online), where('buildingNumber', 'in', MD.view.slice(0, 30))),
               sn => {
                   const recs = new Map(), un = [], known = new Set(MD.units.map(u => flatKeyOf(u.building, u.flat)));
                   sn.docs.forEach(d => { const x = d.data(), k = onlineKey(x.buildingNumber, x.flatNumber), r = { name: x.name || '', ts: x.timestamp, b: x.buildingNumber || '', f: x.flatNumber || '' };
@@ -1361,22 +1405,39 @@
   }
   function renderMuster() {
       if (!MD.units.length) { $d('msMain').innerHTML = 'Loading flats…'; return; }
-      const blds = BORDER.filter(b => b !== 'Shops/Units' && MD.units.some(u => u.building === b));
+      const sel = $d('msBld').value, show = sel ? [sel] : MD.view;
+      const blds = BORDER.filter(b => b !== 'Shops/Units' && show.includes(b) && MD.units.some(u => u.building === b));
       const CK = {}; blds.forEach(b => CK[b] = MD.units.filter(u => u.building === b).map(u => ({ n: digitsOf(u.flat), k: flatKeyOf(u.building, u.flat) })));
       const rows = [...new Set(blds.flatMap(b => CK[b].map(x => x.n)))].sort((a, b) => a - b);
       const [h1, t1] = msGrid(blds, CK, rows, b => b, r => Math.floor(r / 10), ['D1']);
-      const su = MD.units.filter(u => u.building === 'Shops/Units');
+      const su = show.includes('Shops/Units') ? MD.units.filter(u => u.building === 'Shops/Units') : [];
       const SK = { Shops: su.filter(u => !/unit/i.test(u.flat)).map(u => ({ n: digitsOf(u.flat), k: flatKeyOf(u.building, u.flat) })),
                    Units: su.filter(u => /unit/i.test(u.flat)).map(u => ({ n: digitsOf(u.flat), k: flatKeyOf(u.building, u.flat) })) };
       const srows = [...new Set(SK.Shops.concat(SK.Units).map(x => x.n))].sort((a, b) => a - b);
       const [h2, t2] = msGrid(['Shops', 'Units'], SK, srows, b => b, r => Math.floor((r - 1) / 10), []);
       if (MS_SEL && $d('msTip').style.display === 'block') msPop(MS_SEL, MS_XY[0], MS_XY[1]);
-      const sc = $d('msMain').scrollTop; $d('msMain').innerHTML = h1; $d('msMain').scrollTop = sc; $d('msShops').innerHTML = h2;
+      const sc = $d('msMain').scrollTop; $d('msMain').innerHTML = blds.length ? h1 : ''; $d('msMain').scrollTop = sc; $d('msShops').innerHTML = su.length ? h2 : '';
+      $d('msMain').classList.toggle('hidden', !blds.length); $d('msShops').classList.toggle('hidden', !su.length);
+      // ONE building: list with member names (not attended first) instead of the grid
+      const one = sel || (show.length === 1 ? show[0] : '');
+      $d('msSortBox').classList.toggle('hidden', !one);
+      if (one) {
+          $d('msMain').classList.add('hidden'); $d('msShops').classList.add('hidden'); $d('msFollow').classList.remove('hidden');
+          const ks = MD.units.filter(u => u.building === one).map(u => flatKeyOf(u.building, u.flat));
+          const todo = ks.filter(k => !msState(k).s), done = ks.filter(k => msState(k).s);
+          const row = k => { const x = msState(k), w = x.e || x.b; const when = x.s === 'O' ? (x.o[0] && tIST(x.o[0].ts)) : w ? tIST(w.ts) : '';
+              return `<tr class="${x.s || 'todo'}${x.oh ? ' oh' : ''}" data-k="${esc(k)}"><td class="sw"></td><td><strong>${esc(unitOfKey(k))}</strong></td><td>${esc(nice(MD.names[k] || '—'))}${typeTag(k)}</td>
+                  <td>${x.s ? esc(MS_NAME[x.s] + (x.oh ? ' + online' : '')) + (when ? ' · ' + esc(when) : '') : '<span style="color:#b42318">Not yet</span>'}${fuTag(k)}</td></tr>`; };
+          const sep = t => `<tr class="sep"><td colspan="4">${t}</td></tr>`;
+          $d('msFollowBody').innerHTML = $d('msSort').value === 'flat' ? ks.map(row).join('')
+              : sep(`Not attended yet – ${todo.length}`) + (todo.map(row).join('') || '<tr><td colspan="4">Everyone has attended.</td></tr>') + sep(`Attended – ${done.length}`) + done.map(row).join('');
+      } else $d('msFollow').classList.add('hidden');
       const T = { n: t1.n + t2.n, P: t1.P + t2.P, B: t1.B + t2.B, O: t1.O + t2.O, V: t1.V + t2.V }, att = T.P + T.B + T.O + T.V;
       const sw = (bg, fg, l, t) => `<span class="ms-lg"><span class="ms-sw" style="background:${bg}"></span>${t}</span>`;
       $d('msLegend').innerHTML = sw('#b7e4b0', '#14501f', 'P', 'In person present') + sw('#1e7b34', '#fff', 'B', 'Ballot assigned') + sw('#3b8ff0', '#fff', 'O', 'Attended online') +
           sw('#0b2a5b', '#fff', 'V', 'Voted <span style="font-weight:normal;color:#888">(logic to come)</span>') + sw('#fff', '#000', '', 'Not yet') +
           `<span class="ms-tot">${esc(MD.code || 'No meeting')} · Total ${T.n} · Attended ${att} (${T.n ? Math.round(att * 100 / T.n) : 0}%) · Present ${T.P} · Ballot ${T.B} · Online ${T.O} · Voted ${T.V} · Online + hall ${[...MD.onlineSet].filter(k => MD.entries.has(k) || MD.ballots.has(k)).length}</span>`;
+      $d('msUnmatched').closest('.table-scroll').previousElementSibling.classList.toggle('hidden', !MD.muster); $d('msUnmatched').closest('.table-scroll').classList.toggle('hidden', !MD.muster);
       $d('msUnmatched').innerHTML = (MD.onlineUnmatched || []).map(r => `<tr><td>${tIST(r.ts)}</td><td>${esc(r.b)}</td><td>${esc(r.f)}</td><td>${esc(r.name)}</td></tr>`).join('') || '<tr><td colspan="4">None.</td></tr>';
   }
   function msInfo(k) {
@@ -1388,14 +1449,44 @@
       h += `<br>Online: ${x.o ? x.o.map(r => `<b>${esc(r.name)}</b>${mm(r.name, '')} · ${tIST(r.ts)}`).join('<br>&nbsp;&nbsp;') : '—'}`;
       return h;
   }
+  const FU = { online: 'Attending online', inperson: 'Attending in-person', not: 'Not attending' };
+  const dIST = ts => ts && ts.toDate ? ts.toDate().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'saving…';
+  const bldOfKey = k => { const u = MD.units.find(x => flatKeyOf(x.building, x.flat) === k); return u ? u.building : ''; };
+  const canFollow = k => ROLE === 'admin' || MD.muster || MD.view.includes(bldOfKey(k));
+  function fuTag(k) { const f = MD.follow.get(k); return f ? ` <span class="futag ${esc(f.response)}" title="${esc(dIST(f.ts) + ' · ' + shortBy(f.by, f.byName) + ' ' + f.by)}">${esc(FU[f.response] || f.response)} · ${tIST(f.ts)}</span>` : ''; }
+  function fuBlock(k) {
+      const hist = MD.followAll.filter(r => r.flatKey === k), f = hist[hist.length - 1];
+      let h = `<div class="fu"><b>Follow-up</b>: ${f ? `<span class="futag ${esc(f.response)}">${esc(FU[f.response])}</span> · ${esc(dIST(f.ts))} · ${esc(shortBy(f.by, f.byName))} (${esc(f.by)})` : 'none yet'}`;
+      if (hist.length > 1) h += `<br><span style="opacity:.75">Earlier: ${hist.slice(0, -1).reverse().map(r => `${esc(FU[r.response])} ${tIST(r.ts)} ${esc(shortBy(r.by, r.byName))}`).join(' · ')}</span>`;
+      if (canFollow(k)) h += `<div class="fb">${Object.keys(FU).map(r => `<button class="${r}${f && f.response === r ? ' cur' : ''}" onclick="msFollowUp('${r}')">${FU[r]}</button>`).join('')}</div>`;
+      return h + '</div>';
+  }
+  window.msFollowUp = async function (resp) {
+      const k = MS_SEL; if (!k || !MD.code || !FU[resp]) return;
+      const u = MD.units.find(x => flatKeyOf(x.building, x.flat) === k); if (!u) return;
+      document.querySelectorAll('.fu button').forEach(b => b.disabled = true);
+      try {
+          await addDoc(collection(db, 'meeting_followups'), { code: MD.code, flatKey: k, building: u.building, unit: u.unit, registeredName: MD.names[k] || '',
+              response: resp, by: myPhone(), uid: myUid(), byName: MD.myName || '', ts: serverTimestamp() });
+      } catch (e) { alert('Not saved: ' + (e.code === 'permission-denied' ? 'not allowed for this building / meeting.' : (e.message || e))); }
+      finally { if (MS_SEL) msPop(MS_SEL, MS_XY[0], MS_XY[1]); }
+  };
+  $d('msFuExport').addEventListener('click', () => {
+      if (!MD.followAll.length) { alert('No follow-ups recorded yet.'); return; }
+      downloadCsv(`Followups_${MD.code.replace(/[^A-Za-z0-9]+/g, '_')}_${today()}.csv`, [['date_time_ist', 'flat', 'building', 'registered_name', 'response', 'recorded_by_mobile', 'recorded_by_name', 'uid', 'attendance_now'],
+          ...MD.followAll.map(r => [dIST(r.ts), r.unit, r.building, nice(r.registeredName), FU[r.response] || r.response, r.by, r.byName, r.uid, (s => s ? MS_NAME[s] : 'Not yet')(msState(r.flatKey).s)])]);
+  });
   function msPop(k, cx, cy) {
-      const tip = $d('msTip'); tip.innerHTML = `<span class="x" onclick="msClose()">×</span>` + msInfo(k); tip.style.display = 'block';
+      const tip = $d('msTip'); tip.innerHTML = `<span class="x" onclick="msClose()">×</span>` + msInfo(k) + fuBlock(k); tip.style.display = 'block';
       tip.style.left = Math.max(8, Math.min(cx + 14, innerWidth - tip.offsetWidth - 8)) + 'px';
       tip.style.top = Math.max(8, Math.min(cy + 14, innerHeight - tip.offsetHeight - 8)) + 'px';
   }
   window.msClose = () => { MS_SEL = ''; $d('msTip').style.display = 'none'; document.querySelectorAll('.ms td.c.sel').forEach(t => t.classList.remove('sel')); };
-  document.addEventListener('click', e => { if (MS_SEL && !e.target.closest('#msTip') && !e.target.closest('.ms td.c[data-k]')) msClose(); });
+  document.addEventListener('click', e => { if (MS_SEL && e.target.isConnected && !e.target.closest('#msTip') && !e.target.closest('.ms td.c[data-k]')) msClose(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && MS_SEL) msClose(); });
+  $d('msBld').addEventListener('change', () => { msClose(); renderMuster(); });
+  $d('msSort').addEventListener('change', renderMuster);
+  $d('msFollowBody').addEventListener('click', e => { const t = e.target.closest('tr[data-k]'); if (!t) return; e.stopPropagation(); MS_SEL = t.dataset.k; MS_XY = [e.clientX, e.clientY]; msPop(MS_SEL, e.clientX, e.clientY); });
   ['msMain', 'msShops'].forEach(id => {
       $d(id).addEventListener('click', e => { const t = e.target.closest('td.c[data-k]'); if (!t) return;
           document.querySelectorAll('.ms td.c.sel').forEach(x => x.classList.remove('sel')); t.classList.add('sel');
@@ -1484,7 +1575,7 @@
 
   async function logDup(kind, u, reason, extra = {}) {
       try { await addDoc(collection(db, 'meeting_dup_attempts'), { code: MD.code, kind, flatKey: flatKeyOf(u.building, u.flat), unit: u.unit, regNo: extra.regNo || '', name: extra.name || '',
-            reason: reason.slice(0, 150), by: myPhone(), byName: MD.myName || '', ts: serverTimestamp() }); } catch (e) { console.error('dup log', e); }
+            reason: reason.slice(0, 150), by: myPhone(), uid: myUid(), byName: MD.myName || '', ts: serverTimestamp() }); } catch (e) { console.error('dup log', e); }
   }
   const nextNo = v => /^\d+$/.test(v) ? String(+v + 1) : '';
 
@@ -1505,7 +1596,7 @@
       const btn = $d('eSubmit'); btn.disabled = true;
       try {
           await setDoc(doc(db, 'meeting_entries', MD.code + '__' + k), { code: MD.code, flatKey: k, building: u.building, flat: u.flat, unit: u.unit, regNo: reg, srNo: sr,
-              firstName: fn, lastName: ln, fullName: full, registeredName: MD.names[k] || '', by: myPhone(), byName: MD.myName || '', ts: serverTimestamp() });
+              firstName: fn, lastName: ln, fullName: full, registeredName: MD.names[k] || '', by: myPhone(), uid: myUid(), byName: MD.myName || '', ts: serverTimestamp() });
           setMsg('eMsg', `Saved: ${u.unit} – ${full}`, true);
           $d('eReg').value = nextNo(reg); $d('eSr').value = nextNo(sr); $d('eFlat').value = ''; $d('eFirst').value = ''; $d('eLast').value = ''; $d('eFull').value = ''; $d('eMatch').textContent = ''; $d('eChips').innerHTML = '';
           refreshEntryInfo(); $d('eFlat').focus();
@@ -1528,7 +1619,7 @@
       const btn = $d('bSubmit'); btn.disabled = true;
       try {
           await setDoc(doc(db, 'meeting_ballots', MD.code + '__' + k), { code: MD.code, flatKey: k, building: u.building, flat: u.flat, unit: u.unit,
-              registeredName: MD.names[k] || '', entered, by: myPhone(), byName: MD.myName || '', ts: serverTimestamp() });
+              registeredName: MD.names[k] || '', entered, by: myPhone(), uid: myUid(), byName: MD.myName || '', ts: serverTimestamp() });
           setMsg('bMsg', `Ballot recorded: ${u.unit}`, true);
           $d('bFlat').value = ''; $d('bConfirm').checked = false; refreshBallotInfo(); $d('bFlat').focus();
       } catch (e) {
@@ -1568,7 +1659,7 @@
       if (!confirm(`Set the current meeting to:\n\n${code}\n\nAll operators will start entering into this meeting immediately.`)) return;
       const btn = $d('sSave'); btn.disabled = true;
       try {
-          await setDoc(doc(db, 'meeting_config', 'current'), { code, onlineCode: online, updatedAt: serverTimestamp(), by: myPhone() });
+          await setDoc(doc(db, 'meeting_config', 'current'), { code, onlineCode: online, updatedAt: serverTimestamp(), by: myPhone(), uid: myUid() });
           const note = await publishRoster(code);
           setMsg('sMsg', 'Current meeting: ' + code + (note ? ' – but member names NOT published: ' + note : ''), !note);
       } catch (e) { setMsg('sMsg', 'Could not save: ' + (e.code || e.message)); }
@@ -1594,7 +1685,7 @@
               names[k] = n;
               if (iT >= 0 && r[iT]) types[k] = r[iT];
           }
-          await setDoc(doc(db, 'meeting_roster', 'current'), { code: code || MD.code || '', names, types, publishedAt: serverTimestamp(), by: myPhone() });
+          await setDoc(doc(db, 'meeting_roster', 'current'), { code: code || MD.code || '', names, types, publishedAt: serverTimestamp(), by: myPhone(), uid: myUid() });
           return '';
       } catch (e) {
           console.error(e);
@@ -1608,20 +1699,30 @@
       btn.disabled = false;
   });
   function normPhone(v) { let d = String(v || '').replace(/\D/g, ''); if (d.length === 10) d = '91' + d; return /^91[6-9]\d{9}$/.test(d) ? '+' + d : ''; }
-  const staffAllowed = x => [x.role === 'entry' || x.role === 'both' ? 'Entry Register' : '', x.role === 'ballot' || x.role === 'both' ? 'Ballot Delivery' : '', x.muster ? 'Muster' : ''].filter(Boolean).join(' + ') || '—';
-  function stReset() { $d('stPhone').value = ''; $d('stName').value = ''; $d('stRole').selectedIndex = 0; $d('stPhone').readOnly = false; $d('stAdd').textContent = 'Add / update operator'; $d('stCancel').classList.add('hidden'); }
+  const staffAllowed = x => [x.role === 'entry' || x.role === 'both' ? 'Entry Register' : '', x.role === 'ballot' || x.role === 'both' ? 'Ballot Delivery' : '', x.muster ? 'Muster' : '',
+      ...(x.muster ? [] : (x.view || []).map(b => 'ReadOnly-' + (b === 'Shops/Units' ? 'Shops' : b)))].filter(Boolean).join(' + ') || '—';
+  $d('rView').innerHTML = BORDER.map(b => `<label class="ck"><input type="checkbox" class="rv" value="${esc(b)}"> ReadOnly-${b === 'Shops/Units' ? 'Shops/Units' : b}</label>`).join('');
+  $d('rViewAll').addEventListener('change', () => document.querySelectorAll('.rv').forEach(c => c.checked = $d('rViewAll').checked));
+  function setRights(x) {
+      x = x || {}; $d('rEntry').checked = x.role === 'entry' || x.role === 'both'; $d('rBallot').checked = x.role === 'ballot' || x.role === 'both';
+      $d('rMuster').checked = !!x.muster; const v = x.view || []; document.querySelectorAll('.rv').forEach(c => c.checked = v.includes(c.value)); $d('rViewAll').checked = v.length === BORDER.length;
+  }
+  function stReset() { $d('stPhone').value = ''; $d('stName').value = ''; setRights({}); $d('stPhone').readOnly = false; $d('stAdd').textContent = 'Add / update operator'; $d('stCancel').classList.add('hidden'); }
+  setRights({});
   window.mdEditStaff = function (ph) {
       const x = (MD.staff || {})[ph]; if (!x) return;
       $d('stPhone').value = ph; $d('stPhone').readOnly = true; $d('stName').value = x.name || '';
-      $d('stRole').value = (x.role || 'entry') + '|' + (x.muster ? 1 : 0); if ($d('stRole').selectedIndex < 0) $d('stRole').selectedIndex = 0;
+      setRights(x);
       $d('stAdd').textContent = 'Save changes'; $d('stCancel').classList.remove('hidden'); setMsg('stMsg', 'Editing ' + ph + ' – change name / rights and press Save changes.', true); $d('stName').focus();
   };
   $d('stCancel').addEventListener('click', () => { stReset(); setMsg('stMsg', '', true); });
   $d('stAdd').addEventListener('click', async () => {
-      const ph = normPhone($d('stPhone').value), name = cleanName($d('stName').value), [role, mu] = $d('stRole').value.split('|'), muster = mu === '1';
+      const ph = normPhone($d('stPhone').value), name = cleanName($d('stName').value), en = $d('rEntry').checked, ba = $d('rBallot').checked, muster = $d('rMuster').checked;
+      const role = en && ba ? 'both' : en ? 'entry' : ba ? 'ballot' : 'none', view = [...document.querySelectorAll('.rv:checked')].map(c => c.value);
+      if (role === 'none' && !muster && !view.length) { setMsg('stMsg', 'Tick at least one right.'); return; }
       if (!ph) { setMsg('stMsg', 'Enter a valid Indian mobile number.'); return; }
       if (!name) { setMsg('stMsg', 'Enter the operator name.'); return; }
-      try { await setDoc(doc(db, 'meeting_staff', ph), { name, role, muster, addedAt: serverTimestamp(), by: myPhone() }); setMsg('stMsg', `Saved ${ph} (${name}) – ${staffAllowed({ role, muster })}.`, true); stReset(); }
+      try { await setDoc(doc(db, 'meeting_staff', ph), { name, role, muster, view, addedAt: serverTimestamp(), by: myPhone(), uid: myUid() }); setMsg('stMsg', `Saved ${ph} (${name}) – ${staffAllowed({ role, muster, view })}.`, true); stReset(); }
       catch (e) { setMsg('stMsg', 'Could not save: ' + (e.code || e.message)); }
   });
   window.mdRemoveStaff = async function (ph) {
