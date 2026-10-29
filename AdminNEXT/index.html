@@ -177,7 +177,7 @@
 <div class="dashboard" id="dashboardContainer">
 
     <div class="admin-header">
-        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v29-Oct-2026n</span></h2>
+        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v29-Oct-2026o</span></h2>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
 
@@ -369,7 +369,7 @@
             <button class="sub-btn" data-sub="subEntry">Entry Register</button>
             <button class="sub-btn" data-sub="subBallot">Ballot Delivery</button>
             <button class="sub-btn" data-sub="subList">Live list &amp; duplicates</button>
-            <button class="sub-btn adm-only" data-sub="subMuster">Muster (hall + online)</button>
+            <button class="sub-btn" data-sub="subMuster">Muster (hall + online)</button>
             <button class="sub-btn adm-only" data-sub="subSetup">Setup (meeting code &amp; staff)</button>
         </div>
 
@@ -427,7 +427,7 @@
         </div>
 
         <!-- Muster (admin): every flat, hall entries + ballots + online registrations of the SAME meeting code -->
-        <div class="sub-panel adm-only" id="subMuster">
+        <div class="sub-panel" id="subMuster">
             <div class="ms-bar" id="msLegend"></div>
             <div class="ms-wrap"><div class="ms-card" id="msMain"></div><div class="ms-card" id="msShops"></div></div>
             <div class="hint-text" style="margin-top:8px">Letter = highest stage reached. Blue bottom strip = also joined online. Orange border = ballot given but no hall entry. Grey = flat number not in that building. Click a box to see the flat, member name and both entries (click outside or × to close).</div>
@@ -454,9 +454,14 @@
                 <div class="fgrid">
                     <label>Mobile (+91…)<input id="stPhone" inputmode="tel" placeholder="+9198XXXXXXXX"></label>
                     <label>Name<input id="stName" maxlength="40"></label>
-                    <label>Allowed<select id="stRole"><option value="entry">Entry Register</option><option value="ballot">Ballot Delivery</option><option value="both">Both</option></select></label>
+                    <label>Allowed<select id="stRole">
+                        <option value="entry|0">Entry Register</option><option value="ballot|0">Ballot Delivery</option><option value="both|0">Entry + Ballot</option>
+                        <option value="none|1">Muster (hall + online) only</option><option value="entry|1">Entry Register + Muster</option>
+                        <option value="ballot|1">Ballot Delivery + Muster</option><option value="both|1">All (Entry + Ballot + Muster)</option></select></label>
                 </div>
-                <div class="factions"><button class="tool-btn" id="stAdd">Add / update operator</button><span class="fmsg" id="stMsg"></span></div>
+                <div class="factions"><button class="tool-btn" id="stAdd">Add / update operator</button><button class="tool-btn hidden" id="stCancel" style="background:#888">Cancel edit</button><span class="fmsg" id="stMsg"></span></div>
+                <p class="hint-text" style="margin:6px 0 0">Muster rights also let the operator see the online sign-ins (name, mobile, e-mail, photo) of the <b>current meeting only</b> – give it only to trusted people.
+                The login code (fixed OTP) is set in Firebase → Authentication → Sign-in method → Phone → Phone numbers for testing; it can't be changed from here.</p>
                 <div class="table-scroll" style="margin-top:10px"><table><thead><tr><th>Mobile</th><th>Name</th><th>Allowed</th><th></th></tr></thead><tbody id="stBody"></tbody></table></div>
             </div>
         </div>
@@ -1151,7 +1156,7 @@
   //             meeting_staff/<+91…> {name, role} · meeting_entries/<code>__<flatKey> · meeting_ballots/<code>__<flatKey>
   //             meeting_dup_attempts (refused duplicates)
   // =====================================================================
-  const MD = { code: '', online: '', entries: new Map(), ballots: new Map(), dups: [], onlineSet: new Set(), names: {}, types: {}, units: [],
+  const MD = { muster: false, code: '', online: '', entries: new Map(), ballots: new Map(), dups: [], onlineSet: new Set(), names: {}, types: {}, units: [],
                myName: '', unsub: [], base: [] };
   const $d = id => document.getElementById(id);
   const myPhone = () => (auth.currentUser && auth.currentUser.phoneNumber) || '';
@@ -1258,9 +1263,11 @@
   async function startMeetingDay(staffDoc) {
       stopMeetingDay();
       MD.myName = staffDoc ? (staffDoc.name || '') : 'Admin';
+      MD.muster = ROLE === 'admin' || !!(staffDoc && staffDoc.muster);
       $d('subEntry').parentElement.querySelectorAll('.sub-btn').forEach(b => {
           const s = b.dataset.sub;
-          const hide = (s === 'subSetup' && ROLE !== 'admin') || (s === 'subEntry' && ROLE === 'ballot') || (s === 'subBallot' && ROLE === 'entry');
+          const hide = (s === 'subSetup' && ROLE !== 'admin') || (s === 'subEntry' && !['admin', 'entry', 'both'].includes(ROLE)) ||
+                       (s === 'subBallot' && !['admin', 'ballot', 'both'].includes(ROLE)) || (s === 'subMuster' && !MD.muster);
           b.classList.toggle('hidden', hide);
       });
       const first = [...document.querySelectorAll('.sub-btn')].find(b => !b.classList.contains('hidden'));
@@ -1285,8 +1292,9 @@
           refreshEntryInfo(); refreshBallotInfo(); renderDay(); },
           e => console.error('roster', e)));
       if (ROLE === 'admin') MD.base.push(onSnapshot(collection(db, 'meeting_staff'), sn => {
-          $d('stBody').innerHTML = sn.docs.map(d => { const x = d.data(); return `<tr><td>${esc(d.id)}</td><td>${esc(x.name || '')}</td><td>${esc({ entry: 'Entry Register', ballot: 'Ballot Delivery', both: 'Both' }[x.role] || x.role)}</td>
-              <td><button class="del-btn" onclick="mdRemoveStaff('${esc(d.id)}')">Remove</button></td></tr>`; }).join('') || '<tr><td colspan="4">No operators yet.</td></tr>';
+          MD.staff = Object.fromEntries(sn.docs.map(d => [d.id, d.data()]));
+          $d('stBody').innerHTML = sn.docs.map(d => { const x = d.data(); return `<tr><td>${esc(d.id)}</td><td>${esc(x.name || '')}</td><td>${esc(staffAllowed(x))}</td>
+              <td><button class="del-btn" style="color:#003366;border-color:#003366" onclick="mdEditStaff('${esc(d.id)}')">Edit</button> <button class="del-btn" onclick="mdRemoveStaff('${esc(d.id)}')">Remove</button></td></tr>`; }).join('') || '<tr><td colspan="4">No operators yet.</td></tr>';
       }, e => console.error('staff', e)));
   }
 
@@ -1304,7 +1312,7 @@
           MD.unsub.push(onSnapshot(q('meeting_entries'), sn => { MD.entries = new Map(sn.docs.map(d => [d.data().flatKey, { id: d.id, ...d.data() }])); refreshEntryInfo(); refreshBallotInfo(); renderDay(); }, e => console.error('entries', e)));
           MD.unsub.push(onSnapshot(q('meeting_ballots'), sn => { MD.ballots = new Map(sn.docs.map(d => [d.data().flatKey, { id: d.id, ...d.data() }])); refreshBallotInfo(); renderDay(); }, e => console.error('ballots', e)));
           MD.unsub.push(onSnapshot(q('meeting_dup_attempts'), sn => { MD.dups = sn.docs.map(d => d.data()).sort((a, b) => (b.ts ? b.ts.seconds : 9e9) - (a.ts ? a.ts.seconds : 9e9)); renderDay(); }, e => console.error('dups', e)));
-          if (ROLE === 'admin' && online) MD.unsub.push(onSnapshot(query(collection(db, 'registrations'), where('meetingCode', '==', online)),
+          if ((ROLE === 'admin' || MD.muster) && online) MD.unsub.push(onSnapshot(query(collection(db, 'registrations'), where('meetingCode', '==', online)),
               sn => {
                   const recs = new Map(), un = [], known = new Set(MD.units.map(u => flatKeyOf(u.building, u.flat)));
                   sn.docs.forEach(d => { const x = d.data(), k = onlineKey(x.buildingNumber, x.flatNumber), r = { name: x.name || '', ts: x.timestamp, b: x.buildingNumber || '', f: x.flatNumber || '' };
@@ -1600,11 +1608,20 @@
       btn.disabled = false;
   });
   function normPhone(v) { let d = String(v || '').replace(/\D/g, ''); if (d.length === 10) d = '91' + d; return /^91[6-9]\d{9}$/.test(d) ? '+' + d : ''; }
+  const staffAllowed = x => [x.role === 'entry' || x.role === 'both' ? 'Entry Register' : '', x.role === 'ballot' || x.role === 'both' ? 'Ballot Delivery' : '', x.muster ? 'Muster' : ''].filter(Boolean).join(' + ') || '—';
+  function stReset() { $d('stPhone').value = ''; $d('stName').value = ''; $d('stRole').selectedIndex = 0; $d('stPhone').readOnly = false; $d('stAdd').textContent = 'Add / update operator'; $d('stCancel').classList.add('hidden'); }
+  window.mdEditStaff = function (ph) {
+      const x = (MD.staff || {})[ph]; if (!x) return;
+      $d('stPhone').value = ph; $d('stPhone').readOnly = true; $d('stName').value = x.name || '';
+      $d('stRole').value = (x.role || 'entry') + '|' + (x.muster ? 1 : 0); if ($d('stRole').selectedIndex < 0) $d('stRole').selectedIndex = 0;
+      $d('stAdd').textContent = 'Save changes'; $d('stCancel').classList.remove('hidden'); setMsg('stMsg', 'Editing ' + ph + ' – change name / rights and press Save changes.', true); $d('stName').focus();
+  };
+  $d('stCancel').addEventListener('click', () => { stReset(); setMsg('stMsg', '', true); });
   $d('stAdd').addEventListener('click', async () => {
-      const ph = normPhone($d('stPhone').value), name = cleanName($d('stName').value), role = $d('stRole').value;
+      const ph = normPhone($d('stPhone').value), name = cleanName($d('stName').value), [role, mu] = $d('stRole').value.split('|'), muster = mu === '1';
       if (!ph) { setMsg('stMsg', 'Enter a valid Indian mobile number.'); return; }
       if (!name) { setMsg('stMsg', 'Enter the operator name.'); return; }
-      try { await setDoc(doc(db, 'meeting_staff', ph), { name, role, addedAt: serverTimestamp(), by: myPhone() }); setMsg('stMsg', `Saved ${ph} (${name}).`, true); $d('stPhone').value = ''; $d('stName').value = ''; }
+      try { await setDoc(doc(db, 'meeting_staff', ph), { name, role, muster, addedAt: serverTimestamp(), by: myPhone() }); setMsg('stMsg', `Saved ${ph} (${name}) – ${staffAllowed({ role, muster })}.`, true); stReset(); }
       catch (e) { setMsg('stMsg', 'Could not save: ' + (e.code || e.message)); }
   });
   window.mdRemoveStaff = async function (ph) {
