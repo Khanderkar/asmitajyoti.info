@@ -1088,7 +1088,7 @@ button.submit-btn:disabled:hover {
   import { getFirestore, collection, addDoc, Bytes } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const CONFIG = {
-      MEETING_CODE: "Asmita Jyoti - 29Oct2026 (Test)",
+      MEETING_CODE: "Test-31Oct2026",
       ZOOM_URL: "https://us06web.zoom.us/j/81684774229?pwd=0nUitZrD9iia2eZFvVfp3Qar8pYXaU.1",
       INITIAL_COLLAPSE_STATE: "No", // Case-insensitive: "YES" or "NO"
 
@@ -1108,7 +1108,7 @@ button.submit-btn:disabled:hover {
       }
   };
 
-  // Apply the initial checkbox state (non-module script handles the rest)
+  // Apply the initial checkbox state (non-module script handles the rest)Oct
   document.getElementById('faceIdToggle').checked = CONFIG.FACE_ID_DEFAULT_TICKED.toUpperCase() === "YES";
 
   const app = initializeApp(CONFIG.FIREBASE_KEYS);
