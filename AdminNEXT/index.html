@@ -218,7 +218,7 @@
 <div class="dashboard" id="dashboardContainer">
 
     <div class="admin-header">
-        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v31-Oct-2026y</span></h2>
+        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v31-Oct-2026z</span></h2>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
 
@@ -1360,7 +1360,7 @@
           MD.types = sn.exists() ? (sn.data().types || {}) : {};
           const n = Object.keys(MD.names).length, x = sn.exists() ? sn.data() : null, rb = $d('sRoster');
           rb.className = 'reginfo ' + (n ? 'ok' : 'bad');
-          rb.innerHTML = n ? `Member names published: <b>${n}</b> flats/shops · <b>${Object.values(MD.names).filter(v => / \(/.test(v)).length}</b> with associate/nominee · types: ${Object.keys(MD.types).length ? esc(Object.entries(Object.values(MD.types).reduce((m, t) => (m[t] = (m[t] || 0) + 1, m), {})).map(([t, c]) => t + ' ' + c).join(', ')) : '<b style="color:#b00">none – old roster, publish again</b>'}${x.publishedAt && x.publishedAt.toDate ? ' on ' + esc(x.publishedAt.toDate().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })) : ''}.`
+          rb.innerHTML = n ? `Member names published: <b>${n}</b> flats/shops | ${rosterBreakup()}${x.publishedAt && x.publishedAt.toDate ? ' · on ' + esc(x.publishedAt.toDate().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })) : ''}.`
                            : 'Member names are NOT published – operators will not see registered names. Press “Publish member names again”.';
           refreshEntryInfo(); refreshBallotInfo(); renderDay(); },
           e => console.error('roster', e)));
@@ -1592,6 +1592,14 @@
   function fillFlatList(bldId, listId) { const b = $d(bldId).value; $d(listId).innerHTML = MD.units.filter(u => u.building === b).map(u => `<option value="${esc(u.flat)}">`).join(''); }
   // SGBM list "Flat+Shop": the same member owns both – one attendance counts (warning only)
   const FLATSHOP = { 'SH-14': 'A2-63', 'A2-63': 'SH-14', 'SH-46': 'SH-22', 'SH-22': 'SH-46' };
+  const FS_DUP = ['SH-14', 'SH-46'];   // the shop entries of the Flat+Shop sheet (same owner already counted with the flat)
+  function rosterBreakup() {
+      const T = MD.types, c = { Member: 0, Associate: 0, Nomination: 0, Expired: 0 }; let dup = 0;
+      if (!Object.keys(T).length) return '<b style="color:#b00">member types missing – old roster, press “Publish member names again”</b>';
+      Object.keys(MD.names).forEach(k => { if (FS_DUP.includes(k)) { dup++; return; } const t = T[k] || 'Member'; c[t] = (c[t] || 0) + 1; });
+      const auth = c.Member + c.Associate + c.Nomination;
+      return `<b>${auth}</b> authorised members: Members ${c.Member}, Associate ${c.Associate}, Nomination ${c.Nomination} · Expired ${c.Expired} · Duplicate (flat + shop) ${dup} (ignore)`;
+  }
   const fsTag = k => FLATSHOP[k] ? `<span class="mtype" style="background:#b45309">Same owner as ${esc(unitOfKey(FLATSHOP[k]))} – one attendance only</span>` : '';
   const typeTag = k => fsTag(k) + (t =>  t && t !== 'Member' ? `<span class="mtype ${esc(t)}">${t === 'Associate' ? 'Associate member' : t === 'Expired' ? 'Expired member – check' : esc(t)}</span>` : '')(MD.types[k]);
   function regLine(k) { const n = MD.names[k]; return n ? `Registered: <b>${esc(nice(n)).replace(/\(([^)]*)\)/g, '<span class="assocName">($1)</span>')}</b>${typeTag(k)}` : (Object.keys(MD.names).length ? 'No registered name for this flat' : 'Registered names not published yet – the admin must press “Publish member names” in Setup'); }
