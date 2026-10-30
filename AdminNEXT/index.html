@@ -218,7 +218,7 @@
 <div class="dashboard" id="dashboardContainer">
 
     <div class="admin-header">
-        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v31-Oct-2026z</span></h2>
+        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v01-Nov-2026a</span></h2>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
 
@@ -436,6 +436,7 @@
                 </div>
                 <div class="chips" id="eChips"></div>
                 <div class="namematch" id="eMatch"></div>
+                <label class="bconfirm hidden" id="eFsRow" style="background:#fdecea"><input type="checkbox" id="eFsOk"> <span id="eFsTxt"></span></label>
                 <label class="bconfirm hidden" id="eNameOkRow"><input type="checkbox" id="eNameOk"> Name checked – the person is entitled to attend for this flat (save anyway).</label>
                 <div class="hint-text" style="margin:-4px 0 10px">At least 3 letters in total; initials are fine (e.g. <b>S</b> Balakrishnan, Tanuja <b>S</b>, a single name like Meena). Tap a registered name above to fill it in.</div>
                 <div class="factions"><button class="tool-btn big" id="eSubmit">Submit entry</button><span class="fmsg" id="eMsg"></span></div>
@@ -452,6 +453,7 @@
                     <label>Flat #<input id="bFlat" list="bFlatList" autocomplete="off" placeholder="e.g. 21"><datalist id="bFlatList"></datalist></label>
                 </div>
                 <div class="reginfo" id="bInfo">Select building and flat.</div>
+                <label class="bconfirm hidden" id="bFsRow" style="background:#fdecea"><input type="checkbox" id="bFsOk"> <span id="bFsTxt"></span></label>
                 <label class="bconfirm hidden" id="bConfirmRow"><input type="checkbox" id="bConfirm"> This flat is not in the Entry Register yet – the member is present and I confirm the ballot hand-over.</label>
                 <div class="factions"><button class="tool-btn big" id="bSubmit">Record ballot given</button><span class="fmsg" id="bMsg"></span></div>
             </div>
@@ -1613,17 +1615,28 @@
       if (!$d('eBld').value || !$d('eFlat').value.trim()) { box.textContent = 'Select building and flat.'; return; }
       if (!u) { box.className = 'reginfo bad'; box.textContent = 'No such flat in this building.'; return; }
       const k = flatKeyOf(u.building, u.flat), e = MD.entries.get(k);
+      $d('eFsRow').classList.add('hidden');
       if (e) { box.className = 'reginfo bad'; box.innerHTML = `${esc(u.unit)} is ALREADY ENTERED at ${esc(tIST(e.ts))} (Reg # ${esc(e.regNo)}, ${esc(e.fullName)}) by ${esc(shortBy(e.by, e.byName))}. Duplicate not allowed.`; return; }
       box.className = 'reginfo ok'; box.innerHTML = `${esc(u.unit)} · ${regLine(k)}`;
+      fsCheck('e', k, MD.entries, 'entered');
+  }
+  // Flat+Shop same owner: the other unit already used → warning + tick box (not a hard block)
+  function fsCheck(p, k, M, what) {
+      const o = FLATSHOP[k], x = o && M.get(o), row = $d(p + 'FsRow');
+      if (x) { $d(p + 'FsTxt').innerHTML = `Same owner ALREADY ${what} as <b>${esc(x.unit)}</b> at ${esc(tIST(x.ts))}${x.regNo ? ` (Reg ${esc(x.regNo)} · SR ${esc(x.srNo)})` : ''}. One attendance only – tick to continue anyway.`;
+               if (row.dataset.k !== k) { $d(p + 'FsOk').checked = false; row.dataset.k = k; } row.classList.remove('hidden'); }
+      else { row.classList.add('hidden'); $d(p + 'FsOk').checked = false; row.dataset.k = ''; }
+      return !!x;
   }
   function refreshBallotInfo() {
       const box = $d('bInfo'), u = resolveFlat($d('bBld').value, $d('bFlat').value);
-      box.className = 'reginfo'; $d('bConfirmRow').classList.add('hidden');
+      box.className = 'reginfo'; $d('bConfirmRow').classList.add('hidden'); $d('bFsRow').classList.add('hidden');
       if (!$d('bBld').value || !$d('bFlat').value.trim()) { box.textContent = 'Select building and flat.'; return; }
       if (!u) { box.className = 'reginfo bad'; box.textContent = 'No such flat in this building.'; return; }
       const k = flatKeyOf(u.building, u.flat), b = MD.ballots.get(k), e = MD.entries.get(k);
       if (b) { box.className = 'reginfo bad'; box.innerHTML = `Ballot for ${esc(u.unit)} was ALREADY GIVEN at ${esc(tIST(b.ts))} by ${esc(shortBy(b.by, b.byName))}. A second ballot is not allowed.`; return; }
-      if (!e) { box.className = 'reginfo'; box.innerHTML = `${esc(u.unit)} · ${regLine(k)}<br><span style="color:#b54708;font-weight:bold">Not in the Entry Register yet.</span>`; $d('bConfirmRow').classList.remove('hidden'); return; }
+      if (!e) { fsCheck('b', k, MD.ballots, 'given a ballot'); box.className = 'reginfo'; box.innerHTML = `${esc(u.unit)} · ${regLine(k)}<br><span style="color:#b54708;font-weight:bold">Not in the Entry Register yet.</span>`; $d('bConfirmRow').classList.remove('hidden'); return; }
+      fsCheck('b', k, MD.ballots, 'given a ballot');
       box.className = 'reginfo ok'; box.innerHTML = `${esc(u.unit)} · ${regLine(k)}<br>Entered at ${esc(tIST(e.ts))} – Reg # ${esc(e.regNo)} – ${esc(e.fullName)}`;
   }
   ['eBld', 'eFlat'].forEach(id => $d(id).addEventListener('input', () => { if (id === 'eBld') fillFlatList('eBld', 'eFlatList'); refreshEntryInfo(); }));
@@ -1656,6 +1669,7 @@
       // duplicate = same register book AND same serial number (one book can hold any number of entries)
       const used = [...MD.entries.values()].find(x => String(x.regNo).toUpperCase().replace(/\s+/g, '') === reg && String(x.srNo).replace(/\s+/g, '') === sr);
       if (used) { await logDup('entry', u, `Register ${reg} · SR ${sr} already used for ${used.unit}`, { regNo: reg, name: full }); setMsg('eMsg', `Register ${reg} · SR # ${sr} is already used for ${used.unit} – duplicate blocked.`); return; }
+      if (fsCheck('e', k, MD.entries, 'entered') && !$d('eFsOk').checked) { setMsg('eMsg', 'Same owner is already entered with the other unit – tick the red box to continue anyway.'); return; }
       if (MD.nameWarn && !$d('eNameOk').checked) { setMsg('eMsg', 'Name differs from the registered member – check, then tick the box to save anyway.'); $d('eNameOkRow').scrollIntoView({ block: 'center' }); return; }
       const btn = $d('eSubmit'); btn.disabled = true;
       try {
@@ -1679,6 +1693,7 @@
       const k = flatKeyOf(u.building, u.flat);
       if (MD.ballots.has(k)) { await logDup('ballot', u, 'Ballot already given'); setMsg('bMsg', `Ballot for ${u.unit} already given – blocked.`); return; }
       const entered = MD.entries.has(k);
+      if (fsCheck('b', k, MD.ballots, 'given a ballot') && !$d('bFsOk').checked) { setMsg('bMsg', 'Same owner already got a ballot with the other unit – tick the red box to continue anyway.'); return; }
       if (!entered && !$d('bConfirm').checked) { setMsg('bMsg', 'Not in the Entry Register – tick the confirmation box first.'); return; }
       const btn = $d('bSubmit'); btn.disabled = true;
       try {
