@@ -170,6 +170,17 @@
         .ms td.c.fk { font-size:17px; font-weight:900; line-height:1; }
         .ms td.c.fk.online { color:#1f63c2; } .ms td.c.fk.inperson { color:#1e7b34; } .ms td.c.fk.not { color:#d11a1a; }
         .ms-sym { font-weight:900; font-size:15px; }
+        .hdr-break { flex-basis:100%; height:0; }
+        #dayTab .header-left-group { gap:6px; row-gap:10px; }
+        #dayTab .header-left-group h2 { font-size:1.35rem; }
+        #dayTab .header-left-group > span:not(.hdr-break):not(.att-badge):not(.up-group) { font-size:0.78rem; padding:5px 9px; white-space:nowrap; }
+        .att-badge { background:#fff; color:#003366; font-size:1.15rem; font-weight:900; padding:8px 16px; border-radius:22px; border:3px solid #00c853; box-shadow:0 2px 5px rgba(0,0,0,.2); }
+        .att-badge .ip { color:#1e7b34; } .att-badge .ol { color:#1f63c2; } .att-badge .pc { background:#00c853; color:#fff; border-radius:14px; padding:1px 9px; margin-left:4px; }
+        .up-group { display:inline-flex; align-items:center; gap:6px; background:#fff; border:2px dashed #ffcc00; border-radius:22px; padding:4px 6px 4px 12px; }
+        .up-title { font-weight:bold; color:#003366; font-size:0.9rem; }
+        .up-b { font-weight:bold; font-size:0.9rem; padding:5px 11px; border-radius:16px; background:#fff; }
+        .up-b.on { color:#1f63c2; border:2px solid #3b8ff0; } .up-b.in { color:#1e7b34; border:2px solid #1e7b34; } .up-b.no { color:#d11a1a; border:2px solid #d11a1a; }
+        .hist { margin:4px 0 0 0; padding-left:16px; } .hist li { margin:1px 0; }
         .fu { margin-top:8px; padding-top:8px; border-top:1px solid #444; }
         .fu .fb { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
         .fu button { border:0; border-radius:16px; padding:7px 12px; font-weight:bold; font-size:0.85rem; cursor:pointer; color:#fff; }
@@ -204,7 +215,7 @@
 <div class="dashboard" id="dashboardContainer">
 
     <div class="admin-header">
-        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v30-Oct-2026s</span></h2>
+        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v30-Oct-2026v</span></h2>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
 
@@ -388,6 +399,11 @@
                 <span class="count-badge" id="dDup" title="Duplicate entries / ballots that were refused">Duplicates blocked: 0</span>
                 <span class="count-badge adm-only" id="dOnline" title="Flats that joined online with the online meeting code">Joined online: 0</span>
                 <span class="count-badge adm-only" id="dBoth" title="Flats present in the hall AND joined online">Online + hall: 0</span>
+                <span class="hdr-break"></span>
+                <span class="att-badge hidden" id="dAttend" title="In-person = flats in the Entry Register or given a ballot. Online = flats that joined online and did NOT come to the hall (no double counting). Total authorised members is set in Setup.">In-Person + Online: 0 + 0 = 0 of 861 (0%)</span>
+                <span class="up-group" title="Ground-staff follow-ups for flats that have NOT arrived / joined yet – not counted in the actual attendance above">
+                    <span class="up-title">Upcoming joinees</span>
+                    <span class="up-b on" id="dUpOn">Online: 0</span><span class="up-b in" id="dUpIn">In-person: 0</span><span class="up-b no" id="dUpNot">Not attending: 0</span></span>
             </div>
         </div>
         <div class="day-warn" id="dNoCode">No meeting is active yet. The Managing Committee sets it in <b>Setup</b>.</div>
@@ -477,6 +493,7 @@
                     <label>Meeting date<input type="date" id="sDate"></label>
                     <label class="span2">Meeting code (used for all entries &amp; ballots)<input id="sCode" placeholder="Asmita Jyoti - 01Nov2026"></label>
                     <label class="span2">Online meeting code (must be the SAME – use this on the home page)<input id="sOnline" readonly tabindex="-1" placeholder="same as the meeting code"></label>
+                    <label>Total authorised members (for %)<input id="sAuth" type="number" min="1" max="2000" value="861"></label>
                 </div>
                 <div class="factions"><button class="tool-btn big" id="sSave">Set as current meeting</button><button class="tool-btn" id="sPublish">Publish member names again</button><span class="fmsg" id="sMsg"></span></div>
                 <div class="reginfo" id="sRoster" style="margin-top:10px">Member names: checking…</div>
@@ -1195,7 +1212,7 @@
   //             meeting_staff/<+91…> {name, role} · meeting_entries/<code>__<flatKey> · meeting_ballots/<code>__<flatKey>
   //             meeting_dup_attempts (refused duplicates)
   // =====================================================================
-  const MD = { follow: new Map(), followAll: [], muster: false, view: [], code: '', online: '', entries: new Map(), ballots: new Map(), dups: [], onlineSet: new Set(), names: {}, types: {}, units: [],
+  const MD = { auth: 861, follow: new Map(), followAll: [], muster: false, view: [], code: '', online: '', entries: new Map(), ballots: new Map(), dups: [], onlineSet: new Set(), names: {}, types: {}, units: [],
                myName: '', unsub: [], base: [] };
   const $d = id => document.getElementById(id);
   const myPhone = () => (auth.currentUser && auth.currentUser.phoneNumber) || '';
@@ -1321,7 +1338,9 @@
       ['eBld', 'bBld'].forEach(id => { $d(id).innerHTML = '<option value="">Choose…</option>' + blds.map(b => `<option>${esc(b)}</option>`).join(''); });
       MD.base.push(onSnapshot(doc(db, 'meeting_config', 'current'), sn => {
           const c = sn.exists() ? sn.data() : {};
+          MD.auth = +c.authorised > 0 ? +c.authorised : 861; if (ROLE === 'admin' && document.activeElement !== $d('sAuth')) $d('sAuth').value = MD.auth;
           setMeetingCode(c.code || '', c.code || '');   // online code = meeting code
+          renderDay();
           if (ROLE === 'admin') { if (!$d('sCode').value) $d('sCode').value = c.code || ''; $d('sOnline').value = $d('sCode').value; }
       }, e => console.error('config', e)));
       MD.base.push(onSnapshot(doc(db, 'meeting_roster', 'current'), sn => {
@@ -1442,7 +1461,7 @@
           sw('#0b2a5b', '#fff', 'V', 'Voted <span style="font-weight:normal;color:#888">(logic to come)</span>') + sw('#fff', '#000', '', 'Not yet') +
           `<span class="ms-lg"><span class="ms-sym" style="color:#1f63c2">✓</span>Will join online</span><span class="ms-lg"><span class="ms-sym" style="color:#1e7b34">✓</span>Will attend in person</span><span class="ms-lg"><span class="ms-sym" style="color:#d11a1a">✗</span>Not attending</span>` +
           `<span class="ms-tot">${esc(MD.code || 'No meeting')} · Total ${T.n} · Attended ${att} (${T.n ? Math.round(att * 100 / T.n) : 0}%) · Present ${T.P} · Ballot ${T.B} · Online ${T.O} · Voted ${T.V} · Online + hall ${[...MD.onlineSet].filter(k => MD.entries.has(k) || MD.ballots.has(k)).length}</span>` +
-          (fc => `<span class="ms-tot" style="background:#5b2378">Follow-up (not arrived yet, ${esc(sel || 'shown buildings')}): ✓ online ${fc.online} · ✓ in person ${fc.inperson} · ✗ not attending ${fc.not}</span>`)(
+          (fc => `<span class="ms-tot" style="background:#5b2378">Upcoming joinees (${esc(sel || 'shown buildings')}): ✓ online ${fc.online} · ✓ in person ${fc.inperson} · ✗ not attending ${fc.not}</span>`)(
               [...MD.follow.values()].filter(f => !msState(f.flatKey).s && (show.includes(f.building))).reduce((m, f) => (m[f.response] = (m[f.response] || 0) + 1, m), { online: 0, inperson: 0, not: 0 }));
       $d('msUnmatched').closest('.table-scroll').previousElementSibling.classList.toggle('hidden', !MD.muster); $d('msUnmatched').closest('.table-scroll').classList.toggle('hidden', !MD.muster);
       $d('msUnmatched').innerHTML = (MD.onlineUnmatched || []).map(r => `<tr><td>${tIST(r.ts)}</td><td>${esc(r.b)}</td><td>${esc(r.f)}</td><td>${esc(r.name)}</td></tr>`).join('') || '<tr><td colspan="4">None.</td></tr>';
@@ -1464,8 +1483,14 @@
   function fuBlock(k) {
       const hist = MD.followAll.filter(r => r.flatKey === k), f = hist[hist.length - 1];
       let h = `<div class="fu"><b>Follow-up</b>: ${f ? `<span class="futag ${esc(f.response)}">${esc(FU[f.response])}</span> · ${esc(dIST(f.ts))} · ${esc(shortBy(f.by, f.byName))} (${esc(f.by)})` : 'none yet'}`;
-      if (hist.length > 1) h += `<br><span style="opacity:.75">Earlier: ${hist.slice(0, -1).reverse().map(r => `${esc(FU[r.response])} ${tIST(r.ts)} ${esc(shortBy(r.by, r.byName))}`).join(' · ')}</span>`;
-      if (canFollow(k)) h += `<div class="fb">${Object.keys(FU).map(r => `<button class="${r}${f && f.response === r ? ' cur' : ''}" onclick="msFollowUp('${r}')">${FU[r]}</button>`).join('')}</div>`;
+      const x = msState(k), sec = t => t && t.seconds ? t.seconds : 9e9, ev = [];
+      if (x.s && f) h = `<div class="fu"><b>Follow-up</b>: closed – member has ${x.s === 'O' ? 'joined online' : 'arrived'}`;
+      hist.forEach(r => ev.push([sec(r.ts), `${tIST(r.ts)} – told ground staff: <b>${esc(FU[r.response])}</b> (${esc(shortBy(r.by, r.byName))})`]));
+      if (x.e) ev.push([sec(x.e.ts), `${tIST(x.e.ts)} – <b>Joined in person</b> · Register ${esc(x.e.regNo)} · SR ${esc(x.e.srNo)} (${esc(shortBy(x.e.by, x.e.byName))})`]);
+      if (x.b) ev.push([sec(x.b.ts), `${tIST(x.b.ts)} – <b>Ballot given</b> (${esc(shortBy(x.b.by, x.b.byName))})`]);
+      (x.o || []).forEach(r => ev.push([sec(r.ts), `${tIST(r.ts)} – <b>Joined online</b> as ${esc(r.name)}`]));
+      if (ev.length) h += `<br><b>History</b><ul class="hist">${ev.sort((a, b) => a[0] - b[0]).map(e => `<li>${e[1]}</li>`).join('')}</ul>`;
+      if (canFollow(k) && !x.s) h += `<div class="fb">${Object.keys(FU).map(r => `<button class="${r}${f && f.response === r ? ' cur' : ''}" onclick="msFollowUp('${r}')">${FU[r]}</button>`).join('')}</div>`;
       return h + '</div>';
   }
   window.msFollowUp = async function (resp) {
@@ -1513,6 +1538,13 @@
       $d('dDup').textContent = `Duplicates blocked: ${MD.dups.length}`;
       $d('dOnline').textContent = `Joined online: ${O.size}`;
       $d('dBoth').textContent = `Online + hall: ${[...E.keys()].filter(k => O.has(k)).length}`;
+      // actual attendance vs authorised members: hall (entry or ballot) + online-only, no double counting
+      const hall = new Set([...E.keys(), ...B.keys()]), onl = [...O].filter(k => !hall.has(k)).length, tot = hall.size + onl;
+      $d('dAttend').classList.toggle('hidden', !MD.muster);
+      $d('dAttend').innerHTML = `In-Person + Online: <span class="ip">${hall.size}</span> + <span class="ol">${onl}</span> = ${tot} of ${MD.auth} <span class="pc">(${(tot * 100 / MD.auth).toFixed(1)}%)</span>`;
+      // upcoming = latest follow-up of flats that have NOT arrived / joined yet (kept apart from the actual counts)
+      const up = { online: 0, inperson: 0, not: 0 }; MD.follow.forEach((f, k) => { if (!msState(k).s && up[f.response] !== undefined) up[f.response]++; });
+      $d('dUpOn').textContent = `✓ Online: ${up.online}`; $d('dUpIn').textContent = `✓ In-person: ${up.inperson}`; $d('dUpNot').textContent = `✗ Not attending: ${up.not}`;
       // my recent entries / ballots
       const me = myPhone();
       const mine = (M) => [...M.values()].filter(x => x.by === me).sort((a, b) => (b.ts ? b.ts.seconds : 9e9) - (a.ts ? a.ts.seconds : 9e9)).slice(0, 8);
@@ -1666,7 +1698,7 @@
       if (!confirm(`Set the current meeting to:\n\n${code}\n\nAll operators will start entering into this meeting immediately.`)) return;
       const btn = $d('sSave'); btn.disabled = true;
       try {
-          await setDoc(doc(db, 'meeting_config', 'current'), { code, onlineCode: online, updatedAt: serverTimestamp(), by: myPhone(), uid: myUid() });
+          await setDoc(doc(db, 'meeting_config', 'current'), { code, onlineCode: online, authorised: Math.max(1, parseInt($d('sAuth').value, 10) || 861), updatedAt: serverTimestamp(), by: myPhone(), uid: myUid() });
           const note = await publishRoster(code);
           setMsg('sMsg', 'Current meeting: ' + code + (note ? ' – but member names NOT published: ' + note : ''), !note);
       } catch (e) { setMsg('sMsg', 'Could not save: ' + (e.code || e.message)); }
