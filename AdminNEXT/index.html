@@ -167,6 +167,9 @@
         .msl tr.oh td.sw { box-shadow:inset 0 -5px 0 #3b8ff0; }
         .msl tr.todo td { font-weight:bold; }
         .msl tr.sep td { background:#eef2f7; color:#003366; font-weight:bold; font-size:0.85rem; cursor:default; }
+        .ms td.c.fk { font-size:17px; font-weight:900; line-height:1; }
+        .ms td.c.fk.online { color:#1f63c2; } .ms td.c.fk.inperson { color:#1e7b34; } .ms td.c.fk.not { color:#d11a1a; }
+        .ms-sym { font-weight:900; font-size:15px; }
         .fu { margin-top:8px; padding-top:8px; border-top:1px solid #444; }
         .fu .fb { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
         .fu button { border:0; border-radius:16px; padding:7px 12px; font-weight:bold; font-size:0.85rem; cursor:pointer; color:#fff; }
@@ -201,7 +204,7 @@
 <div class="dashboard" id="dashboardContainer">
 
     <div class="admin-header">
-        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v29-Oct-2026r</span></h2>
+        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v30-Oct-2026s</span></h2>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
 
@@ -460,7 +463,7 @@
             <div class="ms-wrap"><div class="ms-card" id="msMain"></div><div class="ms-card" id="msShops"></div></div>
             <div id="msFollow" class="hidden">
                 <div class="table-scroll"><table class="msl"><thead><tr><th></th><th>Flat</th><th>Member</th><th>Status</th></tr></thead><tbody id="msFollowBody"></tbody></table></div></div>
-            <div class="hint-text" style="margin-top:8px">Letter = highest stage reached. Blue bottom strip = also joined online. Orange border = ballot given but no hall entry. Grey = flat number not in that building. Click a box to see the flat, member name and both entries (click outside or × to close).</div>
+            <div class="hint-text" style="margin-top:8px">Colour = highest stage reached. ✓ / ✗ on a white box = ground-staff follow-up for a flat that hasn't arrived yet. Blue bottom strip = also joined online. Orange border = ballot given but no hall entry. Grey = flat number not in that building. Click a box to see the flat, member name and both entries (click outside or × to close).</div>
             <h3 class="mini">Online registrations not matched to a flat</h3>
             <div class="table-scroll"><table><thead><tr><th>Time</th><th>Building</th><th>Flat</th><th>Name</th></tr></thead><tbody id="msUnmatched"></tbody></table></div>
         </div>
@@ -1397,7 +1400,8 @@
               const it = colKeys[c].find(x => x.n === r);
               if (!it) { h += `<td class="c na${g(c)}"></td>`; continue; }
               const x = msState(it.k);
-              h += `<td class="c ${x.s}${x.oh ? ' oh' : ''}${x.ne ? ' ne' : ''}${MS_SEL === it.k ? ' sel' : ''}${g(c)}" data-k="${esc(it.k)}"></td>`;
+              const f = !x.s && MD.follow.get(it.k), sym = f ? (f.response === 'not' ? '✗' : '✓') : '';   // follow-up answer on a not-yet flat
+              h += `<td class="c ${x.s}${x.oh ? ' oh' : ''}${x.ne ? ' ne' : ''}${f ? ' fk ' + esc(f.response) : ''}${MS_SEL === it.k ? ' sel' : ''}${g(c)}" data-k="${esc(it.k)}">${sym}</td>`;
           }
           h += '</tr>';
       }
@@ -1436,7 +1440,10 @@
       const sw = (bg, fg, l, t) => `<span class="ms-lg"><span class="ms-sw" style="background:${bg}"></span>${t}</span>`;
       $d('msLegend').innerHTML = sw('#b7e4b0', '#14501f', 'P', 'In person present') + sw('#1e7b34', '#fff', 'B', 'Ballot assigned') + sw('#3b8ff0', '#fff', 'O', 'Attended online') +
           sw('#0b2a5b', '#fff', 'V', 'Voted <span style="font-weight:normal;color:#888">(logic to come)</span>') + sw('#fff', '#000', '', 'Not yet') +
-          `<span class="ms-tot">${esc(MD.code || 'No meeting')} · Total ${T.n} · Attended ${att} (${T.n ? Math.round(att * 100 / T.n) : 0}%) · Present ${T.P} · Ballot ${T.B} · Online ${T.O} · Voted ${T.V} · Online + hall ${[...MD.onlineSet].filter(k => MD.entries.has(k) || MD.ballots.has(k)).length}</span>`;
+          `<span class="ms-lg"><span class="ms-sym" style="color:#1f63c2">✓</span>Will join online</span><span class="ms-lg"><span class="ms-sym" style="color:#1e7b34">✓</span>Will attend in person</span><span class="ms-lg"><span class="ms-sym" style="color:#d11a1a">✗</span>Not attending</span>` +
+          `<span class="ms-tot">${esc(MD.code || 'No meeting')} · Total ${T.n} · Attended ${att} (${T.n ? Math.round(att * 100 / T.n) : 0}%) · Present ${T.P} · Ballot ${T.B} · Online ${T.O} · Voted ${T.V} · Online + hall ${[...MD.onlineSet].filter(k => MD.entries.has(k) || MD.ballots.has(k)).length}</span>` +
+          (fc => `<span class="ms-tot" style="background:#5b2378">Follow-up (not arrived yet, ${esc(sel || 'shown buildings')}): ✓ online ${fc.online} · ✓ in person ${fc.inperson} · ✗ not attending ${fc.not}</span>`)(
+              [...MD.follow.values()].filter(f => !msState(f.flatKey).s && (show.includes(f.building))).reduce((m, f) => (m[f.response] = (m[f.response] || 0) + 1, m), { online: 0, inperson: 0, not: 0 }));
       $d('msUnmatched').closest('.table-scroll').previousElementSibling.classList.toggle('hidden', !MD.muster); $d('msUnmatched').closest('.table-scroll').classList.toggle('hidden', !MD.muster);
       $d('msUnmatched').innerHTML = (MD.onlineUnmatched || []).map(r => `<tr><td>${tIST(r.ts)}</td><td>${esc(r.b)}</td><td>${esc(r.f)}</td><td>${esc(r.name)}</td></tr>`).join('') || '<tr><td colspan="4">None.</td></tr>';
   }
