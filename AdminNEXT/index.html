@@ -173,6 +173,9 @@
         .fgrid.code4 { grid-template-columns: 160px minmax(200px,1.4fr) minmax(200px,1.4fr) 150px; align-items:end; }
         @media (max-width: 900px) { .fgrid.code4 { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 520px) { .fgrid.code4 { grid-template-columns: 1fr; } }
+        table.ereg td { font-size:0.95rem; } table.ereg td:first-child { font-weight:bold; text-align:center; width:80px; }
+        table.ereg tr.gap td { background:#fff4e5; color:#b45309; font-style:italic; text-align:left; }
+        table.ereg tr.dupsr td { background:#fde8e8; }
         .hdr-break { flex-basis:100%; height:0; }
         #dayTab .header-left-group { gap:6px; row-gap:10px; }
         #dayTab .header-left-group h2 { font-size:1.35rem; }
@@ -218,7 +221,7 @@
 <div class="dashboard" id="dashboardContainer">
 
     <div class="admin-header">
-        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v01-Nov-2026c</span></h2>
+        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v01-Nov-2026d</span></h2>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
 
@@ -416,6 +419,7 @@
             <button class="sub-btn" data-sub="subBallot">Ballot Delivery</button>
             <button class="sub-btn" data-sub="subList">Live list &amp; duplicates</button>
             <button class="sub-btn" data-sub="subMuster">Muster (hall + online)</button>
+            <button class="sub-btn" data-sub="subEReg">eRegister</button>
             <button class="sub-btn adm-only" data-sub="subSetup">Setup (meeting code &amp; staff)</button>
         </div>
 
@@ -477,6 +481,18 @@
             <div class="table-scroll"><table><thead><tr><th>Time</th><th>Type</th><th>Flat</th><th>Reg #</th><th>Name typed</th><th>Reason</th><th>By</th></tr></thead><tbody id="lDup"></tbody></table></div>
         </div>
 
+        <!-- eRegister: digital copy of each physical register book (Reg #) in SR order – to cross-check the paper registers -->
+        <div class="sub-panel" id="subEReg">
+            <div class="toolbar">
+                <label for="rgSel">Reg No</label><select id="rgSel"></select>
+                <span class="spacer"></span>
+                <button class="tool-btn" id="rgPrint">Print</button>
+                <button class="tool-btn yellow" id="rgExport">Export (CSV)</button>
+            </div>
+            <div class="reginfo" id="rgInfo">No entries yet.</div>
+            <div class="table-scroll"><table class="ereg"><thead><tr><th>SR #</th><th>Flat</th><th>Name (as entered)</th><th>Time</th><th>Entered by</th></tr></thead><tbody id="rgBody"></tbody></table></div>
+        </div>
+
         <!-- Muster (admin): every flat, hall entries + ballots + online registrations of the SAME meeting code -->
         <div class="sub-panel" id="subMuster">
             <div class="ms-tools"><label for="msBld" style="font-weight:bold;color:#003366">Building</label><select id="msBld"></select>
@@ -520,6 +536,7 @@
                         <label class="ck"><input type="checkbox" id="rEntry"> Entry Register</label>
                         <label class="ck"><input type="checkbox" id="rBallot"> Ballot Delivery</label>
                         <label class="ck"><input type="checkbox" id="rMuster"> Muster – all buildings (hall + online)</label>
+                        <label class="ck"><input type="checkbox" id="rEReg"> eRegister (view)</label>
                     </div>
                     <div class="rt">Field supporters – read-only live muster of their building(s) <label class="ck" style="margin-left:10px;font-weight:normal"><input type="checkbox" id="rViewAll"> tick all</label></div>
                     <div class="cks bl" id="rView"></div>
@@ -1334,11 +1351,12 @@
       stopMeetingDay();
       MD.myName = staffDoc ? (staffDoc.name || '') : 'Admin';
       MD.muster = ROLE === 'admin' || !!(staffDoc && staffDoc.muster);
+      MD.ereg = ROLE === 'admin' || !!(staffDoc && staffDoc.ereg);
       MD.view = MD.muster ? BORDER.slice() : ((staffDoc && staffDoc.view) || []).filter(b => BORDER.includes(b));
       $d('subEntry').parentElement.querySelectorAll('.sub-btn').forEach(b => {
           const s = b.dataset.sub;
           const hide = (s === 'subSetup' && ROLE !== 'admin') || (s === 'subEntry' && !['admin', 'entry', 'both'].includes(ROLE)) ||
-                       (s === 'subBallot' && !['admin', 'ballot', 'both'].includes(ROLE)) || (s === 'subMuster' && !MD.view.length) || (s === 'subList' && ROLE === 'none');
+                       (s === 'subBallot' && !['admin', 'ballot', 'both'].includes(ROLE)) || (s === 'subMuster' && !MD.view.length) || (s === 'subList' && ROLE === 'none') || (s === 'subEReg' && !MD.ereg);
           b.classList.toggle('hidden', hide);
       });
       const first = [...document.querySelectorAll('.sub-btn')].find(b => !b.classList.contains('hidden'));
@@ -1587,11 +1605,62 @@
           <td class="adm-only">${adm && r.e ? `<button class="del-btn" onclick="mdDelete('entry','${esc(r.e.id)}','${esc(r.unit)}')">Delete entry</button>` : ''}${adm && r.b ? `<button class="del-btn" onclick="mdDelete('ballot','${esc(r.b.id)}','${esc(r.unit)}')">Delete ballot</button>` : ''}</td></tr>`).join('')
           || `<tr><td colspan="10">${MD.code ? 'Nothing for this selection.' : 'No meeting active.'}</td></tr>`;
       if ($d('subMuster').classList.contains('active')) renderMuster();
+      if ($d('subEReg').classList.contains('active')) renderEReg();
       $d('lDup').innerHTML = MD.dups.map(x => `<tr><td>${tIST(x.ts)}</td><td>${x.kind === 'ballot' ? 'Ballot' : 'Entry'}</td><td><strong>${esc(x.unit)}</strong></td><td>${esc(x.regNo || '')}</td><td>${esc(x.name || '')}</td><td>${esc(x.reason || '')}</td><td>${esc(shortBy(x.by, x.byName))}</td></tr>`).join('') || '<tr><td colspan="7">None.</td></tr>';
   }
 
   // ---- forms ----
-  function showSub(id) { document.querySelectorAll('.sub-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === id)); document.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.id === id)); if (id === 'subMuster') renderMuster(); }
+  function showSub(id) { document.querySelectorAll('.sub-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === id)); document.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.id === id)); if (id === 'subMuster') renderMuster(); if (id === 'subEReg') renderEReg(); }
+  // ---- eRegister ----
+  const regKey = v => String(v || '').toUpperCase().replace(/\s+/g, '');
+  const regNum = v => { const n = parseInt(String(v || '').replace(/\D/g, ''), 10); return isNaN(n) ? 1e9 : n; };
+  const regSort = (a, b) => regNum(a) - regNum(b) || String(a).localeCompare(String(b));
+  function eregRows() {
+      const sel = $d('rgSel').value;
+      return [...MD.entries.values()].filter(e => regKey(e.regNo) === sel).sort((a, b) => regSort(a.srNo, b.srNo));
+  }
+  function renderEReg() {
+      const all = [...MD.entries.values()], regs = [...new Set(all.map(e => regKey(e.regNo)))].sort(regSort), cur = $d('rgSel').value;
+      $d('rgSel').innerHTML = regs.map(r => `<option value="${esc(r)}">${esc(r)} (${all.filter(e => regKey(e.regNo) === r).length} entries)</option>`).join('') || '<option value="">—</option>';
+      if (regs.includes(cur)) $d('rgSel').value = cur;
+      const rows = eregRows(); MD.eregRows = rows;
+      if (!rows.length) { $d('rgInfo').className = 'reginfo'; $d('rgInfo').textContent = MD.code ? 'No entries yet.' : 'No meeting active.'; $d('rgBody').innerHTML = ''; return; }
+      const cnt = {}; rows.forEach(e => { const s = String(e.srNo).trim(); cnt[s] = (cnt[s] || 0) + 1; });
+      const nums = rows.map(e => regNum(e.srNo)).filter(n => n < 1e9), lo = Math.min(...nums), hi = Math.max(...nums);
+      const have = new Set(nums), missing = []; for (let n = lo; n <= hi && missing.length < 500; n++) if (!have.has(n)) missing.push(n);
+      const dups = Object.keys(cnt).filter(k => cnt[k] > 1);
+      $d('rgInfo').className = 'reginfo ' + (missing.length || dups.length ? 'bad' : 'ok');
+      $d('rgInfo').innerHTML = `Reg No <b>${esc($d('rgSel').value)}</b> · <b>${rows.length}</b> entries · SR ${lo} to ${hi}` +
+          (missing.length ? ` · <b>SR # not in system:</b> ${missing.slice(0, 50).join(', ')}${missing.length > 50 ? ' …' : ''}` : ' · no gaps') +
+          (dups.length ? ` · <b>SR # used twice:</b> ${dups.map(esc).join(', ')}` : '');
+      let h = '', prev = null;
+      for (const e of rows) {
+          const n = regNum(e.srNo);
+          if (prev !== null && n < 1e9 && n - prev > 1) h += `<tr class="gap"><td colspan="5">SR ${prev + 1}${n - prev > 2 ? ' – ' + (n - 1) : ''} not in system – check the paper register</td></tr>`;
+          if (n < 1e9) prev = n;
+          h += `<tr class="${cnt[String(e.srNo).trim()] > 1 ? 'dupsr' : ''}"><td>${esc(e.srNo)}</td><td><strong>${esc(String(e.unit).replace('/', '-'))}</strong></td><td>${esc(e.fullName)}</td><td>${tIST(e.ts)}</td><td>${esc(shortBy(e.by, e.byName))}</td></tr>`;
+      }
+      $d('rgBody').innerHTML = h;
+  }
+  $d('rgSel').addEventListener('change', renderEReg);
+  $d('rgExport').addEventListener('click', () => {
+      const rows = MD.eregRows || []; if (!rows.length) { alert('Nothing to export.'); return; }
+      downloadCsv(`eRegister_${$d('rgSel').value}_${MD.code.replace(/[^A-Za-z0-9]+/g, '_')}_${today()}.csv`, [['reg_no', 'sr_no', 'flat', 'name_entered', 'time_ist', 'entered_by', 'entered_by_mobile'],
+          ...rows.map(e => [regKey(e.regNo), e.srNo, e.unit, e.fullName, tIST(e.ts), shortBy(e.by, e.byName), e.by])]);
+  });
+  $d('rgPrint').addEventListener('click', () => {
+      const rows = MD.eregRows || []; if (!rows.length) { alert('Nothing to print.'); return; }
+      const w = window.open('', '_blank'); if (!w) { alert('Allow pop-ups to print.'); return; }
+      w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>eRegister ${esc($d('rgSel').value)}</title><style>
+          body{font-family:Arial,sans-serif;margin:0;color:#000} h2{margin:0 0 4px} .s{font-size:12px;margin-bottom:8px}
+          table{width:100%;border-collapse:collapse;font-size:12px} th,td{border:1px solid #000;padding:5px 6px;text-align:left} th{background:#eee}
+          td:first-child{text-align:center;width:60px} @page{size:A4;margin:12mm}</style></head><body>
+          <h2>Asmita Jyoti CHS – eRegister, Reg No ${esc($d('rgSel').value)}</h2><div class="s">${esc(MD.code)} · printed ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} · ${rows.length} entries</div>
+          <table><thead><tr><th>SR #</th><th>Flat</th><th>Name (as entered)</th><th>Time</th></tr></thead><tbody>
+          ${rows.map(e => `<tr><td>${esc(e.srNo)}</td><td>${esc(String(e.unit).replace('/', '-'))}</td><td>${esc(e.fullName)}</td><td>${tIST(e.ts)}</td></tr>`).join('')}
+          </tbody></table></body></html>`);
+      w.document.close(); w.focus(); setTimeout(() => w.print(), 300);
+  });
   document.querySelectorAll('.sub-btn').forEach(b => b.addEventListener('click', () => showSub(b.dataset.sub)));
   function fillFlatList(bldId, listId) { const b = $d(bldId).value; $d(listId).innerHTML = MD.units.filter(u => u.building === b).map(u => `<option value="${esc(u.flat)}">`).join(''); }
   // SGBM list "Flat+Shop": the same member owns both – one attendance counts (warning only)
@@ -1803,13 +1872,13 @@
       btn.disabled = false;
   });
   function normPhone(v) { let d = String(v || '').replace(/\D/g, ''); if (d.length === 10) d = '91' + d; return /^91[6-9]\d{9}$/.test(d) ? '+' + d : ''; }
-  const staffAllowed = x => [x.role === 'entry' || x.role === 'both' ? 'Entry Register' : '', x.role === 'ballot' || x.role === 'both' ? 'Ballot Delivery' : '', x.muster ? 'Muster' : '',
+  const staffAllowed = x => [x.role === 'entry' || x.role === 'both' ? 'Entry Register' : '', x.role === 'ballot' || x.role === 'both' ? 'Ballot Delivery' : '', x.muster ? 'Muster' : '', x.ereg ? 'eRegister' : '',
       ...(x.muster ? [] : (x.view || []).map(b => 'ReadOnly-' + (b === 'Shops/Units' ? 'Shops' : b)))].filter(Boolean).join(' + ') || '—';
   $d('rView').innerHTML = BORDER.map(b => `<label class="ck"><input type="checkbox" class="rv" value="${esc(b)}"> ReadOnly-${b === 'Shops/Units' ? 'Shops/Units' : b}</label>`).join('');
   $d('rViewAll').addEventListener('change', () => document.querySelectorAll('.rv').forEach(c => c.checked = $d('rViewAll').checked));
   function setRights(x) {
       x = x || {}; $d('rEntry').checked = x.role === 'entry' || x.role === 'both'; $d('rBallot').checked = x.role === 'ballot' || x.role === 'both';
-      $d('rMuster').checked = !!x.muster; const v = x.view || []; document.querySelectorAll('.rv').forEach(c => c.checked = v.includes(c.value)); $d('rViewAll').checked = v.length === BORDER.length;
+      $d('rMuster').checked = !!x.muster; $d('rEReg').checked = !!x.ereg; const v = x.view || []; document.querySelectorAll('.rv').forEach(c => c.checked = v.includes(c.value)); $d('rViewAll').checked = v.length === BORDER.length;
   }
   function stReset() { $d('stPhone').value = ''; $d('stName').value = ''; setRights({}); $d('stPhone').readOnly = false; $d('stAdd').textContent = 'Add / update operator'; $d('stCancel').classList.add('hidden'); }
   setRights({});
@@ -1821,12 +1890,12 @@
   };
   $d('stCancel').addEventListener('click', () => { stReset(); setMsg('stMsg', '', true); });
   $d('stAdd').addEventListener('click', async () => {
-      const ph = normPhone($d('stPhone').value), name = cleanName($d('stName').value), en = $d('rEntry').checked, ba = $d('rBallot').checked, muster = $d('rMuster').checked;
+      const ph = normPhone($d('stPhone').value), name = cleanName($d('stName').value), en = $d('rEntry').checked, ba = $d('rBallot').checked, muster = $d('rMuster').checked, ereg = $d('rEReg').checked;
       const role = en && ba ? 'both' : en ? 'entry' : ba ? 'ballot' : 'none', view = [...document.querySelectorAll('.rv:checked')].map(c => c.value);
-      if (role === 'none' && !muster && !view.length) { setMsg('stMsg', 'Tick at least one right.'); return; }
+      if (role === 'none' && !muster && !ereg && !view.length) { setMsg('stMsg', 'Tick at least one right.'); return; }
       if (!ph) { setMsg('stMsg', 'Enter a valid Indian mobile number.'); return; }
       if (!name) { setMsg('stMsg', 'Enter the operator name.'); return; }
-      try { await setDoc(doc(db, 'meeting_staff', ph), { name, role, muster, view, addedAt: serverTimestamp(), by: myPhone(), uid: myUid() }); setMsg('stMsg', `Saved ${ph} (${name}) – ${staffAllowed({ role, muster, view })}.`, true); stReset(); }
+      try { await setDoc(doc(db, 'meeting_staff', ph), { name, role, muster, ereg, view, addedAt: serverTimestamp(), by: myPhone(), uid: myUid() }); setMsg('stMsg', `Saved ${ph} (${name}) – ${staffAllowed({ role, muster, ereg, view })}.`, true); stReset(); }
       catch (e) { setMsg('stMsg', 'Could not save: ' + (e.code || e.message)); }
   });
   window.mdRemoveStaff = async function (ph) {
