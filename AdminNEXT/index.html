@@ -218,7 +218,7 @@
 <div class="dashboard" id="dashboardContainer">
 
     <div class="admin-header">
-        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v31-Oct-2026w</span></h2>
+        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v31-Oct-2026y</span></h2>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
 
@@ -403,7 +403,7 @@
                 <span class="count-badge adm-only" id="dOnline" title="Flats that joined online with the online meeting code">Joined online: 0</span>
                 <span class="count-badge adm-only" id="dBoth" title="Flats present in the hall AND joined online">Online + hall: 0</span>
                 <span class="hdr-break"></span>
-                <span class="att-badge hidden" id="dAttend" title="In-person = flats in the Entry Register or given a ballot. Online = flats that joined online and did NOT come to the hall (no double counting). Total authorised members is set in Setup.">In-Person + Online: 0 + 0 = 0 of 861 (0%)</span>
+                <span class="att-badge hidden" id="dAttend" title="In-person = flats in the Entry Register or given a ballot. Online = flats that joined online and did NOT come to the hall (no double counting). Total authorised members is set in Setup.">In-Person + Online: 0 + 0 = 0 of 856 (0%)</span>
                 <span class="up-group" title="Ground-staff follow-ups for flats that have NOT arrived / joined yet – not counted in the actual attendance above">
                     <span class="up-title">Upcoming joinees</span>
                     <span class="up-b on" id="dUpOn">Online: 0</span><span class="up-b in" id="dUpIn">In-person: 0</span><span class="up-b no" id="dUpNot">Not attending: 0</span></span>
@@ -423,7 +423,7 @@
         <div class="sub-panel" id="subEntry">
             <div class="form-card">
                 <div class="fgrid">
-                    <label>Reg #<input id="eReg" inputmode="numeric" maxlength="12" autocomplete="off"></label>
+                    <label>Reg # (register book: 1, 2, D1…)<input id="eReg" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
                     <label>SR #<input id="eSr" inputmode="numeric" maxlength="12" autocomplete="off"></label>
                     <label>Building #<select id="eBld"></select></label>
                     <label>Flat #<input id="eFlat" list="eFlatList" autocomplete="off" placeholder="e.g. 21"><datalist id="eFlatList"></datalist></label>
@@ -436,6 +436,7 @@
                 </div>
                 <div class="chips" id="eChips"></div>
                 <div class="namematch" id="eMatch"></div>
+                <label class="bconfirm hidden" id="eNameOkRow"><input type="checkbox" id="eNameOk"> Name checked – the person is entitled to attend for this flat (save anyway).</label>
                 <div class="hint-text" style="margin:-4px 0 10px">At least 3 letters in total; initials are fine (e.g. <b>S</b> Balakrishnan, Tanuja <b>S</b>, a single name like Meena). Tap a registered name above to fill it in.</div>
                 <div class="factions"><button class="tool-btn big" id="eSubmit">Submit entry</button><span class="fmsg" id="eMsg"></span></div>
             </div>
@@ -496,7 +497,7 @@
                     <label>Meeting date<input type="date" id="sDate"></label>
                     <label>Meeting code (hall: entries, ballots, follow-ups)<input id="sCode" placeholder="Asmita Jyoti - 01Nov2026"></label>
                     <label>Online meeting code (as used on the home page)<input id="sOnline" placeholder="same as the meeting code"></label>
-                    <label>Total authorised members (for %)<input id="sAuth" type="number" min="1" max="2000" value="861"></label>
+                    <label>Total authorised members (for %)<input id="sAuth" type="number" min="1" max="2000" value="856" title="Authorised Members sheet of the SGBM 01-11-2026 list = 856 (745 own + 104 associated + 7 nomination). Changing it saves immediately."></label>
                 </div>
                 <div class="hint-text" id="sCodeWarn" style="margin:-4px 0 8px"></div>
                 <div class="factions"><button class="tool-btn big" id="sSave">Set as current meeting</button><button class="tool-btn" id="sPublish">Publish member names again</button><span class="fmsg" id="sMsg"></span></div>
@@ -1216,7 +1217,8 @@
   //             meeting_staff/<+91…> {name, role} · meeting_entries/<code>__<flatKey> · meeting_ballots/<code>__<flatKey>
   //             meeting_dup_attempts (refused duplicates)
   // =====================================================================
-  const MD = { auth: 861, follow: new Map(), followAll: [], muster: false, view: [], code: '', online: '', entries: new Map(), ballots: new Map(), dups: [], onlineSet: new Set(), names: {}, types: {}, units: [],
+  const AUTH_DEFAULT = 856;   // SGBM 01-11-2026 authorised list: 745 own + 104 associated + 7 nomination
+  const MD = { auth: AUTH_DEFAULT, follow: new Map(), followAll: [], muster: false, view: [], code: '', online: '', entries: new Map(), ballots: new Map(), dups: [], onlineSet: new Set(), names: {}, types: {}, units: [],
                myName: '', unsub: [], base: [] };
   const $d = id => document.getElementById(id);
   const myPhone = () => (auth.currentUser && auth.currentUser.phoneNumber) || '';
@@ -1305,6 +1307,9 @@
       const reg = u ? MD.names[flatKeyOf(u.building, u.flat)] : '';
       const m = reg ? nameMatch($d('eFirst').value, $d('eLast').value, reg) : '';
       box.className = 'namematch ' + (m === 'part' ? 'fam' : m); box.textContent = m ? (m === 'part' ? `${MATCH_TXT.part} “${LAST_HINT}”?` : MATCH_TXT[m]) : '';
+      const warn = m === 'bad' || m === 'fam'; MD.nameWarn = warn;
+      if ($d('eNameOkRow').classList.contains('hidden') === warn) $d('eNameOk').checked = false;
+      $d('eNameOkRow').classList.toggle('hidden', !warn);
   }
   const nice = n => String(n || '').replace(/\.(?=[A-Za-z])/g, '. ').replace(/\s*\/\s*/g, ' / ').replace(/\s+/g, ' ').trim()
       .toLowerCase().replace(/(^|[\s(/.&-])([a-z])/g, (m, a, c) => a + c.toUpperCase());
@@ -1342,7 +1347,10 @@
       ['eBld', 'bBld'].forEach(id => { $d(id).innerHTML = '<option value="">Choose…</option>' + blds.map(b => `<option>${esc(b)}</option>`).join(''); });
       MD.base.push(onSnapshot(doc(db, 'meeting_config', 'current'), sn => {
           const c = sn.exists() ? sn.data() : {};
-          MD.auth = +c.authorised > 0 ? +c.authorised : 861; if (ROLE === 'admin' && document.activeElement !== $d('sAuth')) $d('sAuth').value = MD.auth;
+          // central count: stored in meeting_config; the old automatic 861 is replaced by 856 unless an admin typed a number himself
+          if (ROLE === 'admin' && sn.exists() && !c.authorisedManual && +c.authorised !== AUTH_DEFAULT)
+              updateDoc(doc(db, 'meeting_config', 'current'), { authorised: AUTH_DEFAULT }).catch(e => console.error('auth', e));
+          MD.auth = !c.authorisedManual ? AUTH_DEFAULT : (+c.authorised > 0 ? +c.authorised : AUTH_DEFAULT); if (ROLE === 'admin' && document.activeElement !== $d('sAuth')) $d('sAuth').value = MD.auth;
           setMeetingCode(c.code || '', c.onlineCode || c.code || '');   // online sign-ins are matched on the online code
           renderDay();
           if (ROLE === 'admin' && !SETUP_DIRTY) { $d('sCode').value = c.code || ''; $d('sOnline').value = c.onlineCode || c.code || ''; ONLINE_TOUCHED = $d('sOnline').value !== $d('sCode').value; codeWarn(); }
@@ -1582,7 +1590,10 @@
   function showSub(id) { document.querySelectorAll('.sub-btn').forEach(b => b.classList.toggle('active', b.dataset.sub === id)); document.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.id === id)); if (id === 'subMuster') renderMuster(); }
   document.querySelectorAll('.sub-btn').forEach(b => b.addEventListener('click', () => showSub(b.dataset.sub)));
   function fillFlatList(bldId, listId) { const b = $d(bldId).value; $d(listId).innerHTML = MD.units.filter(u => u.building === b).map(u => `<option value="${esc(u.flat)}">`).join(''); }
-  const typeTag = k => { const t = MD.types[k]; return t && t !== 'Member' ? `<span class="mtype ${esc(t)}">${t === 'Associate' ? 'Associate member' : t === 'Expired' ? 'Expired member – check' : esc(t)}</span>` : ''; };
+  // SGBM list "Flat+Shop": the same member owns both – one attendance counts (warning only)
+  const FLATSHOP = { 'SH-14': 'A2-63', 'A2-63': 'SH-14', 'SH-46': 'SH-22', 'SH-22': 'SH-46' };
+  const fsTag = k => FLATSHOP[k] ? `<span class="mtype" style="background:#b45309">Same owner as ${esc(unitOfKey(FLATSHOP[k]))} – one attendance only</span>` : '';
+  const typeTag = k => fsTag(k) + (t =>  t && t !== 'Member' ? `<span class="mtype ${esc(t)}">${t === 'Associate' ? 'Associate member' : t === 'Expired' ? 'Expired member – check' : esc(t)}</span>` : '')(MD.types[k]);
   function regLine(k) { const n = MD.names[k]; return n ? `Registered: <b>${esc(nice(n)).replace(/\(([^)]*)\)/g, '<span class="assocName">($1)</span>')}</b>${typeTag(k)}` : (Object.keys(MD.names).length ? 'No registered name for this flat' : 'Registered names not published yet – the admin must press “Publish member names” in Setup'); }
 
   function refreshEntryInfo() {
@@ -1624,7 +1635,7 @@
 
   async function submitEntry() {
       if (!MD.code) { setMsg('eMsg', 'No meeting is active.'); return; }
-      const reg = $d('eReg').value.trim(), sr = $d('eSr').value.trim();
+      const reg = $d('eReg').value.trim().toUpperCase().replace(/\s+/g, ''), sr = $d('eSr').value.trim().replace(/\s+/g, '');
       const u = resolveFlat($d('eBld').value, $d('eFlat').value);
       const fn = titleWord($d('eFirst').value), ln = titleWord($d('eLast').value);
       if (!reg || !sr) { setMsg('eMsg', 'Enter Reg # and SR #.'); return; }
@@ -1634,14 +1645,16 @@
       if (lettersF + lettersL < 3) { setMsg('eMsg', 'The name needs at least 3 letters in total.'); return; }
       const k = flatKeyOf(u.building, u.flat), full = (fn + ' ' + ln).trim();
       if (MD.entries.has(k)) { await logDup('entry', u, `Flat already entered (Reg # ${MD.entries.get(k).regNo})`, { regNo: reg, name: full }); setMsg('eMsg', `${u.unit} is already entered – duplicate blocked.`); return; }
-      const used = [...MD.entries.values()].find(x => x.regNo === reg);
-      if (used) { await logDup('entry', u, `Reg # ${reg} already used for ${used.unit}`, { regNo: reg, name: full }); setMsg('eMsg', `Reg # ${reg} is already used for ${used.unit} – duplicate blocked.`); return; }
+      // duplicate = same register book AND same serial number (one book can hold any number of entries)
+      const used = [...MD.entries.values()].find(x => String(x.regNo).toUpperCase().replace(/\s+/g, '') === reg && String(x.srNo).replace(/\s+/g, '') === sr);
+      if (used) { await logDup('entry', u, `Register ${reg} · SR ${sr} already used for ${used.unit}`, { regNo: reg, name: full }); setMsg('eMsg', `Register ${reg} · SR # ${sr} is already used for ${used.unit} – duplicate blocked.`); return; }
+      if (MD.nameWarn && !$d('eNameOk').checked) { setMsg('eMsg', 'Name differs from the registered member – check, then tick the box to save anyway.'); $d('eNameOkRow').scrollIntoView({ block: 'center' }); return; }
       const btn = $d('eSubmit'); btn.disabled = true;
       try {
           await setDoc(doc(db, 'meeting_entries', MD.code + '__' + k), { code: MD.code, flatKey: k, building: u.building, flat: u.flat, unit: u.unit, regNo: reg, srNo: sr,
               firstName: fn, lastName: ln, fullName: full, registeredName: MD.names[k] || '', by: myPhone(), uid: myUid(), byName: MD.myName || '', ts: serverTimestamp() });
           setMsg('eMsg', `Saved: ${u.unit} – ${full}`, true);
-          $d('eReg').value = nextNo(reg); $d('eSr').value = nextNo(sr); $d('eFlat').value = ''; $d('eFirst').value = ''; $d('eLast').value = ''; $d('eFull').value = ''; $d('eMatch').textContent = ''; $d('eChips').innerHTML = '';
+          $d('eReg').value = reg; $d('eSr').value = nextNo(sr); $d('eNameOk').checked = false; $d('eNameOkRow').classList.add('hidden'); MD.nameWarn = false; $d('eFlat').value = ''; $d('eFirst').value = ''; $d('eLast').value = ''; $d('eFull').value = ''; $d('eMatch').textContent = ''; $d('eChips').innerHTML = '';
           refreshEntryInfo(); $d('eFlat').focus();
       } catch (e) {
           console.error(e);
@@ -1701,6 +1714,11 @@
       const a = $d('sCode').value.trim().replace(/\s+/g, ' '), b = $d('sOnline').value.trim().replace(/\s+/g, ' '), w = $d('sCodeWarn');
       w.innerHTML = a && b && a !== b ? '<b style="color:#b45309">⚠ Hall code and online code are different.</b> Hall data uses the first, online sign-ins are matched on the second – make sure the home page uses exactly the online code.' : '';
   }
+  $d('sAuth').addEventListener('change', async () => {
+      const n = Math.max(1, parseInt($d('sAuth').value, 10) || AUTH_DEFAULT);
+      try { await updateDoc(doc(db, 'meeting_config', 'current'), { authorised: n, authorisedManual: n !== AUTH_DEFAULT }); setMsg('sMsg', `Total authorised members saved: ${n}.`, true); }
+      catch (e) { setMsg('sMsg', 'Could not save the total: ' + (e.code || e.message) + ' (press “Set as current meeting” first).'); }
+  });
   $d('sCode').addEventListener('input', () => { SETUP_DIRTY = true; if (!ONLINE_TOUCHED) $d('sOnline').value = $d('sCode').value; codeWarn(); });
   $d('sOnline').addEventListener('input', () => { SETUP_DIRTY = true; ONLINE_TOUCHED = $d('sOnline').value.trim() !== '' && $d('sOnline').value !== $d('sCode').value; codeWarn(); });
   $d('sSave').addEventListener('click', async () => {
@@ -1709,7 +1727,7 @@
       if (!confirm(`Set the current meeting to:\n\nHall code:   ${code}\nOnline code: ${online}${online !== code ? '\n\n(the two codes are DIFFERENT)' : ''}\n\nAll operators will start entering into this meeting immediately.`)) return;
       const btn = $d('sSave'); btn.disabled = true;
       try {
-          await setDoc(doc(db, 'meeting_config', 'current'), { code, onlineCode: online, authorised: Math.max(1, parseInt($d('sAuth').value, 10) || 861), updatedAt: serverTimestamp(), by: myPhone(), uid: myUid() });
+          await setDoc(doc(db, 'meeting_config', 'current'), { code, onlineCode: online, authorised: Math.max(1, parseInt($d('sAuth').value, 10) || AUTH_DEFAULT), authorisedManual: (parseInt($d('sAuth').value, 10) || AUTH_DEFAULT) !== AUTH_DEFAULT, updatedAt: serverTimestamp(), by: myPhone(), uid: myUid() });
           const note = await publishRoster(code);
           SETUP_DIRTY = false;
           setMsg('sMsg', 'Current meeting: ' + code + (online !== code ? ' · online code: ' + online : '') + (note ? ' – but member names NOT published: ' + note : ''), !note);
