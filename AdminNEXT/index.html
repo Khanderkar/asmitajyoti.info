@@ -221,7 +221,7 @@
 <div class="dashboard" id="dashboardContainer">
 
     <div class="admin-header">
-        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v01-Nov-2026d</span></h2>
+        <h2 style="margin:0;">Asmita Jyoti – Admin <span style="font-size:0.75rem;font-weight:normal;opacity:0.75;">v01-Nov-2026e</span></h2>
         <button class="logout-btn" id="logoutBtn">Secure Sign Out</button>
     </div>
 
@@ -406,7 +406,7 @@
                 <span class="count-badge adm-only" id="dOnline" title="Flats that joined online with the online meeting code">Joined online: 0</span>
                 <span class="count-badge adm-only" id="dBoth" title="Flats present in the hall AND joined online">Online + hall: 0</span>
                 <span class="hdr-break"></span>
-                <span class="att-badge hidden" id="dAttend" title="In-person = flats in the Entry Register or given a ballot. Online = flats that joined online and did NOT come to the hall (no double counting). Total authorised members is set in Setup.">In-Person + Online: 0 + 0 = 0 of 856 (0%)</span>
+                <span class="att-badge hidden" id="dAttend" title="In-person = flats in the Entry Register or given a ballot. Online = flats that joined online and did NOT come to the hall (no double counting). Total authorised members is set in Setup.">In-Person + Online: 0 + 0 = 0 of 861 (0%)</span>
                 <span class="up-group" title="Ground-staff follow-ups for flats that have NOT arrived / joined yet – not counted in the actual attendance above">
                     <span class="up-title">Upcoming joinees</span>
                     <span class="up-b on" id="dUpOn">Online: 0</span><span class="up-b in" id="dUpIn">In-person: 0</span><span class="up-b no" id="dUpNot">Not attending: 0</span></span>
@@ -517,7 +517,7 @@
                     <label>Meeting date<input type="date" id="sDate"></label>
                     <label>Meeting code (hall: entries, ballots, follow-ups)<input id="sCode" placeholder="Asmita Jyoti - 01Nov2026"></label>
                     <label>Online meeting code (as used on the home page)<input id="sOnline" placeholder="same as the meeting code"></label>
-                    <label>Total authorised members (for %)<input id="sAuth" type="number" min="1" max="2000" value="856" title="Authorised Members sheet of the SGBM 01-11-2026 list = 856 (745 own + 104 associated + 7 nomination). Changing it saves immediately."></label>
+                    <label>Total authorised members (for %)<input id="sAuth" type="number" min="1" max="2000" value="861" title="Authorised Members sheet of the SGBM 01-11-2026 list (update 1) = 861 (735 own + 117 associated + 9 nomination). Changing it saves immediately."></label>
                 </div>
                 <div class="hint-text" id="sCodeWarn" style="margin:-4px 0 8px"></div>
                 <div class="factions"><button class="tool-btn big" id="sSave">Set as current meeting</button><button class="tool-btn" id="sPublish">Publish member names again</button><span class="fmsg" id="sMsg"></span></div>
@@ -1238,7 +1238,7 @@
   //             meeting_staff/<+91…> {name, role} · meeting_entries/<code>__<flatKey> · meeting_ballots/<code>__<flatKey>
   //             meeting_dup_attempts (refused duplicates)
   // =====================================================================
-  const AUTH_DEFAULT = 856;   // SGBM 01-11-2026 authorised list: 745 own + 104 associated + 7 nomination
+  const AUTH_DEFAULT = 861;   // SGBM 01-11-2026 authorised list (update 1): 735 own + 117 associated + 9 nomination
   const MD = { auth: AUTH_DEFAULT, follow: new Map(), followAll: [], muster: false, view: [], code: '', online: '', entries: new Map(), ballots: new Map(), dups: [], onlineSet: new Set(), names: {}, types: {}, units: [],
                myName: '', unsub: [], base: [] };
   const $d = id => document.getElementById(id);
@@ -1369,7 +1369,7 @@
       ['eBld', 'bBld'].forEach(id => { $d(id).innerHTML = '<option value="">Choose…</option>' + blds.map(b => `<option>${esc(b)}</option>`).join(''); });
       MD.base.push(onSnapshot(doc(db, 'meeting_config', 'current'), sn => {
           const c = sn.exists() ? sn.data() : {};
-          // central count: stored in meeting_config; the old automatic 861 is replaced by 856 unless an admin typed a number himself
+          // central count: stored in meeting_config; an automatic older value is replaced by AUTH_DEFAULT unless an admin typed a number himself
           if (ROLE === 'admin' && sn.exists() && !c.authorisedManual && +c.authorised !== AUTH_DEFAULT)
               updateDoc(doc(db, 'meeting_config', 'current'), { authorised: AUTH_DEFAULT }).catch(e => console.error('auth', e));
           MD.auth = !c.authorisedManual ? AUTH_DEFAULT : (+c.authorised > 0 ? +c.authorised : AUTH_DEFAULT); if (ROLE === 'admin' && document.activeElement !== $d('sAuth')) $d('sAuth').value = MD.auth;
