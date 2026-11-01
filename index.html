@@ -173,6 +173,43 @@ button.submit-btn:disabled:hover {
     background: #ffcc00;
 }
 
+.ao-consent {
+    max-width: 850px;
+    width: 100%;
+    margin: 0 0 15px;
+    padding: 12px 14px;
+    border: 2px solid #ffcc00;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.25);
+    text-align: left;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.ao-consent label {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    cursor: pointer;
+    white-space: normal;
+    font-weight: normal;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.ao-consent input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    padding: 0;
+    margin: 2px 0 0;
+    accent-color: #ffcc00;
+    cursor: pointer;
+}
+
+.ao-consent .ao-en { display: block; margin-bottom: 8px; }
+.ao-consent .ao-mr { display: block; color: #ffe680; }
+
 .join-hint {
     margin-top: 8px;
     font-size: 0.82rem;
@@ -956,8 +993,20 @@ button.submit-btn:disabled:hover {
                         Note : It is recommended that you download the Zoom app from the Apple App Store or Google Play Store and join the meeting through the Zoom app. Features such as participation in Poll and viewing Poll results are available only when joining through the Zoom app, not through a web browser.
                     </div>
 
+                    <!-- AO / Zoom waiting-room acknowledgement (must be ticked to enable Join meeting) -->
+                    <div class="ao-consent" id="aoConsentBox">
+                        <label for="aoConsent">
+                            <input type="checkbox" id="aoConsent" onchange="updateJoinState()">
+                            <span>
+                                <span class="ao-en">I am aware that this meeting will be conducted by an external vendor under the observation of the Administrative Officer (AO). I understand that I will be kept in the Zoom waiting room until my display name includes my complete name and flat number. I will also keep my identity proof handy and be prepared to show it on camera at the time of voting.</span>
+                                <span class="ao-mr" lang="mr">मला याची जाणीव आहे की ही सभा बाह्य एजन्सीमार्फत प्रशासकीय अधिकारी (AO) यांच्या देखरेखीखाली आयोजित केली जाणार आहे. माझ्या Zoom Display Name मध्ये माझे पूर्ण नाव आणि फ्लॅट क्रमांक नमूद असेपर्यंत मला Zoom Waiting Room मध्ये ठेवले जाईल, याची मला जाणीव आहे. तसेच, मतदानाच्या वेळी माझे ओळखपत्र जवळ ठेवून आवश्यकतेनुसार ते कॅमेऱ्यावर दाखवण्यास मी तयार आहे.</span>
+                            </span>
+                        </label>
+                    </div>
+
                     <button type="submit" class="submit-btn" id="joinBtn">Join meeting</button>
                     <div class="join-hint" id="joinHint" style="display:none;">Please fill mandatory information and attach your Face ID (or untick the Face ID box) to enable "Join meeting" button.</div>
+                    <div class="join-hint" id="aoHint" style="display:none;">Please tick the acknowledgement box above to enable "Join meeting". | पुढे जाण्यासाठी वरील चौकट निवडा.</div>
                 </div>
 
             </div>
@@ -1140,6 +1189,10 @@ button.submit-btn:disabled:hover {
           alert("Please attach your Face ID before joining the meeting.");
           return;
       }
+      if (!document.getElementById('aoConsent').checked) {
+          alert("Please tick the acknowledgement box above the Join meeting button.");
+          return;
+      }
 
       btn.innerText = "Connecting...";
       btn.disabled = true;
@@ -1214,9 +1267,12 @@ function updateJoinState() {
     const btn = document.getElementById('joinBtn');
     const hint = document.getElementById('joinHint');
     const needFace = ticked && !faceState.captured;
+    const aoBox = document.getElementById('aoConsent');
+    const needAo = !!aoBox && !aoBox.checked;
 
-    btn.disabled = needFace;
+    btn.disabled = needFace || needAo;
     hint.style.display = needFace ? 'block' : 'none';
+    document.getElementById('aoHint').style.display = needAo ? 'block' : 'none';
 
     // Face ID button is usable only while the box is ticked
     document.getElementById('faceIdBtn').disabled = !ticked;
